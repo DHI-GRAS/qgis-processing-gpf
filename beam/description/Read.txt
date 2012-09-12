@@ -1,0 +1,6 @@
+Read
+beam_Read
+Read N1 image
+I/O
+ParameterRaster|input|Name of input image|False
+OutputRaster|-out|Output Image

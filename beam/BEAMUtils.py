@@ -18,3 +18,7 @@ class BEAMUtils:
     @staticmethod
     def beamDescriptionPath():
         return os.path.join(os.path.dirname(__file__), "description")
+    
+    @staticmethod
+    def executeOtb(gpf, progress):
+        None

@@ -2,6 +2,7 @@ import os
 from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from sextante.core.GeoAlgorithm import GeoAlgorithm
 from sextante.parameters.ParameterTable import ParameterTable
 from sextante.parameters.ParameterMultipleInput import ParameterMultipleInput
@@ -56,6 +57,7 @@ class BEAMAlgorithm(GeoAlgorithm):
                 line = line.strip("\n").strip()
                 if line.startswith("Parameter"):
                     param = ParameterFactory.getFromString(line)
+                    self.addParameter(param)
                 else:
                     self.addOutput(OutputFactory.getFromString(line))
                 line = lines.readline().strip("\n").strip()
@@ -65,4 +67,28 @@ class BEAMAlgorithm(GeoAlgorithm):
         lines.close()
         
     def processAlgorithm(self, progress):
-        None
+        # create a GFP for execution with BEAM's GPT
+        graph = Element("graph", {'id':self.name+'_gpf'})
+        
+        version = SubElement(graph, "version")
+        version.text = "1.0"
+        
+        node = SubElement(graph, "node", {"id":self.name+'_node'})
+        operator = SubElement(node, "operator")
+        operator.text = self.name
+        
+        # !!!! source should come from the parameters
+        sources = SubElement(node, "sources")
+        
+        parametersNode = SubElement(node, "parameters")
+        for param in self.parameters:
+            if param.value == None:
+                continue
+            else:
+                # !!!! might have to have a list of parameters here and append to the end
+                parameter = SubElement(parametersNode, param.name)
+                parameter.text = param.value
+                
+        BEAMUtils.executeBeam(tostring(graph), progress)
+                
+        
