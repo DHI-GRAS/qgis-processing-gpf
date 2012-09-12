@@ -21,6 +21,7 @@ from sextante.algs.SextanteAlgorithmProvider import SextanteAlgorithmProvider
 from sextante.pymorph.PymorphAlgorithmProvider import PymorphAlgorithmProvider
 from sextante.mmqgisx.MMQGISXAlgorithmProvider import MMQGISXAlgorithmProvider
 from sextante.lidar.LidarToolsAlgorithmProvider import LidarToolsAlgorithmProvider
+from sextante.beam.BEAMAlgorithmProvider import BEAMAlgorithmProvider
 
 class Sextante:
 
@@ -93,6 +94,7 @@ class Sextante:
         Sextante.addProvider(SagaAlgorithmProvider())
         Sextante.addProvider(GrassAlgorithmProvider())
         Sextante.addProvider(ScriptAlgorithmProvider())
+        Sextante.addProvider(BEAMAlgorithmProvider())
         Sextante.modeler.initializeSettings();
         #and initialize
         SextanteLog.startLogging()
