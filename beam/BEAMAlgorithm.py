@@ -3,6 +3,7 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+from xml.dom import minidom
 from sextante.core.GeoAlgorithm import GeoAlgorithm
 from sextante.parameters.ParameterTable import ParameterTable
 from sextante.parameters.ParameterMultipleInput import ParameterMultipleInput
@@ -68,14 +69,14 @@ class BEAMAlgorithm(GeoAlgorithm):
         
     def processAlgorithm(self, progress):
         # create a GFP for execution with BEAM's GPT
-        graph = Element("graph", {'id':self.name+'_gpf'})
+        graph = Element("graph", {'id':self.appkey+'_gpf'})
         
         version = SubElement(graph, "version")
         version.text = "1.0"
         
-        node = SubElement(graph, "node", {"id":self.name+'_node'})
+        node = SubElement(graph, "node", {"id":self.appkey+'_node'})
         operator = SubElement(node, "operator")
-        operator.text = self.name
+        operator.text = self.appkey
         
         # !!!! source should come from the parameters
         sources = SubElement(node, "sources")
@@ -88,7 +89,15 @@ class BEAMAlgorithm(GeoAlgorithm):
                 # !!!! might have to have a list of parameters here and append to the end
                 parameter = SubElement(parametersNode, param.name)
                 parameter.text = param.value
-                
-        BEAMUtils.executeBeam(tostring(graph), progress)
+        
+        # log the GPF 
+        loglines = []
+        loglines.append("BEAM Graph")
+        loglines.append(tostring(graph))
+        SextanteLog.addToLog(SextanteLog.LOG_INFO, loglines)
+        
+        # Execute the GPF
+        # !!! should check that there is at least one output        
+        BEAMUtils.executeBeam(tostring(graph), (self.outputs[0]).value, progress)
                 
         
