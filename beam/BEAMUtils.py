@@ -21,7 +21,11 @@ class BEAMUtils:
         return os.path.join(os.path.dirname(__file__), "description")
     
     @staticmethod
-    def executeBeam(gpf, output, progress):
+    def beamDocPath():
+        return os.path.join(os.path.dirname(__file__), "doc")    
+    
+    @staticmethod
+    def executeBeam(gpf, output, sourceFiles, progress):
         loglines = []
         loglines.append("BEAM execution console output")
         
@@ -32,7 +36,7 @@ class BEAMUtils:
         gpfFile.close()  
         
         # execute the gpf
-        command = ''.join(["\"", BEAMUtils.beamPath(), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\""])
+        command = ''.join(["\"", BEAMUtils.beamPath(), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\" ", sourceFiles])
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         for line in iter(proc.readline, ""):
