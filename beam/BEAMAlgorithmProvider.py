@@ -6,6 +6,7 @@ from sextante.core.AlgorithmProvider import AlgorithmProvider
 from sextante.core.SextanteLog import SextanteLog
 from sextante.beam.BEAMUtils import BEAMUtils
 from sextante.beam.BEAMAlgorithm import BEAMAlgorithm
+from sextante.beam.MultinodeGPFCreator import MultinodeGPFCreator
 from sextante.core.SextanteUtils import SextanteUtils
 
 class BEAMAlgorithmProvider(AlgorithmProvider):
@@ -35,7 +36,8 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
                     else:
                         SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
                 except Exception,e:
-                    SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)  
+                    SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
+        self.preloadedAlgs.append(MultinodeGPFCreator())  
                     
     def getDescription(self):
         return "BEAM (Envisat image analysis)"
