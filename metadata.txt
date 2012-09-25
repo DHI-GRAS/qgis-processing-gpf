@@ -6,12 +6,12 @@
 # This file should be included when you package your plugin.
 
 [general]
-name=SEXTANTE
-description=SEXTANTE for QGIS
-version=1.0.7
+name=SEXTANTE BEAM Provider
+description=A plugin that adds BEAM GPT algorithms to SEXTANTE.
+version=0.1
 qgisMinimumVersion=1.0
-class_name=SextantePlugin
-website=www.sextantegis.com
+class_name=SextanteBeamPlugin
+website=www.qgis.org
 [author]
-name=Victor Olaya
-email=volayaf@gmail.com
+name=Rado Guzinski
+email=rag@geo.ku.dk
