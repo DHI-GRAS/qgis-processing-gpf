@@ -103,7 +103,7 @@ class BEAMAlgorithm(GeoAlgorithm):
                 continue
             else:
                 # add a source product
-                if isinstance(param, ParameterRaster):
+                if isinstance(param, ParameterRaster) and operator.text != "Read":
                     # if the source is a file, then add a "sourceProduct" element
                     if os.path.isfile(param.value):
                         source = SubElement(sources, param.name)
