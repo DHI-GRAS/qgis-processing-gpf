@@ -99,7 +99,7 @@ class BEAMAlgorithm(GeoAlgorithm):
         parametersNode = SubElement(node, "parameters")
         for param in self.parameters:
             # ignore parameters which should have no value unless set by user 
-            if param.value == None or param.value == BEAMAlgorithm.NOVALUEINT or param.value == BEAMAlgorithm.NOVALUEDOUBLE:
+            if param.value == None or param.value == "" or param.value == BEAMAlgorithm.NOVALUEINT or param.value == BEAMAlgorithm.NOVALUEDOUBLE:
                 continue
             else:
                 # add a source product
