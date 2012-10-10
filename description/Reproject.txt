@@ -16,6 +16,7 @@ ParameterBoolean|includeTiePointGrids|Whether tie-point grids should be included
 *ParameterNumber|tileSizeX|The tile size in X direction|0|None|-99999
 *ParameterNumber|tileSizeX|The tile size in Y direction|0|None|-99999
 *ParameterNumber|width|The width of the target product|0|None|-99999
+*ParameterNumber|height|The height of the target product|None|None|-99999
 *ParameterNumber|easting|The easting of the reference pixel|None|None|-99999.9
 *ParameterNumber|northing|The northing of the reference pixel|None|None|-99999.9
 *ParameterNumber|referencePixelX|The X-position of the reference pixel|None|None|-99999.9
@@ -23,4 +24,4 @@ ParameterBoolean|includeTiePointGrids|Whether tie-point grids should be included
 *ParameterNumber|orientation|The orientation of the output product (in degree)|-360|360|0.0
 *ParameterBoolean|orthorectify|Whether the source product should be orthorectified. (Not applicable to all products)|False
 *ParameterString|elevationModelName|The name of the elevation model for the orthorectification. If not given tie-point data is used|
-*ParameterNumber|height|The height of the target product|None|None|-99999
+

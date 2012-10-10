@@ -6,6 +6,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.dom import minidom
 from sextante.core.GeoAlgorithm import GeoAlgorithm
 from sextante.parameters.ParameterTable import ParameterTable
+from sextante.parameters.ParameterNumber import ParameterNumber
 from sextante.parameters.ParameterMultipleInput import ParameterMultipleInput
 from sextante.parameters.ParameterRaster import ParameterRaster
 from sextante.outputs.OutputRaster import OutputRaster
@@ -21,6 +22,8 @@ from sextante_beam.BEAMUtils import BEAMUtils
 from sextante.parameters.ParameterExtent import ParameterExtent
 
 class BEAMAlgorithm(GeoAlgorithm):
+
+    OUTPUT_EXTENT = "OUTPUT_EXTENT"
 
     NOVALUEINT = -99999
     NOVALUEDOUBLE = -99999.9
@@ -97,9 +100,34 @@ class BEAMAlgorithm(GeoAlgorithm):
         sources = SubElement(node, "sources")
         
         parametersNode = SubElement(node, "parameters")
+        
+        # first process the extent parameter by splitting it into four numeric parameters
+        for param in self.parameters:
+            if isinstance(param, ParameterExtent):
+                names = param.name.split(",")
+                values = param.value.split(",")
+                try:
+                    for i in range(4):
+                        # x parameter or y parameter
+                        if i == 0 or i == 2:
+                            value = float(values[i])
+                        # width or height parameter
+                        elif i == 1 or i ==3:
+                            value = float(values[i]) - float(values[i-1])
+                        else:
+                            raise GeoAlgorithmExecutionException("Too many arguments in extent")
+                        param = ParameterNumber(names[i], "", None, None, value)
+                        param.setValue(value)
+                        SextanteLog.addToLog(SextanteLog.LOG_INFO, param.name + " " + str(param.value))
+                        self.parameters.append(param)
+                except Exception,e:
+                    SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + self.descriptionFile + "\n" )
+                    raise e
+                break
+        
         for param in self.parameters:
             # ignore parameters which should have no value unless set by user 
-            if param.value == None or param.value == "" or param.value == BEAMAlgorithm.NOVALUEINT or param.value == BEAMAlgorithm.NOVALUEDOUBLE:
+            if param.value == None or param.value == "" or param.value == BEAMAlgorithm.NOVALUEINT or param.value == BEAMAlgorithm.NOVALUEDOUBLE or isinstance(param, ParameterExtent):
                 continue
             else:
                 # add a source product
@@ -145,7 +173,7 @@ class BEAMAlgorithm(GeoAlgorithm):
                         idx = int(param.value)
                         parameter.text = str(param.options[idx])
                     else:          
-                        parameter.text = param.value
+                        parameter.text = str(param.value)
         
         return graph
         
