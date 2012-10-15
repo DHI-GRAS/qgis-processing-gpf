@@ -1,0 +1,17 @@
+Subset
+beam_Subset
+Subset N1 image
+I/O
+ParameterRaster|sourceProduct|The product which will be subseted|False
+ParameterExtent|geoRegionExtent|Spatial extent |
+*ParameterString|geoRegion|The subset region in geographical coordinates using WKT-format, e.g. "POLYGON((<lon1> <lat1>, <lon2> <lat2>, ..., <lon1> <lat1>))"|
+ParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|1|None|1
+ParameterNumber|subSamplingY|The pixel sub-sampling step in Y (horizontal image direction)|1|None|1
+*ParameterBoolean|fullSwath|Forces the operator to extend the subset region to the full swath.|False
+ParameterString|tiePointGridNames|The comma-separated list of names of tie-point grids to be copied. If not given, all bands are copied.|
+ParameterString|bandNames|The comma-separated list of names of bands to be copied. If not given, all bands are copied.|
+*ParameterBoolean|copyMetadata|Whether to copy the metadata of the source product.|False
+OutputRaster|-out|Output Image
+
+NOTE:
+The geoRegionExtent parameter is there to allow the geoRegion to be either typed in or selected from extent on canvas. 

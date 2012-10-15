@@ -16,6 +16,7 @@ from sextante.parameters.ParameterSelection import ParameterSelection
 from sextante.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 from sextante.core.SextanteLog import SextanteLog
 from sextante.core.SextanteUtils import SextanteUtils
+from sextante.core.QGisLayers import QGisLayers
 from sextante.parameters.ParameterFactory import ParameterFactory
 from sextante.outputs.OutputFactory import OutputFactory
 from sextante_beam.BEAMUtils import BEAMUtils
@@ -101,33 +102,9 @@ class BEAMAlgorithm(GeoAlgorithm):
         
         parametersNode = SubElement(node, "parameters")
         
-        # first process the extent parameter by splitting it into four numeric parameters
-        for param in self.parameters:
-            if isinstance(param, ParameterExtent):
-                names = param.name.split(",")
-                values = param.value.split(",")
-                try:
-                    for i in range(4):
-                        # x parameter or y parameter
-                        if i == 0 or i == 2:
-                            value = float(values[i])
-                        # width or height parameter
-                        elif i == 1 or i ==3:
-                            value = float(values[i]) - float(values[i-1])
-                        else:
-                            raise GeoAlgorithmExecutionException("Too many arguments in extent")
-                        param = ParameterNumber(names[i], "", None, None, value)
-                        param.setValue(value)
-                        SextanteLog.addToLog(SextanteLog.LOG_INFO, param.name + " " + str(param.value))
-                        self.parameters.append(param)
-                except Exception,e:
-                    SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + self.descriptionFile + "\n" )
-                    raise e
-                break
-        
         for param in self.parameters:
             # ignore parameters which should have no value unless set by user 
-            if param.value == None or param.value == "" or param.value == BEAMAlgorithm.NOVALUEINT or param.value == BEAMAlgorithm.NOVALUEDOUBLE or isinstance(param, ParameterExtent):
+            if param.value == None or param.value == "" or param.value == BEAMAlgorithm.NOVALUEINT or param.value == BEAMAlgorithm.NOVALUEDOUBLE:
                 continue
             else:
                 # add a source product
@@ -151,7 +128,14 @@ class BEAMAlgorithm(GeoAlgorithm):
                     for tag in tagList:
                         # if this is the last tag or there are no nested tags create the parameter element
                         if tag == tagList[-1]:
-                            parameter = SubElement(parentElement, tag)
+                            # special treatment for geoRegionExtent parameter in Subset operator
+                            if tag == "geoRegionExtent":
+                                tag = "geoRegion"
+                            # there can be only one parameter element in each parent element 
+                            if len(parentElement.findall(tag)) > 0:
+                                parameter = parentElement.findall(tag)[0]
+                            else:
+                                parameter = SubElement(parentElement, tag)
                         # "!" means that a new element in the graph should be created as child of the parent element and set as a parent    
                         elif tag.startswith("!"):
                             parentElement = SubElement(parentElement, tag[1:])
@@ -172,6 +156,15 @@ class BEAMAlgorithm(GeoAlgorithm):
                     elif isinstance(param, ParameterSelection):
                         idx = int(param.value)
                         parameter.text = str(param.options[idx])
+                    # create at WKT polygon from the extent values, used in Subset Operator
+                    elif isinstance(param, ParameterExtent):
+                        values = param.value.split(",")
+                        parameter.text = "POLYGON(("
+                        parameter.text += values[0] + ' ' + values[2] +", "
+                        parameter.text += values[0] + ' ' + values[3] +", "
+                        parameter.text += values[1] + ' ' + values[3] +", "
+                        parameter.text += values[1] + ' ' + values[2] +", "
+                        parameter.text += values[0] + ' ' + values[2] +"))"
                     else:          
                         parameter.text = str(param.value)
         
