@@ -48,7 +48,7 @@ class BEAMAlgorithm(GeoAlgorithm):
         return newone
 
     def getIcon(self):
-        return  QIcon(os.path.dirname(__file__) + "/../images/beam.png")
+        return  QIcon(os.path.dirname(__file__) + "/images/beam.png")
     
     def helpFile(self):
         folder = BEAMUtils.beamDocPath()
