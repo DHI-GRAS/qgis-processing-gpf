@@ -18,7 +18,7 @@ class BEAMParametersPanel(ParametersPanel):
                 items.append((self.NOT_SELECTED, None))
             for layer in layers:
                 items.append((layer.name(), layer))
-            item = BEAMInputLayerSelectorPanel(items)
+            item = BEAMInputLayerSelectorPanel(items, self.parent)
         else:
             item = ParametersPanel.getWidgetFromParameter(self, param)
             
@@ -29,7 +29,8 @@ class BEAMParametersPanel(ParametersPanel):
 # to show band names            
 class BEAMInputLayerSelectorPanel(InputLayerSelectorPanel):
     
-    def __init__(self, options):
+    def __init__(self, options, parent):
+        self.parent = parent
         InputLayerSelectorPanel.__init__(self, options)
         self.bandsButton = QtGui.QPushButton()
         self.bandsButton.setText("Bands")
@@ -38,8 +39,8 @@ class BEAMInputLayerSelectorPanel(InputLayerSelectorPanel):
         
     def showBandsDialog(self):
         bands = BEAMUtils.getBeamBandNames(self.getFilePath())
-        dlg = BEAMBandsListDialog(bands, self.getFilePath())
-        dlg.exec_()
+        dlg = BEAMBandsListDialog(bands, self.getFilePath(), self.parent)
+        dlg.show()
         
     def getFilePath(self):
         obj = self.getValue()
@@ -51,11 +52,11 @@ class BEAMInputLayerSelectorPanel(InputLayerSelectorPanel):
 
 # Simple dialog displaying a list of bands            
 class BEAMBandsListDialog(QtGui.QDialog):
-    def __init__(self, bands, filename):
+    def __init__(self, bands, filename, parent):
         self.bands = bands
         self.filename = filename
-        QtGui.QDialog.__init__(self)
-        self.setWindowModality(1)
+        QtGui.QDialog.__init__(self, parent)
+        self.setWindowModality(0)
         self.setupUi()
 
     def setupUi(self):
