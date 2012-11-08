@@ -20,6 +20,7 @@ from sextante.core.QGisLayers import QGisLayers
 from sextante.parameters.ParameterFactory import ParameterFactory
 from sextante.outputs.OutputFactory import OutputFactory
 from sextante_beam.BEAMUtils import BEAMUtils
+from sextante_beam.BEAMParametersDialog import BEAMParametersDialog
 from sextante.parameters.ParameterExtent import ParameterExtent
 
 class BEAMAlgorithm(GeoAlgorithm):
@@ -56,6 +57,11 @@ class BEAMAlgorithm(GeoAlgorithm):
             helpfile = os.path.join( str(folder), self.appkey + ".html" )
             return helpfile
         return None
+    
+    # BEAM parameters dialog is the same as normal parameters dialog except
+    # it has a button next to raster inputs to show band names
+    def getCustomParametersDialog(self):
+        return BEAMParametersDialog(self)
     
     def defineCharacteristicsFromFile(self):
         lines = open(self.descriptionFile)

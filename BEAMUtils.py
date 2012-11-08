@@ -36,12 +36,31 @@ class BEAMUtils:
         gpfFile.close()  
         
         # execute the gpf
-        command = ''.join(["\"", BEAMUtils.beamPath(), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\" ", sourceFiles])
+        command = ''.join(["\"", BEAMUtils.beamPath(), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\" ", sourceFiles])
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         for line in iter(proc.readline, ""):
             loglines.append(line)
             
-           
         progress.setPercentage(100)
         SextanteLog.addToLog(SextanteLog.LOG_INFO, loglines)
+    
+    # Get the bands names by calling a java program that uses BEAM functionality 
+    @staticmethod
+    def getBeamBandNames(filename):
+        bands = []
+        bandDelim = "__band:"
+        if filename == None:
+            filename = ""
+        else:
+            filename = str(filename)    # in case it's a QString
+        
+        command = "\""+os.path.dirname(__file__)+os.sep+"sextante_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+BEAMUtils.beamPath()+os.sep+"\" "+"\""+filename+"\" "+bandDelim
+        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
+        for line in iter(proc.readline, ""):
+            if bandDelim in line:
+                bands.append(line[len(bandDelim):])
+                
+        return bands
+         
+            
