@@ -18,7 +18,7 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
 
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
-        SextanteConfig.addSetting(Setting(self.getDescription(), BEAMUtils.BEAM_FOLDER, "OTB command line tools folder", BEAMUtils. beamPath()))
+        SextanteConfig.addSetting(Setting(self.getDescription(), BEAMUtils.BEAM_FOLDER, "BEAM install directory", BEAMUtils. beamPath()))
 
     def unload(self):
         AlgorithmProvider.unload(self)

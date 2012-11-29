@@ -41,6 +41,7 @@ class BEAMUtils:
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         for line in iter(proc.readline, ""):
             loglines.append(line)
+            progress.setConsoleInfo(line)
             
         progress.setPercentage(100)
         SextanteLog.addToLog(SextanteLog.LOG_INFO, loglines)
