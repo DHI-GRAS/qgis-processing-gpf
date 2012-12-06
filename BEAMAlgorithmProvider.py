@@ -37,7 +37,8 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
                         SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
                 except Exception,e:
                     SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
-        self.preloadedAlgs.append(MultinodeGPFCreator())  
+        # leave out for now as the functionality is not fully developed
+        #self.preloadedAlgs.append(MultinodeGPFCreator())  
                     
     def getDescription(self):
         return "BEAM (Envisat image analysis)"

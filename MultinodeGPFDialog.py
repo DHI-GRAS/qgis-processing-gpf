@@ -253,14 +253,14 @@ class MultinodeGPFDialog(ParametersDialog):
             # create a tab for this algorithm
             algDialog = ParametersDialog(alg)
             # add previous alg nodes to the drop down lists for raster selection panels
-            panelList = algDialog.ui.paramTable.findChildren(InputLayerSelectorPanel)
+            panelList = algDialog.paramTable.findChildren(InputLayerSelectorPanel)
             for panel in panelList:
                 comboBox = panel.text
                 for algorithm in self.algList:
                     comboBox.addItem(algorithm.nodeID, algorithm.nodeID)            
-            algDialog.ui.buttonBox.hide()
-            algDialog.ui.progress.hide()
-            algDialog.ui.progress = self.progress
+            algDialog.buttonBox.hide()
+            algDialog.progress.hide()
+            algDialog.progress = self.progress
             self.canvasTabWidget.addTab(algDialog, alg.appkey)
             
             # add this alg to the list 
