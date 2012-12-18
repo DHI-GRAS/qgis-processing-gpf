@@ -27,8 +27,8 @@ class BEAMAlgorithm(GeoAlgorithm):
 
     OUTPUT_EXTENT = "OUTPUT_EXTENT"
 
-    NOVALUEINT = -99999
-    NOVALUEDOUBLE = -99999.9
+    NOVALUEINT = 99999
+    NOVALUEDOUBLE = 99999.9
 
     # static nodeIDNum, increased everytime an algorithm is created
     nodeIDNum = 0;
