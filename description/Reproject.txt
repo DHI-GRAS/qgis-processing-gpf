@@ -1,6 +1,6 @@
 Reproject
 beam_Reproject
-Reproject N1 image
+Reproject image
 I/O
 ParameterRaster|sourceProduct|The product which will be reprojected|False
 ParameterCrs|crs|CRS of the required projection|

@@ -1,6 +1,6 @@
 Subset
 beam_Subset
-Subset N1 image
+Subset image
 I/O
 ParameterRaster|sourceProduct|The product which will be subseted|False
 ParameterExtent|geoRegionExtent|Spatial extent |
