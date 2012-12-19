@@ -16,7 +16,7 @@ from sextante.gui.ParametersDialog import ParametersDialog
 from sextante.gui.ParametersPanel import ParametersPanel
 from sextante.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
 from sextante.core.SextanteUtils import SextanteUtils
-from sextante_beam.BEAMAlgorithm import BEAMAlgorithm
+from sextante_gpf.BEAMAlgorithm import BEAMAlgorithm
 from sextante.core.SextanteLog import SextanteLog
 
 class MultinodeGPFDialog(ParametersDialog):

@@ -1,0 +1,8 @@
+Multi-Temporal-Speckle-Filter
+nest_Multi-Temporal-Speckle-Filter
+Apply Multi Temporal Speckle Filter
+I/O
+ParameterRaster|sourceProduct|The product which will be despeckled|False
+ParameterString|sourceBands|The list of source bands|
+ParameterSelection|windowSize|Window size|3x3;5x5;7x7;9x9;11x11
+OutputRaster|-out|Output Image

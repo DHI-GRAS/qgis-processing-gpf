@@ -5,11 +5,11 @@ from sextante.core.SextanteConfig import SextanteConfig, Setting
 from sextante.core.AlgorithmProvider import AlgorithmProvider
 from sextante.core.SextanteLog import SextanteLog
 from sextante_gpf.GPFUtils import GPFUtils
-from sextante_gpf.BEAMAlgorithm import BEAMAlgorithm
+from sextante_gpf.NESTAlgorithm import NESTAlgorithm
 from sextante_gpf.MultinodeGPFCreator import MultinodeGPFCreator
 from sextante.core.SextanteUtils import SextanteUtils
 
-class BEAMAlgorithmProvider(AlgorithmProvider):
+class NESTAlgorithmProvider(AlgorithmProvider):
 
     def __init__(self):
         AlgorithmProvider.__init__(self)
@@ -18,36 +18,36 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
 
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
-        SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_FOLDER, "BEAM install directory", GPFUtils.programPath(GPFUtils.beamKey())))
+        SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_FOLDER, "NEST install directory", GPFUtils.programPath(GPFUtils.nestKey())))
 
     def unload(self):
         AlgorithmProvider.unload(self)
-        SextanteConfig.removeSetting(GPFUtils.BEAM_FOLDER)
+        SextanteConfig.removeSetting(GPFUtils.NEST_FOLDER)
         
     def createAlgsList(self):
         self.preloadedAlgs = []
-        folder = GPFUtils.gpfDescriptionPath(GPFUtils.beamKey())
+        folder = GPFUtils.gpfDescriptionPath(GPFUtils.nestKey())
         for descriptionFile in os.listdir(folder):
             if descriptionFile.endswith("txt"):
                 try:
-                    alg = BEAMAlgorithm(os.path.join(folder, descriptionFile))
+                    alg = NESTAlgorithm(os.path.join(folder, descriptionFile))
                     if alg.name.strip() != "":
                         self.preloadedAlgs.append(alg)
                     else:
-                        SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
+                        SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open NEST algorithm: " + descriptionFile)
                 except Exception,e:
-                    SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
+                    SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open NEST algorithm: " + descriptionFile)
         # leave out for now as the functionality is not fully developed
         #self.preloadedAlgs.append(MultinodeGPFCreator())  
                     
     def getDescription(self):
-        return "BEAM (Envisat image analysis)"
+        return "NEST (SAR image analysis)"
 
     def getName(self):
-        return "beam"
+        return "nest"
 
     def getIcon(self):
-        return QIcon(os.path.dirname(__file__) + "/images/beam.png")
+        return QIcon(os.path.dirname(__file__) + "/images/nest.png")
 
     def _loadAlgorithms(self):
-        self.algs = self.preloadedAlgs  
+        self.algs = self.preloadedAlgs

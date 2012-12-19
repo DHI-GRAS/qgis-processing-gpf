@@ -1,8 +1,8 @@
-from sextante_beam.SextanteBeamPlugin import SextanteBeamPlugin 
+from sextante_gpf.SextanteGpfPlugin import SextanteGpfPlugin 
 def name():
-    return "SEXTANTE BEAM Provider"
+    return "SEXTANTE BEAM and NEST Provider"
 def description():
-    return "A plugin that adds BEAM GPT algorithms to SEXTANTE."
+    return "A plugin that adds BEAM and NEST GPF algorithms to SEXTANTE."
 def version():
     return "Version 0.1"
 def icon():
@@ -10,4 +10,4 @@ def icon():
 def qgisMinimumVersion():
     return "1.0"
 def classFactory(iface):
-    return SextanteBeamPlugin()
+    return SextanteGpfPlugin()

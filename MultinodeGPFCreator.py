@@ -8,7 +8,7 @@ from sextante.core.SextanteLog import SextanteLog
 from sextante.gui.RectangleMapTool import RectangleMapTool
 from sextante.core.SextanteConfig import SextanteConfig
 from sextante.core.GeoAlgorithm import GeoAlgorithm
-from sextante_beam.MultinodeGPFDialog import MultinodeGPFDialog
+from sextante_gpf.MultinodeGPFDialog import MultinodeGPFDialog
 
 class MultinodeGPFCreator(GeoAlgorithm):
         def __init__(self):

@@ -1,6 +1,6 @@
 from sextante.gui.AlgorithmExecutionDialog import AlgorithmExecutionDialog
 from sextante.gui.ParametersDialog import ParametersDialog
-from sextante_beam.BEAMParametersPanel import BEAMParametersPanel
+from sextante_gpf.BEAMParametersPanel import BEAMParametersPanel
 
 # BEAM parameters dialog is the same as normal parameters dialog except
 # it has a button next to raster inputs to show band names

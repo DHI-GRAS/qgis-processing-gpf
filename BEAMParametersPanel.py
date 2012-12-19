@@ -3,7 +3,7 @@ from sextante.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
 from sextante.core.QGisLayers import QGisLayers
 from qgis.core import QgsRasterLayer 
 from sextante.parameters.ParameterRaster import ParameterRaster
-from sextante_beam.BEAMUtils import BEAMUtils
+from sextante_gpf.GPFUtils import GPFUtils
 from PyQt4 import QtGui, QtCore
 import pyperclip
 
@@ -39,7 +39,7 @@ class BEAMInputLayerSelectorPanel(InputLayerSelectorPanel):
         self.horizontalLayout.addWidget(self.bandsButton)
         
     def showBandsDialog(self):
-        bands = BEAMUtils.getBeamBandNames(self.getFilePath())
+        bands = GPFUtils.getBeamBandNames(self.getFilePath())
         dlg = BEAMBandsListDialog(bands, self.getFilePath(), self.parent)
         dlg.show()
         

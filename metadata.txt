@@ -6,11 +6,11 @@
 # This file should be included when you package your plugin.
 
 [general]
-name=SEXTANTE BEAM Provider
-description=A plugin that adds BEAM GPT algorithms to SEXTANTE.
+name=SEXTANTE BEAM and NEST Provider
+description=A plugin that adds BEAM and NEST GPF algorithms to SEXTANTE.
 version=0.1
 qgisMinimumVersion=1.0
-class_name=SextanteBeamPlugin
+class_name=SextanteGpfPlugin
 website=www.grasdk.com
 [author]
 name=Rado Guzinski
