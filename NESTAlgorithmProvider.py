@@ -1,13 +1,10 @@
 import os
-from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from sextante.core.SextanteConfig import SextanteConfig, Setting
 from sextante.core.AlgorithmProvider import AlgorithmProvider
 from sextante.core.SextanteLog import SextanteLog
 from sextante_gpf.GPFUtils import GPFUtils
 from sextante_gpf.NESTAlgorithm import NESTAlgorithm
-from sextante_gpf.MultinodeGPFCreator import MultinodeGPFCreator
-from sextante.core.SextanteUtils import SextanteUtils
 
 class NESTAlgorithmProvider(AlgorithmProvider):
 

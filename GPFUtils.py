@@ -3,7 +3,6 @@ import tempfile
 import subprocess
 from sextante.core.SextanteConfig import SextanteConfig
 from sextante.core.SextanteLog import SextanteLog
-from sextante.core.SextanteUtils import SextanteUtils
 
 class GPFUtils:
     
@@ -70,8 +69,10 @@ class GPFUtils:
         # execute the gpf
         if key == GPFUtils.beamKey():
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\" ", sourceFiles])
+            #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", sourceFiles])
         elif key == GPFUtils.nestKey():
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\" ", sourceFiles])     
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\" ", "-q 8 ", sourceFiles])   
+            #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", "-q 8 ", sourceFiles])    
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         for line in iter(proc.readline, ""):

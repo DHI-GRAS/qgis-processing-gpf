@@ -1,22 +1,10 @@
 import os
-from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
-from xml.dom import minidom
+from xml.etree.ElementTree import Element, SubElement, tostring
 from sextante.core.GeoAlgorithm import GeoAlgorithm
-from sextante.parameters.ParameterTable import ParameterTable
-from sextante.parameters.ParameterNumber import ParameterNumber
-from sextante.parameters.ParameterMultipleInput import ParameterMultipleInput
 from sextante.parameters.ParameterRaster import ParameterRaster
-from sextante.outputs.OutputRaster import OutputRaster
-from sextante.parameters.ParameterVector import ParameterVector
 from sextante.parameters.ParameterBoolean import ParameterBoolean
 from sextante.parameters.ParameterSelection import ParameterSelection
-from sextante.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 from sextante.core.SextanteLog import SextanteLog
-from sextante.core.SextanteUtils import SextanteUtils
-from sextante.core.QGisLayers import QGisLayers
 from sextante.parameters.ParameterFactory import ParameterFactory
 from sextante.outputs.OutputFactory import OutputFactory
 from sextante_gpf.GPFUtils import GPFUtils
@@ -170,6 +158,32 @@ class GPFAlgorithm(GeoAlgorithm):
         
         return graph
     
+    def addWriteNode(self, graph):
+        # add write node
+        node = SubElement(graph, "node", {"id":self.nodeID+"_write"})
+        operator = SubElement(node, "operator")
+        operator.text = "Write"
+        
+        # add source
+        sources = SubElement(node, "sources")
+        source = SubElement(sources, "source")
+        source.text = self.nodeID
+    
+        # add some options
+        parametersNode = SubElement(node, "parameters")
+        parameter = SubElement(parametersNode, "clearCacheAfterRowWrite")
+        parameter.text = "False"
+        parameter = SubElement(parametersNode, "deleteOutputOnFailure")
+        parameter.text = "True"
+        parameter = SubElement(parametersNode, "writeEntireTileRows")
+        parameter.text = "True"
+        parameter = SubElement(parametersNode, "formatName")
+        parameter.text = "GeoTIFF"
+        parameter = SubElement(parametersNode, "file")
+        parameter.text = str((self.outputs[0]).value)
+        
+        return graph
+    
     def processAlgorithm(self, key, progress):
         # create a GFP for execution with BEAM's GPT
         graph = Element("graph", {'id':self.appkey+'_gpf'})
@@ -178,6 +192,8 @@ class GPFAlgorithm(GeoAlgorithm):
         
         # add node with this algorithm's operator
         graph = self.addGPFNode(graph)
+        # For now use command line option (in GPFUtils) to write output, not sure it this matters or not
+        #graph = self.addWriteNode(graph)
         
         # log the GPF 
         loglines = []

@@ -1,23 +1,10 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import QtCore, QtGui
-from sextante.modeler.ModelerParameterDefinitionDialog import ModelerParameterDefinitionDialog
-from sextante.modeler.ModelerAlgorithm import ModelerAlgorithm
-from sextante.modeler.ModelerParametersDialog import ModelerParametersDialog
 from sextante.modeler.ModelerUtils import ModelerUtils
-from sextante.modeler.WrongModelException import WrongModelException
-from sextante.modeler.ModelerScene import ModelerScene
-import copy
 from sextante.modeler.Providers import Providers
-from sextante.script.ScriptUtils import ScriptUtils
-from sextante.gui.HelpEditionDialog import HelpEditionDialog
-import pickle
 from sextante.gui.ParametersDialog import ParametersDialog
-from sextante.gui.ParametersPanel import ParametersPanel
 from sextante.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
-from sextante.core.SextanteUtils import SextanteUtils
-from sextante_gpf.BEAMAlgorithm import BEAMAlgorithm
-from sextante.core.SextanteLog import SextanteLog
 
 class MultinodeGPFDialog(ParametersDialog):
     def __init__(self, alg=None):

@@ -1,12 +1,5 @@
 import os
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from sextante.gui.ToolboxAction import ToolboxAction
-from sextante.core.QGisLayers import QGisLayers
-from sextante.core.SextanteLog import SextanteLog
-from sextante.gui.RectangleMapTool import RectangleMapTool
-from sextante.core.SextanteConfig import SextanteConfig
 from sextante.core.GeoAlgorithm import GeoAlgorithm
 from sextante_gpf.MultinodeGPFDialog import MultinodeGPFDialog
 
