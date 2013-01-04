@@ -1,9 +1,9 @@
 Speckle-Filter
 nest_Speckle-Filter
 Speckle Filter
-I/O
+Filters
 ParameterRaster|sourceProduct|The product which will be despeckled|False
-ParameterString|sourceBands|The list of source bands|
+ParameterString|!sourceBands>band|The list of source bands|
 ParameterSelection|filter|filter type|Mean;Median;Frost;Gamma Map;Lee;Refined Lee
 ParameterNumber|filterSizeX|The kernel X dimension|1|100|3
 ParameterNumber|filterSizeY|The kernel Y dimension|1|100|3

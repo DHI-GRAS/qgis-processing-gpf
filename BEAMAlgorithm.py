@@ -5,6 +5,10 @@ from sextante_gpf.GPFAlgorithm import GPFAlgorithm
 
 
 class BEAMAlgorithm(GPFAlgorithm):
+    
+    def __init__(self, descriptionfile):
+        GPFAlgorithm.__init__(self, descriptionfile)
+        self.programKey = GPFUtils.beamKey()
         
     def processAlgorithm(self, progress):
         GPFAlgorithm.processAlgorithm(self, GPFUtils.beamKey(), progress)

@@ -84,7 +84,7 @@ class GPFUtils:
     
     # Get the bands names by calling a java program that uses BEAM functionality 
     @staticmethod
-    def getBeamBandNames(filename):
+    def getBeamBandNames(filename, programKey, appendProductName = False):
         bands = []
         bandDelim = "__band:"
         if filename == None:
@@ -92,11 +92,14 @@ class GPFUtils:
         else:
             filename = str(filename)    # in case it's a QString
         
-        command = "\""+os.path.dirname(__file__)+os.sep+"sextante_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+GPFUtils.programPath(GPFUtils.beamKey())+os.sep+"\" "+"\""+filename+"\" "+bandDelim
+        command = "\""+os.path.dirname(__file__)+os.sep+"sextante_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+bandDelim+" "+str(appendProductName)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         for line in iter(proc.readline, ""):
             if bandDelim in line:
-                bands.append(line[len(bandDelim):])
+                line = line[len(bandDelim):].strip()
+                #if appendFilename:
+                #    line +="::"+os.path.basename(filename)
+                bands.append(line)
                 
         return bands
          

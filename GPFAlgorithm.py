@@ -1,4 +1,5 @@
 import os
+import re
 from xml.etree.ElementTree import Element, SubElement, tostring
 from sextante.core.GeoAlgorithm import GeoAlgorithm
 from sextante.parameters.ParameterRaster import ParameterRaster
@@ -23,11 +24,11 @@ class GPFAlgorithm(GeoAlgorithm):
 
     def __init__(self, descriptionfile):
         GeoAlgorithm.__init__(self)
+        self.multipleRasterInput = False
         self.descriptionFile = descriptionfile
         self.defineCharacteristicsFromFile()
         self.nodeID = ""+self.appkey+"_"+str(GPFAlgorithm.nodeIDNum)
         GPFAlgorithm.nodeIDNum +=1
-        self.numExportedLayers = 0
         self.sourceFiles = ""
         self.previousAlgInGraph = None
         
@@ -73,7 +74,6 @@ class GPFAlgorithm(GeoAlgorithm):
                 raise e
         lines.close()
     
-    
     def addGPFNode(self, graph):
         
         # if there are previous nodes that should be added to the graph, recursively go backwards and add them
@@ -81,7 +81,7 @@ class GPFAlgorithm(GeoAlgorithm):
             self.previousAlgInGraph.addGPFNode(graph)
 
         # now create and add the current node
-        node = SubElement(graph, "node", {"id":self.nodeID})
+        node = Element("node", {"id":self.nodeID})
         operator = SubElement(node, "operator")
         operator.text = self.appkey
         
@@ -99,9 +99,19 @@ class GPFAlgorithm(GeoAlgorithm):
                 if isinstance(param, ParameterRaster) and operator.text != "Read":
                     # if the source is a file, then add an external "source product" file
                     if os.path.isfile(param.value):
-                        source = SubElement(sources, param.name)
-                        source.text = "${"+param.name+"}"
-                        self.sourceFiles = self.sourceFiles +"".join("-S"+param.name+"=\"" + param.value + "\" ")
+                        # check if the file should be added individually or through the
+                        # ProductSet-Reader used sometimes by NEST
+                        match = re.match("^\d*ProductSet-Reader>(.*)",param.name)
+                        if match:
+                            paramName = match.group(1)
+                            productSetReaderNodeId = self.addProductSetReaderNode(graph, param.value)
+                            if sources.find(paramName) == None:
+                                source = SubElement(sources, paramName)
+                                source.set("refid",productSetReaderNodeId)
+                        else:
+                            source = SubElement(sources, param.name)
+                            source.text = "${"+param.name+"}"
+                            self.sourceFiles = self.sourceFiles +"".join("-S"+param.name+"=\"" + param.value + "\" ")
                     # else assume its a reference to a previous node and add a "source" element
                     else:
                         source = SubElement(sources, param.name)
@@ -156,8 +166,29 @@ class GPFAlgorithm(GeoAlgorithm):
                     else:          
                         parameter.text = str(param.value)
         
+        graph.append(node)
         return graph
-    
+        
+    def addProductSetReaderNode(self, graph, filename):
+        nodeID = self.nodeID+"_ProductSet-Reader"
+        node = graph.find(".//*[@id='"+nodeID+"']")
+        
+        # add ProductSet-Reader node if it doesn't exist yet   
+        if node == None:
+            node = SubElement(graph, "node", {"id":nodeID})
+            SubElement(node, "sources")
+            operator = SubElement(node, "operator")
+            operator.text = "ProductSet-Reader"
+            # add the file list
+            parametersNode = SubElement(node, "parameters")
+            parameter = SubElement(parametersNode, "fileList")
+            parameter.text=filename
+        # otherwise append filename to the node's fileList
+        else:
+            parameter = node.find(".//fileList")
+            parameter.text +=","+filename
+        return nodeID
+          
     def addWriteNode(self, graph):
         # add write node
         node = SubElement(graph, "node", {"id":self.nodeID+"_write"})

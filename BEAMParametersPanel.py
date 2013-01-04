@@ -19,7 +19,7 @@ class BEAMParametersPanel(ParametersPanel):
                 items.append((self.NOT_SELECTED, None))
             for layer in layers:
                 items.append((layer.name(), layer))
-            item = BEAMInputLayerSelectorPanel(items, self.parent)
+            item = BEAMInputLayerSelectorPanel(items, self.parent, self.alg.programKey, self.alg.multipleRasterInput)
         else:
             item = ParametersPanel.getWidgetFromParameter(self, param)
             
@@ -30,16 +30,18 @@ class BEAMParametersPanel(ParametersPanel):
 # to show band names            
 class BEAMInputLayerSelectorPanel(InputLayerSelectorPanel):
     
-    def __init__(self, options, parent):
+    def __init__(self, options, parent, programKey, appendProductName):
         self.parent = parent
         InputLayerSelectorPanel.__init__(self, options)
         self.bandsButton = QtGui.QPushButton()
         self.bandsButton.setText("Bands")
         self.bandsButton.clicked.connect(self.showBandsDialog)
         self.horizontalLayout.addWidget(self.bandsButton)
+        self.appendProductName = appendProductName
+        self.programKey = programKey
         
     def showBandsDialog(self):
-        bands = GPFUtils.getBeamBandNames(self.getFilePath())
+        bands = GPFUtils.getBeamBandNames(self.getFilePath(), self.programKey, self.appendProductName)
         dlg = BEAMBandsListDialog(bands, self.getFilePath(), self.parent)
         dlg.show()
         
@@ -113,8 +115,9 @@ class BEAMBandsListDialog(QtGui.QDialog):
             if widget.isChecked(): 
                 selectedBands+=widget.text()
                 selectedBands+=","
-        if selectedBands[-1] == ",":
-            selectedBands = selectedBands[:-1]
+        if selectedBands:
+            if selectedBands[-1] == ",":
+                selectedBands = selectedBands[:-1]
         self.bandList.setText(selectedBands)
             
     def selectAll(self):

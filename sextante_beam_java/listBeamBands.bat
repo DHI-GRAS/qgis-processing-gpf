@@ -9,6 +9,6 @@ cd %CODE_HOME%
 -Xmx1024M ^
 -cp ^
 "%BEAM4_HOME%lib\*;^
-%BEAM4_HOME%modules\*;" listBeamBands %2 %3
+%BEAM4_HOME%modules\*;" listBeamBands %2 %3 %4
 
 exit /B 0

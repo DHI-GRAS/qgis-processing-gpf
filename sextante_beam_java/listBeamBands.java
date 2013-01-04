@@ -15,13 +15,19 @@ class listBeamBands {
         	try{	
         		product = ProductIO.readProduct(args[0]);
         		String bandDelim;
+        		String appendProductName = "";
         		if (args.length >= 2)
         			bandDelim = args[1];
         		else
         			bandDelim = "";
+        		if (args.length >= 3)
+        			appendProductName = args[2];
         		Band[] bands = product.getBands();
                 for (Band band : bands) {
-                    System.out.println(bandDelim+band.getName());
+                	if (appendProductName.equals("True"))
+                		System.out.println(bandDelim+band.getName()+"::"+product.getName());
+                	else
+                		System.out.println(bandDelim+band.getName());
                 }
                 product.closeIO();
         	} catch (IOException e) {
