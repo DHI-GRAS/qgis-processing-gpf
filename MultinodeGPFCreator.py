@@ -8,8 +8,8 @@ class MultinodeGPFCreator(GeoAlgorithm):
             GeoAlgorithm.__init__(self)
             self.name="Create a multinode GPF"
             self.group="Miscellaneous"
-            self.appkey = "multiGPF"
-            self.cliName = "Multinode GPF creator"
+            self.operator = "multiGPF"
+            self.description = "Multinode GPF creator"
 
         def getCopy(self):
             newone = MultinodeGPFCreator()

@@ -27,7 +27,7 @@ class GPFAlgorithm(GeoAlgorithm):
         self.multipleRasterInput = False
         self.descriptionFile = descriptionfile
         self.defineCharacteristicsFromFile()
-        self.nodeID = ""+self.appkey+"_"+str(GPFAlgorithm.nodeIDNum)
+        self.nodeID = ""+self.operator+"_"+str(GPFAlgorithm.nodeIDNum)
         GPFAlgorithm.nodeIDNum +=1
         self.sourceFiles = ""
         self.previousAlgInGraph = None
@@ -35,7 +35,7 @@ class GPFAlgorithm(GeoAlgorithm):
     def helpFile(self, key):
         folder = GPFUtils.gpfDocPath(key)
         if str(folder).strip() != "":
-            helpfile = os.path.join( str(folder), self.appkey + ".html" )
+            helpfile = os.path.join( str(folder), self.operator + ".html" )
             return helpfile
         return None
     
@@ -49,9 +49,9 @@ class GPFAlgorithm(GeoAlgorithm):
     def defineCharacteristicsFromFile(self):
         lines = open(self.descriptionFile)
         line = lines.readline().strip("\n").strip()
-        self.appkey = line
+        self.operator = line
         line = lines.readline().strip("\n").strip()
-        self.cliName = line
+        self.description = line
         line = lines.readline().strip("\n").strip()
         self.name = line
         line = lines.readline().strip("\n").strip()
@@ -83,7 +83,7 @@ class GPFAlgorithm(GeoAlgorithm):
         # now create and add the current node
         node = Element("node", {"id":self.nodeID})
         operator = SubElement(node, "operator")
-        operator.text = self.appkey
+        operator.text = self.operator
         
         # sources are added in the parameters loop below
         sources = SubElement(node, "sources")
@@ -217,7 +217,7 @@ class GPFAlgorithm(GeoAlgorithm):
     
     def processAlgorithm(self, key, progress):
         # create a GFP for execution with BEAM's GPT
-        graph = Element("graph", {'id':self.appkey+'_gpf'})
+        graph = Element("graph", {'id':self.operator+'_gpf'})
         version = SubElement(graph, "version")
         version.text = "1.0"
         
@@ -237,5 +237,6 @@ class GPFAlgorithm(GeoAlgorithm):
         # !!! should check that there is at least one output        
         GPFUtils.executeGpf(key, tostring(graph), (self.outputs[0]).value, self.sourceFiles, progress)
         
-
+    def commandLineName(self):
+        return self.provider.getName().lower().replace(" ", "") + ":" + self.operator.lower().replace("-","")
                 
