@@ -1,0 +1,26 @@
+Meris.Case2Regional
+beam_Meris.Case2Regional
+Perform IOP retrieval
+Analysis - MERIS
+ParameterRaster|sourceProduct|MERIS L1b source product|False
+ParameterBoolean|doAtmosphericCorrection|Perform atmospheric correction|True
+*ParameterFile|atmoNetFile|The file of the atmospheric net to be used instead of the default neural net|False|True
+ParameterBoolean|doSmileCorrection|Perform SMILE correction|True
+ParameterBoolean|outputTosa|Output TOSA reflectances|False
+ParameterBoolean|outputReflec|Output water leaving reflectance|True
+ParameterSelection|outputReflecAs|Select if reflectances shall be written as radiances or irradiances. The irradiances are compatible with standard MERIS product|RADIANCE_REFLECTANCES;IRRADIANCE_REFLECTANCES|0
+ParameterBoolean|outputPath|Output water leaving path reflectance|True
+ParameterBoolean|outputTransmittance|output downwelling irradiance transmittance|False
+ParameterBoolean|outputNormReflec|Output normalised reflectances|False
+ParameterString|landExpression|The arithmetic expression used for land detection|toa_reflec_10 > toa_reflec_6 AND toa_reflec_13 > 0.0475
+ParameterString|cloudIceExpression|The arithmetic expression used for cloud/ice detection|toa_reflec_14 > 0.2
+*ParameterSelection|algorithm|The algorithm used for IOP computation|REGIONAL|0
+*ParameterNumber|tsmConversionExponent|Exponent for conversion from TSM to B_TSM|None|None|1.0
+*ParameterNumber|tsmConversionFactor|Factor for conversion from TSM to B_TSM|None|None|1.73
+*ParameterNumber|chlConversionExponent|Exponent for conversion from A_PIG to CHL_CONC|None|None|1.04
+*ParameterNumber|chlConversionFactor|Factor for conversion from A_PIG to CHL_CONC|None|None|21.0
+*ParameterNumber|spectrumOutOfScopeThreshold|Threshold to indicate Spectrum is Out of Scope|None|None|4.0
+*ParameterString|invalidPixelExpression|Expression defining pixels not considered for processing|agc_flags.INVALID
+*ParameterFile|inverseWaterNnFile|The file of the inverse water neural net to be used instead of the default|False|True
+*ParameterFile|forwardWaterNnFile|The file of the forward water neural net to be used instead of the default|False|True
+OutputRaster|-out|Output Image
