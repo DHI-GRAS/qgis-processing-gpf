@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 import subprocess
 from sextante.core.SextanteConfig import SextanteConfig
@@ -75,10 +76,18 @@ class GPFUtils:
             #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", "-q 8 ", sourceFiles])    
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
-        for line in iter(proc.readline, ""):
-            loglines.append(line)
-            progress.setConsoleInfo(line)
-            
+        line =""
+        for char in iter((lambda:proc.read(1)),''):
+            line += char
+            if "\n" in line:
+                loglines.append(line)
+                progress.setConsoleInfo(line)
+                line = ""
+            # show progress during NEST executions    
+            m = re.search("\.(\d{2,3})\%$", line)
+            if m:
+                progress.setPercentage(int(m.group(1)))
+                
         progress.setPercentage(100)
         SextanteLog.addToLog(SextanteLog.LOG_INFO, loglines)
     
