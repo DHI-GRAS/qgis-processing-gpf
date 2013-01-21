@@ -8,7 +8,9 @@ from sextante.core.SextanteLog import SextanteLog
 class GPFUtils:
     
     BEAM_FOLDER = "BEAM_FOLDER"
+    BEAM_THREADS = "BEAM_THREADS"
     NEST_FOLDER = "NEST_FOLDER"
+    NEST_THREADS = "NEST_THREADS"
     
     @staticmethod
     def beamKey():
@@ -69,10 +71,18 @@ class GPFUtils:
         
         # execute the gpf
         if key == GPFUtils.beamKey():
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\" ", sourceFiles])
+            try:
+                threads = int(float(SextanteConfig.getSetting(GPFUtils.BEAM_THREADS)))
+            except:
+                threads = 4
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])
             #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", sourceFiles])
         elif key == GPFUtils.nestKey():
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -t \"", output, "\" ", "-q 8 ", sourceFiles])   
+            try:
+                threads = int(float(SextanteConfig.getSetting(GPFUtils.NEST_THREADS)))
+            except:
+                threads = 4
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])   
             #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", "-q 8 ", sourceFiles])    
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout

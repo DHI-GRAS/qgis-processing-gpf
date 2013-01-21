@@ -16,10 +16,12 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
         SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_FOLDER, "BEAM install directory", GPFUtils.programPath(GPFUtils.beamKey())))
+        SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_THREADS, "Maximum number of parallel (native) threads", 4))
 
     def unload(self):
         AlgorithmProvider.unload(self)
         SextanteConfig.removeSetting(GPFUtils.BEAM_FOLDER)
+        SextanteConfig.removeSetting(GPFUtils.BEAM_THREADS)
         
     def createAlgsList(self):
         self.preloadedAlgs = []

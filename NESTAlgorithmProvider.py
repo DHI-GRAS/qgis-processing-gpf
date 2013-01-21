@@ -16,10 +16,12 @@ class NESTAlgorithmProvider(AlgorithmProvider):
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
         SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_FOLDER, "NEST install directory", GPFUtils.programPath(GPFUtils.nestKey())))
+        SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_THREADS, "Maximum number of parallel (native) threads", 4))
 
     def unload(self):
         AlgorithmProvider.unload(self)
         SextanteConfig.removeSetting(GPFUtils.NEST_FOLDER)
+        SextanteConfig.removeSetting(GPFUtils.NEST_THREADS)
         
     def createAlgsList(self):
         self.preloadedAlgs = []
