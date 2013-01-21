@@ -48,3 +48,6 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
 
     def _loadAlgorithms(self):
         self.algs = self.preloadedAlgs  
+        
+    def getSupportedOutputRasterLayerExtensions(self):
+        return ["tif", "dim"]
