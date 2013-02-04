@@ -92,7 +92,7 @@ class GPFAlgorithm(GeoAlgorithm):
         
         for param in self.parameters:
             # ignore parameters which should have no value unless set by user 
-            if param.value == None or param.value == "" or param.value == GPFAlgorithm.NOVALUEINT or param.value == GPFAlgorithm.NOVALUEDOUBLE:
+            if param.value == None or param.value == GPFAlgorithm.NOVALUEINT or param.value == GPFAlgorithm.NOVALUEDOUBLE:
                 continue
             else:
                 # add a source product
