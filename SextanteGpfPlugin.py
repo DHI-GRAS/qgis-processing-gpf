@@ -16,8 +16,8 @@ class SextanteGpfPlugin:
         self.NestProvider = NESTAlgorithmProvider()
         
     def initGui(self):
-        Sextante.addProvider(self.BeamProvider)
-        Sextante.addProvider(self.NestProvider)
+        Sextante.addProvider(self.BeamProvider, True)
+        Sextante.addProvider(self.NestProvider, True)
 
     def unload(self):
         Sextante.removeProvider(self.BeamProvider)
