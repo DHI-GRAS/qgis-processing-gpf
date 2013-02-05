@@ -11,7 +11,8 @@ ParameterSelection|demResamplingMethod|DEM resampling method|NEAREST_NEIGHBOUR;B
 ParameterSelection|imgResamplingMethod|Image resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION|1
 *ParameterNumber|pixelSpacingInDegree|The pixel spacing in degrees|0.0|None|99999.9
 *ParameterNumber|pixelSpacingInMeter|The pixel spacing in meters|0.0|None|99999.9
-ParameterCrs|mapProjection|Map projection|
+*ParameterCrs|mapProjection|Map projection|
+*ParameterBoolean|nodataValueAtSea|No data value at sea|True
 *ParameterBoolean|saveDEM|Save DEM|False
 *ParameterBoolean|saveLocalIncidenceAngle|Save local incidence angle|False
 *ParameterBoolean|saveProjectedLocalIncidenceAngle|Save projected local incidence angle|False
