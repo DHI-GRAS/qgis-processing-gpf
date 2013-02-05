@@ -21,17 +21,20 @@ class NESTAlgorithm(GPFAlgorithm):
         for parent in graph.findall(".//band/.."):
             for element in parent.findall("band"):
                 bands = element.text.split(',')
-                if len(bands) > 1:
-                    parent.remove(element)
-                    for band in bands:
+                parent.remove(element)
+                for band in bands:
+                    if len(band) > 0:
                         newElement = SubElement(parent, "band")
                         newElement.text = band
         for parent in graph.findall(".//mapProjection/.."):
             for element in parent.findall("mapProjection"):
                 crs = element.text
-                projection = QgsCoordinateReferenceSystem(int(crs), 2)
-                wkt = projection.toWkt()
-                element.text = str(wkt)
+                try:
+                    projection = QgsCoordinateReferenceSystem(int(crs), 2)
+                    wkt = projection.toWkt()
+                    element.text = str(wkt)
+                except:
+                    parent.remove(element)
                 
         
         return graph
