@@ -2,6 +2,7 @@ import os
 import re
 import tempfile
 import subprocess
+from decimal import Decimal 
 from sextante.core.SextanteConfig import SextanteConfig
 from sextante.core.SextanteLog import SextanteLog
 
@@ -121,5 +122,39 @@ class GPFUtils:
                 bands.append(line)
                 
         return bands
-         
+    
+    # Special functionality for NEST terrain-correction
+    # Get the SAR image pixel sizes by calling a java program that uses NEST functionality 
+    @staticmethod
+    def getNESTPixelSize(filename, programKey):
+        
+        # The value which NEST uses to convert resolution from meters to degrees
+        # As far as I can see it's independent of the geographical location and is used for
+        # both latitude and longitude
+        METERSPERDEGREE = Decimal(111319.4907932735600086975208)
+        
+        pixels = {}
+        delim = ":::"
+        if filename == None:
+            filename = ""
+        else:
+            filename = str(filename)    # in case it's a QString
+        
+        command = "\""+os.path.dirname(__file__)+os.sep+"sextante_nest_java"+os.sep+"getNESTPixelSizes.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+delim
+        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
+        for line in iter(proc.readline, ""):
+            SextanteLog.addToLog(SextanteLog.LOG_INFO, line)
+            if delim in line:
+                line = line.strip().split(delim)
+                if len(line)>=3:
+                    key = line[0]+" ("+line[2]+")"
+                    pixels[key] = line[1]
+                    if line[2] == "m":
+                        key = line[0]+" (deg)"
+                        pixels[key] = str(Decimal(line[1])/METERSPERDEGREE)
+                    elif line[2] == "deg":
+                        key = line[0]+" (m)"
+                        pixels[key] = str(Decimal(line[1])*METERSPERDEGREE)
+
+        return pixels
             

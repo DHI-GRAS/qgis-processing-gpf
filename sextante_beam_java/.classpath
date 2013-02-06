@@ -108,5 +108,7 @@
 	<classpathentry kind="lib" path="C:/Program Files/beam-4.10.3/modules/ceres-ui-0.13.1.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/beam-4.10.3/modules/flint-processor-1.2.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/beam-4.10.3/modules/seadas-reader-1.3-20120621-01.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/beam-4.10.3/modules/beam-meris-case2-regional-1.5.7.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/beam-4.10.3/modules/beam-spot-vgt-reader-1.2.2.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

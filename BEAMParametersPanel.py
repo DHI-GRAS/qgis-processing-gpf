@@ -1,8 +1,10 @@
 from sextante.gui.ParametersPanel import ParametersPanel
 from sextante.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
+from sextante.gui.NumberInputPanel import NumberInputPanel
 from sextante.core.QGisLayers import QGisLayers
 from qgis.core import QgsRasterLayer 
 from sextante.parameters.ParameterRaster import ParameterRaster
+from sextante.parameters.ParameterNumber import ParameterNumber
 from sextante_gpf.GPFUtils import GPFUtils
 from PyQt4 import QtGui, QtCore
 import pyperclip
@@ -20,10 +22,72 @@ class BEAMParametersPanel(ParametersPanel):
             for layer in layers:
                 items.append((layer.name(), layer))
             item = BEAMInputLayerSelectorPanel(items, self.parent, self.alg.programKey, self.alg.multipleRasterInput)
+        # special treatment for NEST Terrain-Correction to get pixel sizes from SAR image
+        elif isinstance(param, ParameterNumber) and (param.name == "pixelSpacingInMeter" or param.name == "pixelSpacingInDegree") and self.alg.commandLineName() == "nest:terraincorrection":
+            item = NESTPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
         else:
             item = ParametersPanel.getWidgetFromParameter(self, param)
             
         return item
+
+# Special functionality for NEST terrain-correction
+# NEST pixel size input panel is the same as normal number
+# input panel except that it has a button next to it
+# to show selected products pixel size.     
+class NESTPixelSizeInputPanel(NumberInputPanel):
+    
+    def __init__(self, default, isInteger, parent, programKey):
+        self.parent = parent
+        self.programKey = programKey
+        NumberInputPanel.__init__(self, default, isInteger)
+        self.metadataButton = QtGui.QPushButton()
+        self.metadataButton.setText("Pixel Size")
+        self.metadataButton.clicked.connect(self.showMetadataDialog)
+        self.horizontalLayout.addWidget(self.metadataButton)
+
+    def showMetadataDialog(self):
+        sourceProduct = self.parent.paramTable.valueItems["sourceProduct"].getFilePath()
+        pixelSizes = GPFUtils.getNESTPixelSize(sourceProduct, self.programKey)
+        dlg = NESTPixelSizeInputDialog(pixelSizes, sourceProduct, self.parent)
+        dlg.show()
+        
+# Simple dialog displaying SAR image pixel sizes           
+class NESTPixelSizeInputDialog(QtGui.QDialog): 
+    def __init__(self, pixelSizes, filename, parent):
+        self.pixelSizes = pixelSizes
+        self.filename = filename
+        QtGui.QDialog.__init__(self, parent)
+        self.setWindowModality(0)
+        self.setupUi()
+      
+    def setupUi(self):
+        self.resize(500, 180)
+        self.setWindowTitle("Pixel Sizes: "+str(self.filename))
+        self.verticalLayout = QtGui.QVBoxLayout(self)
+        self.horizontalLayout = QtGui.QHBoxLayout(self)
+        self.horizontalLayout.setSpacing(2)
+        self.horizontalLayout.setMargin(0)
+        self.table = QtGui.QTableWidget()
+        self.table.setColumnCount(1)
+        self.table.setColumnWidth(0,270)
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setVisible(False)
+        self.table.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.setTableContent()
+        self.horizontalLayout.addWidget(self.table)
+        self.setLayout(self.horizontalLayout)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+       
+    def setTableContent(self):
+        self.table.setRowCount(len(self.pixelSizes))
+        i=0
+        for k,v in self.pixelSizes.items():
+            item = QtGui.QLineEdit()
+            item.setReadOnly(True)
+            text = QtCore.QString(k).simplified() + ":\t\t" + QtCore.QString(str(v)).simplified()
+            item.setText(text)
+            self.table.setCellWidget(i,0, item)
+            i += 1     
     
 # BEAM input layer selecor panel is the same as normal input layer
 # selector panel except that it has a button next to it
