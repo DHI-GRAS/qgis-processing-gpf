@@ -52,4 +52,4 @@ class NESTAlgorithmProvider(AlgorithmProvider):
         self.algs = self.preloadedAlgs
 
     def getSupportedOutputRasterLayerExtensions(self):
-        return ["tif", "dim"]
+        return ["tif", "dim", "hdr"]
