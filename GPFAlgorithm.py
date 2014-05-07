@@ -1,16 +1,16 @@
 import os
 import re
 from xml.etree.ElementTree import Element, SubElement, tostring
-from sextante.core.GeoAlgorithm import GeoAlgorithm
-from sextante.parameters.ParameterRaster import ParameterRaster
-from sextante.parameters.ParameterBoolean import ParameterBoolean
-from sextante.parameters.ParameterSelection import ParameterSelection
-from sextante.core.SextanteLog import SextanteLog
-from sextante.parameters.ParameterFactory import ParameterFactory
-from sextante.outputs.OutputFactory import OutputFactory
-from sextante_gpf.GPFUtils import GPFUtils
-from sextante_gpf.BEAMParametersDialog import BEAMParametersDialog
-from sextante.parameters.ParameterExtent import ParameterExtent
+from processing.core.GeoAlgorithm import GeoAlgorithm
+from processing.parameters.ParameterRaster import ParameterRaster
+from processing.parameters.ParameterBoolean import ParameterBoolean
+from processing.parameters.ParameterSelection import ParameterSelection
+from processing.core.ProcessingLog import ProcessingLog
+from processing.parameters.ParameterFactory import ParameterFactory
+from processing.outputs.OutputFactory import OutputFactory
+from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.BEAMParametersDialog import BEAMParametersDialog
+from processing.parameters.ParameterExtent import ParameterExtent
 
 class GPFAlgorithm(GeoAlgorithm):
 
@@ -70,7 +70,7 @@ class GPFAlgorithm(GeoAlgorithm):
                     self.addOutput(OutputFactory.getFromString(line))
                 line = lines.readline().strip("\n").strip()
             except Exception,e:
-                SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open GPF algorithm: " + self.descriptionFile + "\n" + line)
+                ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open GPF algorithm: " + self.descriptionFile + "\n" + line)
                 raise e
         lines.close()
     
@@ -231,7 +231,7 @@ class GPFAlgorithm(GeoAlgorithm):
         loglines.append("GPF Graph")
         loglines.append(tostring(graph))
         loglines.append(self.sourceFiles)
-        SextanteLog.addToLog(SextanteLog.LOG_INFO, loglines)
+        ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
         
         # Execute the GPF
         # !!! should check that there is at least one output        

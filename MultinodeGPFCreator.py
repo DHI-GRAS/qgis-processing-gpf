@@ -1,7 +1,7 @@
 import os
 from PyQt4.QtGui import *
-from sextante.core.GeoAlgorithm import GeoAlgorithm
-from sextante_gpf.MultinodeGPFDialog import MultinodeGPFDialog
+from processing.core.GeoAlgorithm import GeoAlgorithm
+from processing_gpf.MultinodeGPFDialog import MultinodeGPFDialog
 
 class MultinodeGPFCreator(GeoAlgorithm):
         def __init__(self):

@@ -1,11 +1,11 @@
-from sextante.gui.ParametersPanel import ParametersPanel
-from sextante.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
-from sextante.gui.NumberInputPanel import NumberInputPanel
-from sextante.core.QGisLayers import QGisLayers
+from processing.gui.ParametersPanel import ParametersPanel
+from processing.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
+from processing.gui.NumberInputPanel import NumberInputPanel
+from processing.tools import dataobjects 
 from qgis.core import QgsRasterLayer 
-from sextante.parameters.ParameterRaster import ParameterRaster
-from sextante.parameters.ParameterNumber import ParameterNumber
-from sextante_gpf.GPFUtils import GPFUtils
+from processing.parameters.ParameterRaster import ParameterRaster
+from processing.parameters.ParameterNumber import ParameterNumber
+from processing_gpf.GPFUtils import GPFUtils
 from PyQt4 import QtGui, QtCore
 import pyperclip
 
@@ -15,7 +15,7 @@ class BEAMParametersPanel(ParametersPanel):
     
     def getWidgetFromParameter(self, param):
         if isinstance(param, ParameterRaster):
-            layers = QGisLayers.getRasterLayers()
+            layers = dataobjects.getRasterLayers()
             items = []
             if (param.optional):
                 items.append((self.NOT_SELECTED, None))
@@ -167,7 +167,7 @@ class BEAMBandsListDialog(QtGui.QDialog):
         self.table.setRowCount(len(self.bands))
         for i in range(len(self.bands)):
             item = QtGui.QCheckBox()
-            item.setText(QtCore.QString(self.bands[i]).simplified())
+            item.setText(self.bands[i])
             self.table.setCellWidget(i,0, item)
             QtCore.QObject.connect(item, QtCore.SIGNAL("stateChanged(int)"), self.updateBandList)
     

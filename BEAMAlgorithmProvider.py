@@ -1,10 +1,10 @@
 import os
 from PyQt4.QtGui import *
-from sextante.core.SextanteConfig import SextanteConfig, Setting
-from sextante.core.AlgorithmProvider import AlgorithmProvider
-from sextante.core.SextanteLog import SextanteLog
-from sextante_gpf.GPFUtils import GPFUtils
-from sextante_gpf.BEAMAlgorithm import BEAMAlgorithm
+from processing.core.ProcessingConfig import ProcessingConfig, Setting
+from processing.core.AlgorithmProvider import AlgorithmProvider
+from processing.core.ProcessingLog import ProcessingLog
+from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.BEAMAlgorithm import BEAMAlgorithm
 
 class BEAMAlgorithmProvider(AlgorithmProvider):
 
@@ -15,13 +15,13 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
 
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
-        SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_FOLDER, "BEAM install directory", GPFUtils.programPath(GPFUtils.beamKey())))
-        SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_THREADS, "Maximum number of parallel (native) threads", 4))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_FOLDER, "BEAM install directory", GPFUtils.programPath(GPFUtils.beamKey())))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_THREADS, "Maximum number of parallel (native) threads", 4))
 
     def unload(self):
         AlgorithmProvider.unload(self)
-        SextanteConfig.removeSetting(GPFUtils.BEAM_FOLDER)
-        SextanteConfig.removeSetting(GPFUtils.BEAM_THREADS)
+        ProcessingConfig.removeSetting(GPFUtils.BEAM_FOLDER)
+        ProcessingConfig.removeSetting(GPFUtils.BEAM_THREADS)
         
     def createAlgsList(self):
         self.preloadedAlgs = []
@@ -33,9 +33,9 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
                     if alg.name.strip() != "":
                         self.preloadedAlgs.append(alg)
                     else:
-                        SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
+                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
                 except Exception,e:
-                    SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
         # leave out for now as the functionality is not fully developed
         #self.preloadedAlgs.append(MultinodeGPFCreator())  
                     

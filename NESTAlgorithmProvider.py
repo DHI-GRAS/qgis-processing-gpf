@@ -1,10 +1,10 @@
 import os
 from PyQt4.QtGui import *
-from sextante.core.SextanteConfig import SextanteConfig, Setting
-from sextante.core.AlgorithmProvider import AlgorithmProvider
-from sextante.core.SextanteLog import SextanteLog
-from sextante_gpf.GPFUtils import GPFUtils
-from sextante_gpf.NESTAlgorithm import NESTAlgorithm
+from processing.core.ProcessingConfig import ProcessingConfig, Setting
+from processing.core.AlgorithmProvider import AlgorithmProvider
+from processing.core.ProcessingLog import ProcessingLog
+from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.NESTAlgorithm import NESTAlgorithm
 
 class NESTAlgorithmProvider(AlgorithmProvider):
 
@@ -15,13 +15,13 @@ class NESTAlgorithmProvider(AlgorithmProvider):
 
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
-        SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_FOLDER, "NEST install directory", GPFUtils.programPath(GPFUtils.nestKey())))
-        SextanteConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_THREADS, "Maximum number of parallel (native) threads", 4))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_FOLDER, "NEST install directory", GPFUtils.programPath(GPFUtils.nestKey())))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_THREADS, "Maximum number of parallel (native) threads", 4))
 
     def unload(self):
         AlgorithmProvider.unload(self)
-        SextanteConfig.removeSetting(GPFUtils.NEST_FOLDER)
-        SextanteConfig.removeSetting(GPFUtils.NEST_THREADS)
+        ProcessingConfig.removeSetting(GPFUtils.NEST_FOLDER)
+        ProcessingConfig.removeSetting(GPFUtils.NEST_THREADS)
         
     def createAlgsList(self):
         self.preloadedAlgs = []
@@ -33,9 +33,9 @@ class NESTAlgorithmProvider(AlgorithmProvider):
                     if alg.name.strip() != "":
                         self.preloadedAlgs.append(alg)
                     else:
-                        SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open NEST algorithm: " + descriptionFile)
+                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open NEST algorithm: " + descriptionFile)
                 except Exception,e:
-                    SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Could not open NEST algorithm: " + descriptionFile)
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open NEST algorithm: " + descriptionFile)
         # leave out for now as the functionality is not fully developed
         #self.preloadedAlgs.append(MultinodeGPFCreator())  
                     

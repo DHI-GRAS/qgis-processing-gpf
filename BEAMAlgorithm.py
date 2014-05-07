@@ -1,7 +1,7 @@
 import os
 from PyQt4.QtGui import *
-from sextante_gpf.GPFUtils import GPFUtils
-from sextante_gpf.GPFAlgorithm import GPFAlgorithm
+from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.GPFAlgorithm import GPFAlgorithm
 
 
 class BEAMAlgorithm(GPFAlgorithm):

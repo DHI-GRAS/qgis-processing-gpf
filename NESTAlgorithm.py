@@ -2,9 +2,9 @@ import os
 from PyQt4.QtGui import *
 from qgis.core import *
 from xml.etree.ElementTree import Element, SubElement
-from sextante_gpf.GPFUtils import GPFUtils
-from sextante_gpf.GPFAlgorithm import GPFAlgorithm
-from sextante.parameters.ParameterRaster import ParameterRaster
+from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.GPFAlgorithm import GPFAlgorithm
+from processing.parameters.ParameterRaster import ParameterRaster
 
 class NESTAlgorithm(GPFAlgorithm):
     

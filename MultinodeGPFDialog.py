@@ -1,10 +1,10 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import QtCore, QtGui
-from sextante.modeler.ModelerUtils import ModelerUtils
-from sextante.modeler.Providers import Providers
-from sextante.gui.ParametersDialog import ParametersDialog
-from sextante.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
+from processing.modeler.ModelerUtils import ModelerUtils
+from processing.modeler.Providers import Providers
+from processing.gui.ParametersDialog import ParametersDialog
+from processing.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
 
 class MultinodeGPFDialog(ParametersDialog):
     def __init__(self, alg=None):
@@ -148,7 +148,7 @@ class MultinodeGPFDialog(ParametersDialog):
       #      None        
 #        ##TODO: enable alg cloning without saving to file
 #        if self.alg.descriptionFile is None:
-#            self.alg.descriptionFile = SextanteUtils.getTempFilename("model")
+#            self.alg.descriptionFile = ProcessingUtils.getTempFilename("model")
 #            text = self.alg.serialize()
 #            fout = open(self.alg.descriptionFile, "w")
 #            fout.write(text)

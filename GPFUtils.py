@@ -3,8 +3,8 @@ import re
 import tempfile
 import subprocess
 from decimal import Decimal 
-from sextante.core.SextanteConfig import SextanteConfig
-from sextante.core.SextanteLog import SextanteLog
+from processing.core.ProcessingConfig import ProcessingConfig
+from processing.core.ProcessingLog import ProcessingLog
 
 class GPFUtils:
     
@@ -24,9 +24,9 @@ class GPFUtils:
     @staticmethod
     def programPath(key):
         if key == GPFUtils.beamKey():
-            folder = SextanteConfig.getSetting(GPFUtils.BEAM_FOLDER)
+            folder = ProcessingConfig.getSetting(GPFUtils.BEAM_FOLDER)
         elif key == GPFUtils.nestKey():
-            folder = SextanteConfig.getSetting(GPFUtils.NEST_FOLDER)
+            folder = ProcessingConfig.getSetting(GPFUtils.NEST_FOLDER)
         else:
             folder = None
             
@@ -61,7 +61,7 @@ class GPFUtils:
         elif key == GPFUtils.nestKey():
             loglines.append("NEST execution console output")
         else:
-            SextanteLog.addToLog(SextanteLog.LOG_ERROR, "Unknown GPF algorithm provider")
+            ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Unknown GPF algorithm provider")
             return    
         
         # save gpf to temporary file
@@ -73,14 +73,14 @@ class GPFUtils:
         # execute the gpf
         if key == GPFUtils.beamKey():
             try:
-                threads = int(float(SextanteConfig.getSetting(GPFUtils.BEAM_THREADS)))
+                threads = int(float(ProcessingConfig.getSetting(GPFUtils.BEAM_THREADS)))
             except:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])
             #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", sourceFiles])
         elif key == GPFUtils.nestKey():
             try:
-                threads = int(float(SextanteConfig.getSetting(GPFUtils.NEST_THREADS)))
+                threads = int(float(ProcessingConfig.getSetting(GPFUtils.NEST_THREADS)))
             except:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])   
@@ -100,7 +100,7 @@ class GPFUtils:
                 progress.setPercentage(int(m.group(1)))
                 
         progress.setPercentage(100)
-        SextanteLog.addToLog(SextanteLog.LOG_INFO, loglines)
+        ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
     
     # Get the bands names by calling a java program that uses BEAM functionality 
     @staticmethod
@@ -112,7 +112,7 @@ class GPFUtils:
         else:
             filename = str(filename)    # in case it's a QString
         
-        command = "\""+os.path.dirname(__file__)+os.sep+"sextante_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+bandDelim+" "+str(appendProductName)
+        command = "\""+os.path.dirname(__file__)+os.sep+"processing_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+bandDelim+" "+str(appendProductName)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         for line in iter(proc.readline, ""):
             if bandDelim in line:
@@ -140,10 +140,10 @@ class GPFUtils:
         else:
             filename = str(filename)    # in case it's a QString
         
-        command = "\""+os.path.dirname(__file__)+os.sep+"sextante_nest_java"+os.sep+"getNESTPixelSizes.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+delim
+        command = "\""+os.path.dirname(__file__)+os.sep+"processing_nest_java"+os.sep+"getNESTPixelSizes.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+delim
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         for line in iter(proc.readline, ""):
-            SextanteLog.addToLog(SextanteLog.LOG_INFO, line)
+            ProcessingLog.addToLog(ProcessingLog.LOG_INFO, line)
             if delim in line:
                 line = line.strip().split(delim)
                 if len(line)>=3:
