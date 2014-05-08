@@ -240,3 +240,9 @@ class GPFAlgorithm(GeoAlgorithm):
     def commandLineName(self):
         return self.provider.getName().lower().replace(" ", "") + ":" + self.operator.lower().replace("-","")
                 
+
+    def convertUnsupportedFormats(self, progress):
+        pass
+    
+    def checkOutputFileExtensions(self):
+        pass
