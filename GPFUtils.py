@@ -93,11 +93,21 @@ class GPFUtils:
             if "\n" in line:
                 loglines.append(line)
                 progress.setConsoleInfo(line)
+                # force refresh of the execution dialog 
+                try:
+                    progress.repaint()
+                except:
+                    pass
                 line = ""
             # show progress during NEST executions    
             m = re.search("\.(\d{2,3})\%$", line)
             if m:
                 progress.setPercentage(int(m.group(1)))
+                # force refresh of the execution dialog
+                try:
+                    progress.repaint()
+                except:
+                    pass
                 
         progress.setPercentage(100)
         ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
