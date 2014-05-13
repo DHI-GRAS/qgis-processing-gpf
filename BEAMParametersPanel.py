@@ -39,7 +39,7 @@ class NESTPixelSizeInputPanel(NumberInputPanel):
     def __init__(self, default, isInteger, parent, programKey):
         self.parent = parent
         self.programKey = programKey
-        NumberInputPanel.__init__(self, default, isInteger)
+        NumberInputPanel.__init__(self, default, None, None, isInteger)
         self.metadataButton = QtGui.QPushButton()
         self.metadataButton.setText("Pixel Size")
         self.metadataButton.clicked.connect(self.showMetadataDialog)
@@ -84,7 +84,7 @@ class NESTPixelSizeInputDialog(QtGui.QDialog):
         for k,v in self.pixelSizes.items():
             item = QtGui.QLineEdit()
             item.setReadOnly(True)
-            text = QtCore.QString(k).simplified() + ":\t\t" + QtCore.QString(str(v)).simplified()
+            text = str(k).strip() + ":\t\t" + str(v).strip()
             item.setText(text)
             self.table.setCellWidget(i,0, item)
             i += 1     
