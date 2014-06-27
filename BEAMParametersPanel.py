@@ -21,7 +21,7 @@ class BEAMParametersPanel(ParametersPanel):
                 items.append((self.NOT_SELECTED, None))
             for layer in layers:
                 items.append((layer.name(), layer))
-            item = BEAMInputLayerSelectorPanel(items, self.parent, self.alg.programKey, self.alg.multipleRasterInput)
+            item = BEAMInputLayerSelectorPanel(items, param, self.parent, self.alg.programKey, self.alg.multipleRasterInput)
         # special treatment for NEST Terrain-Correction to get pixel sizes from SAR image
         elif isinstance(param, ParameterNumber) and (param.name == "pixelSpacingInMeter" or param.name == "pixelSpacingInDegree") and self.alg.commandLineName() == "nest:terraincorrection":
             item = NESTPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
@@ -94,9 +94,9 @@ class NESTPixelSizeInputDialog(QtGui.QDialog):
 # to show band names            
 class BEAMInputLayerSelectorPanel(InputLayerSelectorPanel):
     
-    def __init__(self, options, parent, programKey, appendProductName):
+    def __init__(self, options, param, parent, programKey, appendProductName):
         self.parent = parent
-        InputLayerSelectorPanel.__init__(self, options)
+        InputLayerSelectorPanel.__init__(self, options, param)
         self.bandsButton = QtGui.QPushButton()
         self.bandsButton.setText("Bands")
         self.bandsButton.clicked.connect(self.showBandsDialog)
