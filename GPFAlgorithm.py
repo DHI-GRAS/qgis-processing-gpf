@@ -157,12 +157,13 @@ class GPFAlgorithm(GeoAlgorithm):
                     # create at WKT polygon from the extent values, used in Subset Operator
                     elif isinstance(param, ParameterExtent):
                         values = param.value.split(",")
-                        parameter.text = "POLYGON(("
-                        parameter.text += values[0] + ' ' + values[2] +", "
-                        parameter.text += values[0] + ' ' + values[3] +", "
-                        parameter.text += values[1] + ' ' + values[3] +", "
-                        parameter.text += values[1] + ' ' + values[2] +", "
-                        parameter.text += values[0] + ' ' + values[2] +"))"
+                        if len(values) == 4:
+                            parameter.text = "POLYGON(("
+                            parameter.text += values[0] + ' ' + values[2] +", "
+                            parameter.text += values[0] + ' ' + values[3] +", "
+                            parameter.text += values[1] + ' ' + values[3] +", "
+                            parameter.text += values[1] + ' ' + values[2] +", "
+                            parameter.text += values[0] + ' ' + values[2] +"))"
                     else:          
                         parameter.text = str(param.value)
         
