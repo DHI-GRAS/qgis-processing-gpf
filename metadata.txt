@@ -26,8 +26,7 @@ qgisMinimumVersion=2.0
 
 tags=processing, SAR, Envisat, Sentinel
 
-homepage=www.tiger-net.org
-
+homepage=http://www.tiger-net.org
 tracker=https://github.com/TIGER-NET/Processing-GPF/issues
 repository=https://github.com/TIGER-NET/Processing-GPF
 
