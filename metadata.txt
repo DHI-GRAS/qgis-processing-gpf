@@ -7,14 +7,41 @@
 
 [general]
 name=Processing BEAM and NEST Provider
-email=rmgu@dhi-gras.dk
-author=Radoslaw Guzinski
-description=A plugin that adds BEAM and NEST GPF algorithms to Processing.
-version=0.2
+description= QGIS Processing provider for GPF-based algorithms (BEAM and NEST). 
+
+about= This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. In the future Sentinel toolboxes will also be supported. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
+
+version=1.0
 qgisMinimumVersion=2.0
 
+# Optional items:
 
-class_name=ProcessingGpfPlugin
-website=www.tiger-net.org
+
+
+# changelog=
+
+
+
+# tags are comma separated with spaces allowed
+
+tags=processing, SAR, Envisat, Sentinel
+
+homepage=www.tiger-net.org
+
+tracker=https://github.com/TIGER-NET/Processing-GPF/issues
+repository=https://github.com/TIGER-NET/Processing-GPF
+
+#icon=
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version
+
+deprecated=False
+
+# Author contact information
+author=Radoslaw Guzinski
+email=rmgu@dhi-gras.com
+
+
 
 
