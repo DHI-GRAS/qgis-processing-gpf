@@ -32,7 +32,10 @@ from qgis.core import *
 from xml.etree.ElementTree import Element, SubElement
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFAlgorithm import GPFAlgorithm
-from processing.parameters.ParameterRaster import ParameterRaster
+try:
+    from processing.parameters.ParameterRaster import ParameterRaster
+except:
+    from processing.core.parameters import ParameterRaster
 
 class NESTAlgorithm(GPFAlgorithm):
     

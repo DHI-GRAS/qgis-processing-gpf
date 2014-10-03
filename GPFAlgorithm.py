@@ -30,15 +30,36 @@ import os
 import re
 from xml.etree.ElementTree import Element, SubElement, tostring
 from processing.core.GeoAlgorithm import GeoAlgorithm
-from processing.parameters.ParameterRaster import ParameterRaster
-from processing.parameters.ParameterBoolean import ParameterBoolean
-from processing.parameters.ParameterSelection import ParameterSelection
+try:
+    from processing.parameters.ParameterRaster import ParameterRaster
+except:
+    from processing.core.parameters import ParameterRaster
+try:	
+    from processing.parameters.ParameterBoolean import ParameterBoolean
+except:
+    from processing.core.parameters import ParameterBoolean
+try:
+    from processing.parameters.ParameterSelection import ParameterSelection
+except:
+    from processing.core.parameters import ParameterSelection
+try:
+    from processing.parameters.ParameterExtent import ParameterExtent
+except:
+    from processing.core.parameters import ParameterExtent
+try:
+    from processing.parameters.ParameterFactory import ParameterFactory
+    getParameterFromString = ParameterFactory.getFromString 
+except:
+    from processing.core.parameters import getParameterFromString
+try:
+    from processing.outputs.OutputFactory import OutputFactory
+    getOutputFromString = OutputFactory.getFromString
+except:
+    from processing.core.outputs import getOutputFromString
 from processing.core.ProcessingLog import ProcessingLog
-from processing.parameters.ParameterFactory import ParameterFactory
-from processing.outputs.OutputFactory import OutputFactory
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.BEAMParametersDialog import BEAMParametersDialog
-from processing.parameters.ParameterExtent import ParameterExtent
+
 
 class GPFAlgorithm(GeoAlgorithm):
 
@@ -84,18 +105,18 @@ class GPFAlgorithm(GeoAlgorithm):
         self.name = line
         line = lines.readline().strip("\n").strip()
         self.group = line
+        line = lines.readline().strip("\n").strip()
         while line != "":
             try:
-                line = line.strip("\n").strip()
                 if line.startswith("Parameter"):
-                    param = ParameterFactory.getFromString(line)
+                    param = getParameterFromString(line)
                     self.addParameter(param)
                 elif line.startswith("*Parameter"):
-                    param = ParameterFactory.getFromString(line[1:])
+                    param = getParameterFromString(line[1:])
                     param.isAdvanced = True
                     self.addParameter(param)
                 else:
-                    self.addOutput(OutputFactory.getFromString(line))
+                    self.addOutput(getOutputFromString(line))
                 line = lines.readline().strip("\n").strip()
             except Exception,e:
                 ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open GPF algorithm: " + self.descriptionFile + "\n" + line)

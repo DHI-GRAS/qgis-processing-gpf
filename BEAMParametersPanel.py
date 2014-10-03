@@ -30,9 +30,15 @@ from processing.gui.ParametersPanel import ParametersPanel
 from processing.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
 from processing.gui.NumberInputPanel import NumberInputPanel
 from processing.tools import dataobjects 
-from qgis.core import QgsRasterLayer 
-from processing.parameters.ParameterRaster import ParameterRaster
-from processing.parameters.ParameterNumber import ParameterNumber
+from qgis.core import QgsRasterLayer
+try: 
+    from processing.parameters.ParameterRaster import ParameterRaster
+except:
+    from processing.core.parameters import ParameterRaster
+try:
+    from processing.parameters.ParameterNumber import ParameterNumber
+except:
+    from processing.core.parameters import ParameterNumber
 from processing_gpf.GPFUtils import GPFUtils
 from PyQt4 import QtGui, QtCore
 import pyperclip
