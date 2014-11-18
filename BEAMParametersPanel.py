@@ -41,7 +41,6 @@ except:
     from processing.core.parameters import ParameterNumber
 from processing_gpf.GPFUtils import GPFUtils
 from PyQt4 import QtGui, QtCore
-import pyperclip
 
 # BEAM parameters panel is the same as normal parameters panel except
 # it has a button next to raster inputs to show band names
@@ -230,7 +229,8 @@ class BEAMBandsListDialog(QtGui.QDialog):
             widget.setChecked(checked)
             
     def copyBands(self):
-        pyperclip.copy(self.bandList.text())
+        clipboard = QtGui.QApplication.clipboard()
+        clipboard.setText(self.bandList.text())
         
     def close(self):
         self.copyBands()
