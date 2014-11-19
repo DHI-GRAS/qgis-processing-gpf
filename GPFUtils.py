@@ -27,6 +27,7 @@
 """
 
 import os
+import platform
 import re
 import tempfile
 import subprocess
@@ -98,20 +99,26 @@ class GPFUtils:
         gpfPath = gpfFile.name
         gpfFile.close()  
         
+        # check if running on windows or other OS
+        if platform.system() == "Windows":
+            batchFile = "gpt.bat"
+        else:
+            batchFile = "gpt.sh"
+        
         # execute the gpf
         if key == GPFUtils.beamKey():
             try:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.BEAM_THREADS)))
             except:
                 threads = 4
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])
             #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", sourceFiles])
         elif key == GPFUtils.nestKey():
             try:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.NEST_THREADS)))
             except:
                 threads = 4
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])   
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])   
             #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", "-q 8 ", sourceFiles])    
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
