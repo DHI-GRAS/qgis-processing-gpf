@@ -74,12 +74,13 @@ class NESTPixelSizeInputPanel(NumberInputPanel):
         self.programKey = programKey
         NumberInputPanel.__init__(self, default, None, None, isInteger)
         self.metadataButton = QtGui.QPushButton()
+        self.metadataButton.setMaximumWidth(75)
         self.metadataButton.setText("Pixel Size")
         self.metadataButton.clicked.connect(self.showMetadataDialog)
         self.horizontalLayout.addWidget(self.metadataButton)
 
     def showMetadataDialog(self):
-        sourceProduct = self.parent.paramTable.valueItems["sourceProduct"].getFilePath()
+        sourceProduct = self.parent.mainWidget.valueItems["sourceProduct"].getFilePath()
         pixelSizes = GPFUtils.getNESTPixelSize(sourceProduct, self.programKey)
         dlg = NESTPixelSizeInputDialog(pixelSizes, sourceProduct, self.parent)
         dlg.show()
@@ -131,6 +132,7 @@ class BEAMInputLayerSelectorPanel(InputLayerSelectorPanel):
         self.parent = parent
         InputLayerSelectorPanel.__init__(self, options, param)
         self.bandsButton = QtGui.QPushButton()
+        self.bandsButton.setMaximumWidth(75)
         self.bandsButton.setText("Bands")
         self.bandsButton.clicked.connect(self.showBandsDialog)
         self.horizontalLayout.addWidget(self.bandsButton)
