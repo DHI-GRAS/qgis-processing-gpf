@@ -296,3 +296,6 @@ class GPFAlgorithm(GeoAlgorithm):
     
     def checkOutputFileExtensions(self):
         pass
+    
+    def checkInputCRS(self):
+        return True
