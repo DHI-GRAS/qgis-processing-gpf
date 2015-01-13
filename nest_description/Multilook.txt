@@ -2,7 +2,7 @@ Multilook
 nest_Multilook
 Multilook
 I/O
-ParameterRaster|sourceProduct|Input image|False
+ParameterRaster|sourceProduct|Input image|False|False
 ParameterString|!sourceBands>band|The list of source bands|
 ParameterNumber|nAzLooks|The user defined number of azimuth looks|1|None|1
 ParameterNumber|nRgLooks|The user defined number of range looks|1|None|1

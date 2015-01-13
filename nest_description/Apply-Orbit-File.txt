@@ -2,6 +2,6 @@ Apply-Orbit-File
 nest_Apply-Orbit-File
 Apply Orbit File
 I/O
-ParameterRaster|sourceProduct|Input image|False
+ParameterRaster|sourceProduct|Input image|False|False
 ParameterSelection|orbitType|Orbit type|DORIS Precise (ENVISAT);DORIS Verified (ENVISAT);DELFT Precise (ENVISAT, ERS1&2);PRARE Precise (ERS1&2)|1
 OutputRaster|-out|Output Image

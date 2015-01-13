@@ -2,10 +2,10 @@ CreateStack
 nest_CreateStack
 Create Stack
 I/O
-ParameterRaster|1ProductSet-Reader>sourceProduct|Input product 1|False
-ParameterRaster|2ProductSet-Reader>sourceProduct|Input product 2|False
-*ParameterRaster|3ProductSet-Reader>sourceProduct|Input product 3|True
-*ParameterRaster|4ProductSet-Reader>sourceProduct|Input product 4|True
+ParameterRaster|1ProductSet-Reader>sourceProduct|Input product 1|False|False
+ParameterRaster|2ProductSet-Reader>sourceProduct|Input product 2|False|False
+*ParameterRaster|3ProductSet-Reader>sourceProduct|Input product 3|True|False
+*ParameterRaster|4ProductSet-Reader>sourceProduct|Input product 4|True|False
 ParameterString|!masterBands>band|The list of master source bands|
 ParameterString|!sourceBands>band|The list of slave source bands|
 ParameterSelection|extent|The output image extents|Master;Minimum;Maximum|0

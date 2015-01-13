@@ -2,7 +2,7 @@ Calibration
 nest_Calibration
 Calibration
 I/O
-ParameterRaster|sourceProduct|Input image|False
+ParameterRaster|sourceProduct|Input image|False|False
 ParameterString|!sourceBands>band|The list of source bands|
 ParameterSelection|auxFile|The auxiliary file|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|0
 ParameterFile|externalAuxFile|The antenne elevation pattern gain auxiliary data file|False|True

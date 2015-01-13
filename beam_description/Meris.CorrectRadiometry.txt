@@ -2,7 +2,7 @@ Meris.CorrectRadiometry
 beam_Meris.CorrectRadiometry
 Radiometric correction
 Analysis - MERIS
-ParameterRaster|sourceProduct|MERIS L1b source product|False
+ParameterRaster|sourceProduct|MERIS L1b source product|False|False
 ParameterBoolean|doCalibration|Perform calibration|True
 ParameterFile|sourceRacFile|The radiometric correction auxiliary file for the source product|False|True
 ParameterFile|targetRacFile|The radiometric correction auxiliary file for the target product|False|True

@@ -2,7 +2,7 @@ Subset
 beam_Subset
 Subset image
 I/O
-ParameterRaster|sourceProduct|The product which will be subseted|False
+ParameterRaster|sourceProduct|The product which will be subseted|False|False
 ParameterExtent|geoRegionExtent|Spatial extent |
 ParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|1|None|1
 ParameterNumber|subSamplingY|The pixel sub-sampling step in Y (horizontal image direction)|1|None|1

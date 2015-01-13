@@ -2,7 +2,7 @@ KMeansClusterAnalysis
 beam_KMeansClusterAnalysis
 K Means Cluster Analysis
 Classification
-ParameterRaster|sourceProduct|The product to be classified|False
+ParameterRaster|sourceProduct|The product to be classified|False|False
 OutputRaster|-out|Output Image
 ParameterNumber|clusterCount|Number of clusters|0|100|14
 *ParameterNumber|iterationCount|Number of iterations|0|1000|30

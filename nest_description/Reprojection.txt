@@ -2,10 +2,10 @@ Reprojection
 nest_Reprojection
 Apply a map projection
 I/O
-ParameterRaster|sourceProduct|The product which will be reprojected|False
+ParameterRaster|sourceProduct|The product which will be reprojected|False|False
 ParameterCrs|crs|CRS of the required projection|
 OutputRaster|-out|Output Image
-*ParameterRaster|collocateWith|The source product will be collocated with this product|True
+*ParameterRaster|collocateWith|The source product will be collocated with this product|True|False
 *ParameterFile|wktFile|A file which contains the target Coordinate Reference System in WKT format|False
 ParameterSelection|resampling|The method used for resampling of floating-point raster data|Nearest;Bilinear;Bicubic
 ParameterBoolean|includeTiePointGrids|Whether tie-point grids should be included in the output product|True

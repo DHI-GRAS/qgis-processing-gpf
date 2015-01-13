@@ -2,8 +2,8 @@ icol.Meris
 beam_icol.Meris
 Correct for the adjacency effect
 Analysis - MERIS
-ParameterRaster|sourceProduct|MERIS L1b source product|False
-*ParameterRaster|cloudMaskProduct|Cloud Mask product|True
+ParameterRaster|sourceProduct|MERIS L1b source product|False|False
+*ParameterRaster|cloudMaskProduct|Cloud Mask product|True|False
 ParameterString|cloudMaskExpression|The arithmetic expression used for cloud/ice detection|toa_reflec_14 > 0.2
 ParameterBoolean|useUserCtp|User user defined cloud top pressure value in AE correction algorithm|False
 ParameterNumber|userCtp|User defined cloud top pressure value to be used by AE correction algorithm|0.0|1013.0|1013.0
