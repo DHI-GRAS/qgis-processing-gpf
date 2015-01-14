@@ -43,7 +43,7 @@ class NESTAlgorithmProvider(AlgorithmProvider):
 
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_FOLDER, "NEST install directory", GPFUtils.programPath(GPFUtils.nestKey())))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_FOLDER, "S1 Toolbox install directory", GPFUtils.programPath(GPFUtils.nestKey())))
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.NEST_THREADS, "Maximum number of parallel (native) threads", 4))
 
     def unload(self):
@@ -61,14 +61,14 @@ class NESTAlgorithmProvider(AlgorithmProvider):
                     if alg.name.strip() != "":
                         self.preloadedAlgs.append(alg)
                     else:
-                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open NEST algorithm: " + descriptionFile)
+                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S1 Toolbox algorithm: " + descriptionFile)
                 except Exception,e:
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open NEST algorithm: " + descriptionFile)
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S1 Toolbox algorithm: " + descriptionFile)
         # leave out for now as the functionality is not fully developed
         #self.preloadedAlgs.append(MultinodeGPFCreator())  
                     
     def getDescription(self):
-        return "NEST (SAR image analysis)"
+        return "S1 Toolbox (SAR image analysis)"
 
     def getName(self):
         return "nest"
