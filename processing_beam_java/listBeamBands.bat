@@ -3,7 +3,7 @@
 set BEAM4_HOME=%~1
 set CODE_HOME=%~dp0
 
-cd %CODE_HOME%
+cd /D %CODE_HOME%
 
 "%BEAM4_HOME%\jre\bin\java.exe" ^
 -Xmx1024M ^
