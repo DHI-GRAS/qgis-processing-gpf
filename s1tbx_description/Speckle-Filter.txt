@@ -1,0 +1,14 @@
+Speckle-Filter
+s1tbx_Speckle-Filter
+Speckle Filter
+Filters
+ParameterRaster|sourceProduct|The product which will be despeckled|False|False
+ParameterString|!sourceBands>band|The list of source bands|
+ParameterSelection|filter|filter type|Mean;Median;Frost;Gamma Map;Lee;Refined Lee
+ParameterNumber|filterSizeX|The kernel X dimension|1|100|3
+ParameterNumber|filterSizeY|The kernel Y dimension|1|100|3
+*ParameterNumber|dampingFactor|The damping factor (Frost filter only)|0|100|2
+*ParameterNumber|edgeThreshold|The edge threshold (Refined Lee filter only)|0|None|5000.0
+ParameterBoolean|estimateENL|Estimate the number of looks|False
+ParameterNumber|enl|The number of looks|0|None|1.0
+OutputRaster|-out|Output Image

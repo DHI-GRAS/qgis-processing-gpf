@@ -90,8 +90,8 @@ class GPFAlgorithm(GeoAlgorithm):
     
     # BEAM parameters dialog is the same as normal parameters dialog except
     # it has a button next to raster inputs to show band names
-    # For now NEST uses the same dialog, maybe later that might have to change
-    # if BEAM can't read band name from NEST images.
+    # For now S1Tbx uses the same dialog, maybe later that might have to change
+    # if BEAM can't read band name from S1Tbx images.
     def getCustomParametersDialog(self):
         return BEAMParametersDialog(self)
     
@@ -149,7 +149,7 @@ class GPFAlgorithm(GeoAlgorithm):
                     # if the source is a file, then add an external "source product" file
                     if os.path.isfile(param.value):
                         # check if the file should be added individually or through the
-                        # ProductSet-Reader used sometimes by NEST
+                        # ProductSet-Reader used sometimes by S1 Toolbox
                         match = re.match("^\d*ProductSet-Reader>(.*)",param.name)
                         if match:
                             paramName = match.group(1)

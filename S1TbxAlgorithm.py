@@ -1,6 +1,6 @@
 """
 ***************************************************************************
-    BEAMAlgorithm.py
+    S1TbxAlgorithm.py
 -------------------------------------
     Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
@@ -28,27 +28,66 @@
 
 import os
 from PyQt4.QtGui import *
+from qgis.core import *
+from xml.etree.ElementTree import Element, SubElement
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFAlgorithm import GPFAlgorithm
+try:
+    from processing.parameters.ParameterRaster import ParameterRaster
+except:
+    from processing.core.parameters import ParameterRaster
 
-
-class BEAMAlgorithm(GPFAlgorithm):
+class S1TbxAlgorithm(GPFAlgorithm):
     
     def __init__(self, descriptionfile):
         GPFAlgorithm.__init__(self, descriptionfile)
-        self.programKey = GPFUtils.beamKey()
+        self.programKey = GPFUtils.s1tbxKey()
         
     def processAlgorithm(self, progress):
-        GPFAlgorithm.processAlgorithm(self, GPFUtils.beamKey(), progress)
+        GPFAlgorithm.processAlgorithm(self, GPFUtils.s1tbxKey(), progress)
+        
+    def addGPFNode(self, graph):
+        graph = GPFAlgorithm.addGPFNode(self, graph)
+        # split band element with multiple bands into multiple elements
+        for parent in graph.findall(".//band/.."):
+            for element in parent.findall("band"):
+                bands = element.text.split(',')
+                parent.remove(element)
+                for band in bands:
+                    if len(band) > 0:
+                        newElement = SubElement(parent, "band")
+                        newElement.text = band
+        for parent in graph.findall(".//mapProjection/.."):
+            for element in parent.findall("mapProjection"):
+                crs = element.text
+                try:
+                    projection = QgsCoordinateReferenceSystem(int(crs), 2)
+                    wkt = projection.toWkt()
+                    element.text = str(wkt)
+                except:
+                    parent.remove(element)
+                
+        
+        return graph
+        
+    def defineCharacteristicsFromFile(self):
+        GPFAlgorithm.defineCharacteristicsFromFile(self)
+        # check if there are multiple raster inputs
+        inputsCount = 0
+        for param in self.parameters:
+            if isinstance(param, ParameterRaster):
+                inputsCount+=1
+        if inputsCount > 1:
+            self.multipleRasterInput = True                    
         
     def helpFile(self):
-        GPFAlgorithm.helpFile(self, GPFUtils.beamKey())
+        GPFAlgorithm.helpFile(self, GPFUtils.s1tbxKey())
         
     def getIcon(self):
-        return  QIcon(os.path.dirname(__file__) + "/images/beam.png")
+        return  QIcon(os.path.dirname(__file__) + "/images/s1Tbx.png")
     
     def getCopy(self):
-        newone = BEAMAlgorithm(self.descriptionFile)
+        newone = S1TbxAlgorithm(self.descriptionFile)
         newone.provider = self.provider
         return newone
                 

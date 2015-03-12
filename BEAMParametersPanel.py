@@ -55,19 +55,19 @@ class BEAMParametersPanel(ParametersPanel):
             for layer in layers:
                 items.append((layer.name(), layer))
             item = BEAMInputLayerSelectorPanel(items, param, self.parent, self.alg.programKey, self.alg.multipleRasterInput)
-        # special treatment for NEST Terrain-Correction to get pixel sizes from SAR image
-        elif isinstance(param, ParameterNumber) and (param.name == "pixelSpacingInMeter" or param.name == "pixelSpacingInDegree") and self.alg.commandLineName() == "nest:terraincorrection":
-            item = NESTPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
+        # special treatment for S1 Toolbox Terrain-Correction to get pixel sizes from SAR image
+        elif isinstance(param, ParameterNumber) and (param.name == "pixelSpacingInMeter" or param.name == "pixelSpacingInDegree") and self.alg.commandLineName() == "s1tbx:terraincorrection":
+            item = S1TbxPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
         else:
             item = ParametersPanel.getWidgetFromParameter(self, param)
             
         return item
 
-# Special functionality for NEST terrain-correction
-# NEST pixel size input panel is the same as normal number
+# Special functionality for S1 Toolbox terrain-correction
+# S1 Toolbox pixel size input panel is the same as normal number
 # input panel except that it has a button next to it
 # to show selected products pixel size.     
-class NESTPixelSizeInputPanel(NumberInputPanel):
+class S1TbxPixelSizeInputPanel(NumberInputPanel):
     
     def __init__(self, default, isInteger, parent, programKey):
         self.parent = parent
@@ -81,12 +81,12 @@ class NESTPixelSizeInputPanel(NumberInputPanel):
 
     def showMetadataDialog(self):
         sourceProduct = self.parent.mainWidget.valueItems["sourceProduct"].getFilePath()
-        pixelSizes = GPFUtils.getNESTPixelSize(sourceProduct, self.programKey)
-        dlg = NESTPixelSizeInputDialog(pixelSizes, sourceProduct, self.parent)
+        pixelSizes = GPFUtils.getS1TbxPixelSize(sourceProduct, self.programKey)
+        dlg = S1TbxPixelSizeInputDialog(pixelSizes, sourceProduct, self.parent)
         dlg.show()
         
 # Simple dialog displaying SAR image pixel sizes           
-class NESTPixelSizeInputDialog(QtGui.QDialog): 
+class S1TbxPixelSizeInputDialog(QtGui.QDialog): 
     def __init__(self, pixelSizes, filename, parent):
         self.pixelSizes = pixelSizes
         self.filename = filename

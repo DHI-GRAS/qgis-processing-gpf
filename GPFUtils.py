@@ -39,23 +39,23 @@ class GPFUtils:
     
     BEAM_FOLDER = "BEAM_FOLDER"
     BEAM_THREADS = "BEAM_THREADS"
-    NEST_FOLDER = "NEST_FOLDER"
-    NEST_THREADS = "NEST_THREADS"
+    S1TBX_FOLDER = "S1TBX_FOLDER"
+    S1TBX_THREADS = "S1TBX_THREADS"
     
     @staticmethod
     def beamKey():
         return "BEAM"
     
     @staticmethod
-    def nestKey():
-        return "NEST"
+    def s1tbxKey():
+        return "S1Tbx"
     
     @staticmethod
     def programPath(key):
         if key == GPFUtils.beamKey():
             folder = ProcessingConfig.getSetting(GPFUtils.BEAM_FOLDER)
-        elif key == GPFUtils.nestKey():
-            folder = ProcessingConfig.getSetting(GPFUtils.NEST_FOLDER)
+        elif key == GPFUtils.s1tbxKey():
+            folder = ProcessingConfig.getSetting(GPFUtils.S1TBX_FOLDER)
         else:
             folder = None
             
@@ -67,8 +67,8 @@ class GPFUtils:
     def gpfDescriptionPath(key):
         if key == GPFUtils.beamKey():
             return os.path.join(os.path.dirname(__file__), "beam_description")
-        elif key == GPFUtils.nestKey():
-            return os.path.join(os.path.dirname(__file__), "nest_description")
+        elif key == GPFUtils.s1tbxKey():
+            return os.path.join(os.path.dirname(__file__), "s1tbx_description")
         else:
             return ""
     
@@ -76,8 +76,8 @@ class GPFUtils:
     def gpfDocPath(key):
         if key == GPFUtils.beamKey():
             return os.path.join(os.path.dirname(__file__), "beam_doc") 
-        elif key == GPFUtils.nestKey():
-            return os.path.join(os.path.dirname(__file__), "nest_doc") 
+        elif key == GPFUtils.s1tbxKey():
+            return os.path.join(os.path.dirname(__file__), "s1tbx_doc") 
         else:
             return ""
            
@@ -87,8 +87,8 @@ class GPFUtils:
         loglines = []
         if key == GPFUtils.beamKey():
             loglines.append("BEAM execution console output")
-        elif key == GPFUtils.nestKey():
-            loglines.append("NEST execution console output")
+        elif key == GPFUtils.s1tbxKey():
+            loglines.append("Sentinel-1 Toolbox execution console output")
         else:
             ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Unknown GPF algorithm provider")
             return    
@@ -113,9 +113,9 @@ class GPFUtils:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])
             #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", sourceFiles])
-        elif key == GPFUtils.nestKey():
+        elif key == GPFUtils.s1tbxKey():
             try:
-                threads = int(float(ProcessingConfig.getSetting(GPFUtils.NEST_THREADS)))
+                threads = int(float(ProcessingConfig.getSetting(GPFUtils.S1TBX_THREADS)))
             except:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])   
@@ -134,7 +134,7 @@ class GPFUtils:
                 except:
                     pass
                 line = ""
-            # show progress during NEST executions    
+            # show progress during S1 Toolbox executions    
             m = re.search("\.(\d{2,3})\%$", line)
             if m:
                 progress.setPercentage(int(m.group(1)))
@@ -168,12 +168,12 @@ class GPFUtils:
                 
         return bands
     
-    # Special functionality for NEST terrain-correction
-    # Get the SAR image pixel sizes by calling a java program that uses NEST functionality 
+    # Special functionality for S1 Toolbox terrain-correction
+    # Get the SAR image pixel sizes by calling a java program that uses S1 Toolbox functionality 
     @staticmethod
-    def getNESTPixelSize(filename, programKey):
+    def getS1TbxPixelSize(filename, programKey):
         
-        # The value which NEST uses to convert resolution from meters to degrees
+        # The value which S1 Toolbox uses to convert resolution from meters to degrees
         # As far as I can see it's independent of the geographical location and is used for
         # both latitude and longitude
         METERSPERDEGREE = Decimal(111319.4907932735600086975208)
@@ -185,7 +185,7 @@ class GPFUtils:
         else:
             filename = str(filename)    # in case it's a QString
         
-        command = "\""+os.path.dirname(__file__)+os.sep+"processing_nest_java"+os.sep+"getNESTPixelSizes.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+delim
+        command = "\""+os.path.dirname(__file__)+os.sep+"processing_s1tbx_java"+os.sep+"getS1TbxPixelSizes.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+delim
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         for line in iter(proc.readline, ""):
             ProcessingLog.addToLog(ProcessingLog.LOG_INFO, line)

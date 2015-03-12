@@ -1,6 +1,6 @@
 """
 ***************************************************************************
-    BEAMAlgorithmProvider.py
+    S1TbxAlgorithmProvider.py
 -------------------------------------
     Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
@@ -32,9 +32,9 @@ from processing.core.ProcessingConfig import ProcessingConfig, Setting
 from processing.core.AlgorithmProvider import AlgorithmProvider
 from processing.core.ProcessingLog import ProcessingLog
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.BEAMAlgorithm import BEAMAlgorithm
+from processing_gpf.S1TbxAlgorithm import S1TbxAlgorithm
 
-class BEAMAlgorithmProvider(AlgorithmProvider):
+class S1TbxAlgorithmProvider(AlgorithmProvider):
 
     def __init__(self):
         AlgorithmProvider.__init__(self)
@@ -43,41 +43,42 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
 
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_FOLDER, "BEAM install directory", GPFUtils.programPath(GPFUtils.beamKey())))
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.BEAM_THREADS, "Maximum number of parallel (native) threads", 4))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_FOLDER, "S1 Toolbox install directory", GPFUtils.programPath(GPFUtils.s1tbxKey())))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_THREADS, "Maximum number of parallel (native) threads", 4))
 
     def unload(self):
         AlgorithmProvider.unload(self)
-        ProcessingConfig.removeSetting(GPFUtils.BEAM_FOLDER)
-        ProcessingConfig.removeSetting(GPFUtils.BEAM_THREADS)
+        ProcessingConfig.removeSetting(GPFUtils.S1TBX_FOLDER)
+        ProcessingConfig.removeSetting(GPFUtils.S1TBX_THREADS)
         
     def createAlgsList(self):
         self.preloadedAlgs = []
-        folder = GPFUtils.gpfDescriptionPath(GPFUtils.beamKey())
+        folder = GPFUtils.gpfDescriptionPath(GPFUtils.s1tbxKey())
         for descriptionFile in os.listdir(folder):
             if descriptionFile.endswith("txt"):
                 try:
-                    alg = BEAMAlgorithm(os.path.join(folder, descriptionFile))
+                    alg = S1TbxAlgorithm(os.path.join(folder, descriptionFile))
                     if alg.name.strip() != "":
                         self.preloadedAlgs.append(alg)
                     else:
-                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
+                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S1 Toolbox algorithm: " + descriptionFile)
                 except Exception,e:
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, str(e))
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S1 Toolbox algorithm: " + descriptionFile)
         # leave out for now as the functionality is not fully developed
         #self.preloadedAlgs.append(MultinodeGPFCreator())  
                     
     def getDescription(self):
-        return "BEAM (Envisat image analysis)"
+        return "S1 Toolbox (SAR image analysis)"
 
     def getName(self):
-        return "beam"
+        return "s1tbx"
 
     def getIcon(self):
-        return QIcon(os.path.dirname(__file__) + "/images/beam.png")
+        return QIcon(os.path.dirname(__file__) + "/images/s1tbx.png")
 
     def _loadAlgorithms(self):
-        self.algs = self.preloadedAlgs  
-        
+        self.algs = self.preloadedAlgs
+
     def getSupportedOutputRasterLayerExtensions(self):
-        return ["tif", "dim"]
+        return ["tif", "dim", "hdr"]
