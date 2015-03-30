@@ -1,0 +1,7 @@
+LinearTodB
+s1tbx_LinearTodB
+Linear to dB
+I/O
+ParameterRaster|sourceProduct|Input image|False|False
+ParameterString|!sourceBands>band|The list of source bands|
+OutputRaster|-out|Output Image
