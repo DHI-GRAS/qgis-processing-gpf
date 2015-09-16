@@ -112,14 +112,16 @@ class GPFUtils:
             except:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])
-            #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", sourceFiles])
         elif key == GPFUtils.s1tbxKey():
             try:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.S1TBX_THREADS)))
             except:
                 threads = 4
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])   
-            #command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "gpt.bat\" \"", gpfPath, "\" -e ", "-q 8 ", sourceFiles])    
+            if output.endswith(".tif") or output.endswith(".TIF"):
+                outputCmd = " -f \"GeoTIFF-BigTIFF\" -t \""
+            else:
+                outputCmd = " -t \""
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), outputCmd, output, "\" ", sourceFiles])      
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         line =""
