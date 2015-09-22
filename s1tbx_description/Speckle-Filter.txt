@@ -3,7 +3,7 @@ s1tbx_Speckle-Filter
 Speckle Filter
 Filters
 ParameterRaster|sourceProduct|The product which will be despeckled|False|False
-ParameterString|!sourceBands>band|The list of source bands|
+ParameterString|!sourceBands>band|The list of source bands||False|True
 ParameterSelection|filter|filter type|Mean;Median;Frost;Gamma Map;Lee;Refined Lee
 ParameterNumber|filterSizeX|The kernel X dimension|1|100|3
 ParameterNumber|filterSizeY|The kernel Y dimension|1|100|3

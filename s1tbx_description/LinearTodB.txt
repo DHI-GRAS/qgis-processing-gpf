@@ -3,5 +3,5 @@ s1tbx_LinearTodB
 Linear to dB
 I/O
 ParameterRaster|sourceProduct|Input image|False|False
-ParameterString|!sourceBands>band|The list of source bands|
+ParameterString|!sourceBands>band|The list of source bands||False|True
 OutputRaster|-out|Output Image

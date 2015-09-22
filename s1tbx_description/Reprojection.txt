@@ -20,5 +20,5 @@ ParameterBoolean|includeTiePointGrids|Whether tie-point grids should be included
 *ParameterNumber|referencePixelY|The Y-position of the reference pixel|None|None|99999.9
 *ParameterNumber|orientation|The orientation of the output product (in degree)|-360|360|0
 *ParameterBoolean|orthorectify|Whether the source product should be orthorectified. (Not applicable to all products)|False
-*ParameterString|elevationModelName|The name of the elevation model for the orthorectification. If not given tie-point data is used|
+*ParameterString|elevationModelName|The name of the elevation model for the orthorectification. If not given tie-point data is used||False|True
 
