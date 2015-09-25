@@ -12,7 +12,7 @@ description= QGIS Processing provider for GPF-based algorithms (BEAM and Sentine
 about= 
 	QGIS Processing provider for GPF (Graph Processing Framework)-based algorithms. Currently supports selected algorithms from BEAM (http://www.brockmann-consult.de/cms/web/beam/) and Sentinel-1 Toolbox (https://sentinel.esa.int/web/sentinel/toolboxes/sentinel-1). In the future support will be extended to other Sentinel Toolboxes (https://sentinel.esa.int/web/sentinel/toolboxes). 
 	
-	The plugin requires BEAM and/or S-1 Toolbox to be installed for it to be able to access their GPF algorithms. 
+	The plugin requires BEAM and/or S-1 Toolbox (version 1.1.1) to be installed for it to be able to access their GPF algorithms. 
 	
 	This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
@@ -22,8 +22,9 @@ qgisMinimumVersion=2.8
 # Optional items:
 
 
-Changelog=2.1.2
+Changelog=1.2.2
 	- Save Sentinel-1 Toolbox TIFF output in BigTIFF format.
+	-  Make band selection parameters optional in S1 preprocessing algorithms. Makes it easier to use the in Processing models.
 	1.2.1
 	- Set minimum QGIS version to 2.8 
 	1.2.0
