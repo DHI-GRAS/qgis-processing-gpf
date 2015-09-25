@@ -289,7 +289,10 @@ class GPFAlgorithm(GeoAlgorithm):
         
     def commandLineName(self):
         return self.provider.getName().lower().replace(" ", "") + ":" + self.operator.lower().replace("-","")
-                
+    
+    ##############################################################################            
+    # Below are GeoAlgorithm functions which need to be overwritten to support 
+    # non-GDAL inputs (.safe, .zip, .dim) and outputs (.dim) in Processing toolbox.
 
     def convertUnsupportedFormats(self, progress):
         pass
@@ -299,3 +302,11 @@ class GPFAlgorithm(GeoAlgorithm):
     
     def checkInputCRS(self):
         return True
+        
+    def _checkParameterValuesBeforeExecuting(self):
+        msg = GeoAlgorithm._checkParameterValuesBeforeExecuting(self)
+        # .safe and .zip file formats can be opened with Sentinel Toolbox
+        # even though they can't be opened by GDAL. 
+        if msg and (msg.endswith(".safe") or msg.endswith(".zip")):
+            msg = None
+        return msg  
