@@ -11,7 +11,7 @@ After the activation the BEAM and/or S1TBX algorithms become available in the Pr
 
 ![](https://github.com/TIGER-NET/screenshots/blob/master/Processing-GPF/algorithms.png)
 
-The algorithms can be used as any other Processing algorithms, i.e. added to scripts, models, run in batch mode, etc. However, some processing chains (e.g. SAR data pre-processing) require an output of a previous step to be saved in BEAM/S1TBX format (.DIM) so that it can be used as input for the next step, since not all the metadata is saved in GeoTIFF. Unfortunately .DIM format is not fully supported by GDAL so in those cases the output cannot be properly displayed in QGIS until it is saved as GeoTIFF (when the extra metadata is no longer required) and also those processing chains cannot be build using Processing Toolbox modeller. 
+The algorithms can be used as any other Processing algorithms, i.e. added to scripts, models, run in batch mode, etc. However, some processing chains might require an output of a previous step to be saved in BEAM/S1TBX format (.DIM) so that it can be used as input for the next step, since not all the metadata is saved in GeoTIFF. Unfortunately .DIM format is not fully supported by GDAL so in those cases the output cannot be properly displayed in QGIS until it is saved as GeoTIFF (when the extra metadata is no longer required) and also those processing chains cannot be build using Processing Toolbox modeller. 
 
 This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa.
 
