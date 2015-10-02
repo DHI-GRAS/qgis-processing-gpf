@@ -24,7 +24,9 @@ qgisMinimumVersion=2.8
 
 Changelog=1.2.2
 	- Save Sentinel-1 Toolbox TIFF output in BigTIFF format.
-	-  Make band selection parameters optional in S1 preprocessing algorithms. Makes it easier to use the in Processing models.
+	- Make band selection parameters optional in S1 pre-processing algorithms. Makes it easier to use in Processing models.
+	- Enable the use of .zip and .safe files as algorithm inputs in newer versions of Processing.
+	- Update subset operator to be compatible with S1TBX 1.1.1
 	1.2.1
 	- Set minimum QGIS version to 2.8 
 	1.2.0
