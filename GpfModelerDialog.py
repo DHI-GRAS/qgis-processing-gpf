@@ -1,0 +1,117 @@
+from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QMessageBox, QTreeWidget, QTreeWidgetItem, QFileDialog
+from processing.modeler.ModelerDialog import ModelerDialog, TreeAlgorithmItem
+from processing.modeler.ModelerUtils import ModelerUtils
+from processing.gui.HelpEditionDialog import HelpEditionDialog
+from processing.gui.AlgorithmDialog import AlgorithmDialog
+from processing.core.ProcessingLog import ProcessingLog
+from processing.modeler.WrongModelException import WrongModelException
+from processing_gpf.GpfModelerAlgorithm import GpfModelerAlgorithm
+
+class GpfModelerDialog(ModelerDialog):
+    
+    def __init__(self, gpfAlgorithmProvider):
+        self.gpfAlgorithmProvider = gpfAlgorithmProvider
+        ModelerDialog.__init__(self)
+    
+    def editHelp(self):
+        if self.alg.provider is None:
+            # Might happen if model is opened from modeler dialog
+            self.alg.provider = ModelerUtils.providers[self.gpfAlgorithmProvider.getName()]
+        alg = self.alg.getCopy()
+        dlg = HelpEditionDialog(alg)
+        dlg.exec_()
+        if dlg.descriptions:
+            self.hasChanged = True
+            
+    def runModel(self):
+        if len(self.alg.algs) == 0:
+            QMessageBox.warning(self, self.tr('Empty model'),
+                    self.tr("Model doesn't contains any algorithms and/or "
+                            "parameters and can't be executed"))
+            return
+
+        if self.alg.provider is None:
+            # Might happen if model is opened from modeler dialog
+            self.alg.provider = ModelerUtils.providers[self.gpfAlgorithmProvider.getName()]
+        alg = self.alg.getCopy()
+        dlg = AlgorithmDialog(alg)
+        dlg.exec_()
+        
+    def fillAlgorithmTree(self):
+        
+        self.fillAlgorithmTreeUsingProviders()
+
+        self.algorithmTree.sortItems(0, Qt.AscendingOrder)
+
+        text = unicode(self.searchBox.text())
+        if text != '':
+            self.algorithmTree.expandAll()
+            
+    def fillAlgorithmTreeUsingProviders(self):
+        self.algorithmTree.clear()
+        text = unicode(self.searchBox.text())
+        groups = {}
+        providerName = self.gpfAlgorithmProvider.getName()
+        
+        # Add only GPF algorithms
+        for alg in self.gpfAlgorithmProvider.algs:
+            if not alg.showInModeler or alg.allowOnlyOpenedLayers:
+                continue
+            if text == '' or text.lower() in alg.name.lower():
+                if alg.group in groups:
+                    groupItem = groups[alg.group]
+                else:
+                    groupItem = QTreeWidgetItem()
+                    groupItem.setText(0, alg.group)
+                    groupItem.setToolTip(0, alg.group)
+                    groups[alg.group] = groupItem
+                algItem = TreeAlgorithmItem(alg)
+                groupItem.addChild(algItem)
+
+        if len(groups) > 0:
+            providerItem = QTreeWidgetItem()
+            providerItem.setText(0,
+                    ModelerUtils.providers[providerName].getDescription())
+            providerItem.setToolTip(0,
+                    ModelerUtils.providers[providerName].getDescription())
+            providerItem.setIcon(0,
+                    ModelerUtils.providers[providerName].getIcon())
+            for groupItem in groups.values():
+                providerItem.addChild(groupItem)
+            self.algorithmTree.addTopLevelItem(providerItem)
+            providerItem.setExpanded(text != '')
+            for groupItem in groups.values():
+                if text != '':
+                    groupItem.setExpanded(True)
+
+        self.algorithmTree.sortItems(0, Qt.AscendingOrder)
+        
+    def openModel(self):
+        filename = unicode(QFileDialog.getOpenFileName(self,
+                           self.tr('Open GPF Model'), ModelerUtils.modelsFolder(),
+                           self.tr('GPF models (*.xml *.XML)')))
+        if filename:
+            try:
+                alg = GpfModelerAlgorithm.fromFile(filename, self.gpfAlgorithmProvider)
+                self.alg = alg
+                self.alg.setModelerView(self)
+                self.textGroup.setText(alg.group)
+                self.textName.setText(alg.name)
+                self.repaintModel()
+    
+                self.view.centerOn(0, 0)
+                self.hasChanged = False
+            except WrongModelException, e:
+                ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
+                    self.tr('Could not load model %s\n%s') % (filename, e.msg))
+                QMessageBox.critical(self, self.tr('Could not open model'),
+                        self.tr('The selected model could not be loaded.\n'
+                                'See the log for more information.'))
+            except Exception, e:
+                ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
+                    self.tr('Could not load model %s\n%s') % (filename, e.args[0]))
+                QMessageBox.critical(self, self.tr('Could not open model'),
+                    self.tr('The selected model could not be loaded.\n'
+                            'See the log for more information.'))
+            

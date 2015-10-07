@@ -33,11 +33,13 @@ from processing.core.AlgorithmProvider import AlgorithmProvider
 from processing.core.ProcessingLog import ProcessingLog
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.S1TbxAlgorithm import S1TbxAlgorithm
+from processing_gpf.CreateNewGpfModelAction import CreateNewGpfModelAction
 
 class S1TbxAlgorithmProvider(AlgorithmProvider):
 
     def __init__(self):
         AlgorithmProvider.__init__(self)
+        self.actions = [CreateNewGpfModelAction(self)]
         self.activate = False
         self.createAlgsList() #preloading algorithms to speed up
 
@@ -76,6 +78,12 @@ class S1TbxAlgorithmProvider(AlgorithmProvider):
 
     def getIcon(self):
         return QIcon(os.path.dirname(__file__) + "/images/s1tbx.png")
+    
+    def getAlgorithmFromOperator(self, operatorName):
+        for alg in self.algs:
+            if alg.operator == operatorName:
+                return alg
+        return None
 
     def _loadAlgorithms(self):
         self.algs = self.preloadedAlgs
