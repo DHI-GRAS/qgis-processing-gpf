@@ -28,7 +28,10 @@
 
 import os
 import re
-from xml.etree.ElementTree import Element, SubElement, tostring
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 from processing.core.GeoAlgorithm import GeoAlgorithm
 try:
     from processing.parameters.ParameterRaster import ParameterRaster
@@ -124,20 +127,19 @@ class GPFAlgorithm(GeoAlgorithm):
         lines.close()
     
     def addGPFNode(self, graph):
-        
         # if there are previous nodes that should be added to the graph, recursively go backwards and add them
         if self.previousAlgInGraph != None:
             self.previousAlgInGraph.addGPFNode(graph)
 
         # now create and add the current node
-        node = Element("node", {"id":self.nodeID})
-        operator = SubElement(node, "operator")
+        node = ET.Element("node", {"id":self.nodeID})
+        operator = ET.SubElement(node, "operator")
         operator.text = self.operator
         
         # sources are added in the parameters loop below
-        sources = SubElement(node, "sources")
+        sources = ET.SubElement(node, "sources")
         
-        parametersNode = SubElement(node, "parameters")
+        parametersNode = ET.SubElement(node, "parameters")
         
         for param in self.parameters:
             # ignore parameters which should have no value unless set by user 
@@ -155,16 +157,15 @@ class GPFAlgorithm(GeoAlgorithm):
                             paramName = match.group(1)
                             productSetReaderNodeId = self.addProductSetReaderNode(graph, param.value)
                             if sources.find(paramName) == None:
-                                source = SubElement(sources, paramName)
+                                source = ET.SubElement(sources, paramName)
                                 source.set("refid",productSetReaderNodeId)
                         else:
-                            source = SubElement(sources, param.name)
+                            source = ET.SubElement(sources, param.name)
                             source.text = "${"+param.name+"}"
                             self.sourceFiles = self.sourceFiles +"".join("-S"+param.name+"=\"" + param.value + "\" ")
                     # else assume its a reference to a previous node and add a "source" element
                     else:
-                        source = SubElement(sources, param.name)
-                        source.text = param.value   
+                        source = ET.SubElement(sources, param.name, {"refid":param.value}) 
                 # add parameters
                 else:
                     # Set the name of the parameter
@@ -182,17 +183,17 @@ class GPFAlgorithm(GeoAlgorithm):
                             if len(parentElement.findall(tag)) > 0:
                                 parameter = parentElement.findall(tag)[0]
                             else:
-                                parameter = SubElement(parentElement, tag)
+                                parameter = ET.SubElement(parentElement, tag)
                         # "!" means that a new element in the graph should be created as child of the parent element and set as a parent    
                         elif tag.startswith("!"):
-                            parentElement = SubElement(parentElement, tag[1:])
+                            parentElement = ET.SubElement(parentElement, tag[1:])
                         # otherwise just find the last element with required name and set it as parent of the parameter element
                         # or create a new one if it can't be found    
                         else:
                             if len(parentElement.findall(tag)) > 0:
                                 parentElement = (parentElement.findall(tag))[-1]
                             else:
-                                parentElement = SubElement(parentElement, tag)
+                                parentElement = ET.SubElement(parentElement, tag)
                     
                     # Set the value of the parameter    
                     if isinstance(param, ParameterBoolean):
@@ -225,13 +226,13 @@ class GPFAlgorithm(GeoAlgorithm):
         
         # add ProductSet-Reader node if it doesn't exist yet   
         if node == None:
-            node = SubElement(graph, "node", {"id":nodeID})
-            SubElement(node, "sources")
-            operator = SubElement(node, "operator")
+            node = ET.SubElement(graph, "node", {"id":nodeID})
+            ET.SubElement(node, "sources")
+            operator = ET.SubElement(node, "operator")
             operator.text = "ProductSet-Reader"
             # add the file list
-            parametersNode = SubElement(node, "parameters")
-            parameter = SubElement(parametersNode, "fileList")
+            parametersNode = ET.SubElement(node, "parameters")
+            parameter = ET.SubElement(parametersNode, "fileList")
             parameter.text=filename
         # otherwise append filename to the node's fileList
         else:
@@ -241,34 +242,34 @@ class GPFAlgorithm(GeoAlgorithm):
           
     def addWriteNode(self, graph):
         # add write node
-        node = SubElement(graph, "node", {"id":self.nodeID+"_write"})
-        operator = SubElement(node, "operator")
+        node = ET.SubElement(graph, "node", {"id":self.nodeID+"_write"})
+        operator = ET.SubElement(node, "operator")
         operator.text = "Write"
         
         # add source
-        sources = SubElement(node, "sources")
-        source = SubElement(sources, "source")
+        sources = ET.SubElement(node, "sources")
+        source = ET.SubElement(sources, "source")
         source.text = self.nodeID
     
         # add some options
-        parametersNode = SubElement(node, "parameters")
-        parameter = SubElement(parametersNode, "clearCacheAfterRowWrite")
+        parametersNode = ET.SubElement(node, "parameters")
+        parameter = ET.SubElement(parametersNode, "clearCacheAfterRowWrite")
         parameter.text = "False"
-        parameter = SubElement(parametersNode, "deleteOutputOnFailure")
+        parameter = ET.SubElement(parametersNode, "deleteOutputOnFailure")
         parameter.text = "True"
-        parameter = SubElement(parametersNode, "writeEntireTileRows")
+        parameter = ET.SubElement(parametersNode, "writeEntireTileRows")
         parameter.text = "True"
-        parameter = SubElement(parametersNode, "formatName")
+        parameter = ET.SubElement(parametersNode, "formatName")
         parameter.text = "GeoTIFF"
-        parameter = SubElement(parametersNode, "file")
+        parameter = ET.SubElement(parametersNode, "file")
         parameter.text = str((self.outputs[0]).value)
         
         return graph
     
     def processAlgorithm(self, key, progress):
         # create a GFP for execution with BEAM's GPT
-        graph = Element("graph", {'id':self.operator+'_gpf'})
-        version = SubElement(graph, "version")
+        graph = ET.Element("graph", {'id':self.operator+'_gpf'})
+        version = ET.SubElement(graph, "version")
         version.text = "1.0"
         
         # add node with this algorithm's operator
@@ -279,13 +280,13 @@ class GPFAlgorithm(GeoAlgorithm):
         # log the GPF 
         loglines = []
         loglines.append("GPF Graph")
-        loglines.append(tostring(graph))
+        loglines.append(ET.tostring(graph))
         loglines.append(self.sourceFiles)
         ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
         
         # Execute the GPF
         # !!! should check that there is at least one output        
-        GPFUtils.executeGpf(key, tostring(graph), (self.outputs[0]).value, self.sourceFiles, progress)
+        GPFUtils.executeGpf(key, ET.tostring(graph), (self.outputs[0]).value, self.sourceFiles, progress)
         
     def commandLineName(self):
         return self.provider.getName().lower().replace(" ", "") + ":" + self.operator.lower().replace("-","")

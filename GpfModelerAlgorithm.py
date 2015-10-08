@@ -25,6 +25,53 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
             return ''
         else:
             return self.gpfAlgorithmProvider+':' + os.path.basename(self.descriptionFile)[:-4].lower()
+
+    def indent(self, elem, level=0):
+        i = "\n" + level*"  "
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + "  "
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                self.indent(elem, level+1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i
+    
+        
+    def toXml(self):
+        graph = ET.Element("graph", {'id':"Graph"})
+        version = ET.SubElement(graph, "version")
+        version.text = "1.0"
+    
+        # Copy also sets some internal model variables
+        modelInstance = self.getCopy()
+    
+        # Set the connections between nodes
+        for alg in modelInstance.algs.values():
+            for param in alg.params.values():
+                if isinstance(param, ValueFromOutput):
+                    alg.algorithm.getParameterFromName("sourceProduct").setValue(modelInstance.algs[param.alg].algorithm.nodeID)
+        
+        # Save model parameters
+        for alg in modelInstance.algs.values():
+            modelInstance.prepareAlgorithm(alg)
+            graph = alg.algorithm.addGPFNode(graph)
+            
+        # Save model layout
+        presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation"})
+        ET.SubElement(presentation, "Description")
+        for alg in self.algs.values():
+            node = ET.SubElement(presentation, "node", {"id":alg.algorithm.nodeID})
+            ET.SubElement(node, "displayPosition", {"x":str(alg.pos.x()), "y":str(alg.pos.y())})     
+        
+        # Make it look nice in text file
+        self.indent(graph)
+        
+        return ET.tostring(graph)
         
     # Need to set the parameter here while checking it's type to
     # accommodate drop-down list, CRS and possibly extent
@@ -65,6 +112,7 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                         modelAlg = Algorithm(alg.commandLineName())
                         modelAlg.description = node.attrib["id"]
                         for param in alg.parameters:
+                            modelAlg.params[param.name] = None
                             # Process parameter settings
                             if node.find("parameters/"+param.name) is not None:
                                 modelAlg.params[param.name] = GpfModelerAlgorithm.parseParameterValue(param, node.find("parameters/"+param.name).text)
@@ -89,8 +137,7 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                 for alg in model.algs.values():
                     position = presentation.find('node[@id="'+alg.description+'"]/displayPosition')
                     if position is not None:
-                        alg.pos = QPointF(float(position.attrib["x"]), float(position.attrib["y"]))
-                    
+                        alg.pos = QPointF(float(position.attrib["x"]), float(position.attrib["y"]))       
             return model
         except:
             raise WrongModelException("Error reading GPF XML file")

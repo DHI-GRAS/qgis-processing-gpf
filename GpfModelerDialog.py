@@ -1,3 +1,4 @@
+import codecs
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QMessageBox, QTreeWidget, QTreeWidgetItem, QFileDialog
 from processing.modeler.ModelerDialog import ModelerDialog, TreeAlgorithmItem
@@ -102,6 +103,7 @@ class GpfModelerDialog(ModelerDialog):
     
                 self.view.centerOn(0, 0)
                 self.hasChanged = False
+            
             except WrongModelException, e:
                 ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
                     self.tr('Could not load model %s\n%s') % (filename, e.msg))
@@ -114,4 +116,47 @@ class GpfModelerDialog(ModelerDialog):
                 QMessageBox.critical(self, self.tr('Could not open model'),
                     self.tr('The selected model could not be loaded.\n'
                             'See the log for more information.'))
+                
             
+    def saveModel(self, saveAs):
+        if unicode(self.textGroup.text()).strip() == '' \
+                or unicode(self.textName.text()).strip() == '':
+            QMessageBox.warning(
+                self, self.tr('Warning'), self.tr('Please enter group and model names before saving')
+            )
+            return
+        self.alg.name = unicode(self.textName.text())
+        self.alg.group = unicode(self.textGroup.text())
+        if self.alg.descriptionFile is not None and not saveAs:
+            filename = self.alg.descriptionFile
+        else:
+            filename = unicode(QFileDialog.getSaveFileName(self,
+                               self.tr('Save GPF Model'),
+                               ModelerUtils.modelsFolder(),
+                               self.tr('GPF models (*.xml)')))
+            if filename:
+                if not filename.endswith('.xml'):
+                    filename += '.xml'
+                self.alg.descriptionFile = filename
+        if filename:
+            text = self.alg.toXml()
+            try:
+                fout = codecs.open(filename, 'w', encoding='utf-8')
+            except:
+                if saveAs:
+                    QMessageBox.warning(self, self.tr('I/O error'),
+                            self.tr('Unable to save edits. Reason:\n %s') % unicode(sys.exc_info()[1]))
+                else:
+                    QMessageBox.warning(self, self.tr("Can't save model"),
+                            self.tr("This model can't be saved in its "
+                                    "original location (probably you do not "
+                                    "have permission to do it). Please, use "
+                                    "the 'Save as...' option."))
+                return
+            fout.write(text)
+            fout.close()
+            self.update = True
+            QMessageBox.information(self, self.tr('Model saved'),
+                                    self.tr('Model was correctly saved.'))
+
+            self.hasChanged = False
