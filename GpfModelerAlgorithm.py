@@ -62,7 +62,7 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
             graph = alg.algorithm.addGPFNode(graph)
             
         # Save model layout
-        presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation"})
+        presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation", "name":self.name, "group":self.group})
         ET.SubElement(presentation, "Description")
         for alg in self.algs.values():
             node = ET.SubElement(presentation, "node", {"id":alg.algorithm.nodeID})
@@ -90,8 +90,6 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
             if root.tag == "graph" and "id" in root.attrib and root.attrib["id"] == "Graph":
                 model = GpfModelerAlgorithm()
                 model.descriptionFile = filename
-                model.name = root.attrib["name"] if "name" in root.attrib.keys() else os.path.splitext(os.path.basename(filename))[0]
-                model.group = root.attrib["group"] if "group" in root.attrib.keys() else "Uncategorized"
                 modelConnections = {}
                 # Process all graph nodes (algorithms)
                 for node in root.findall("node"):
@@ -132,8 +130,11 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                             modelAlg.params[paramName] = ValueFromOutput(alg.name, "-out")
                             break
                 
-                # Place the nodes on the graph canvas
                 presentation = root.find('applicationData[@id="Presentation"]')
+                # Set the model name and group
+                model.name = presentation.attrib["name"] if "name" in presentation.attrib.keys() else os.path.splitext(os.path.basename(filename))[0]
+                model.group = presentation.attrib["group"] if "group" in presentation.attrib.keys() else "Uncategorized"
+                # Place the nodes on the graph canvas
                 for alg in model.algs.values():
                     position = presentation.find('node[@id="'+alg.description+'"]/displayPosition')
                     if position is not None:
