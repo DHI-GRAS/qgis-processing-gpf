@@ -248,22 +248,17 @@ class GPFAlgorithm(GeoAlgorithm):
         
         # add source
         sources = ET.SubElement(node, "sources")
-        source = ET.SubElement(sources, "source")
-        source.text = self.nodeID
+        ET.SubElement(sources, "source", {"refid":self.nodeID})
     
         # add some options
         parametersNode = ET.SubElement(node, "parameters")
-        parameter = ET.SubElement(parametersNode, "clearCacheAfterRowWrite")
-        parameter.text = "False"
-        parameter = ET.SubElement(parametersNode, "deleteOutputOnFailure")
-        parameter.text = "True"
-        parameter = ET.SubElement(parametersNode, "writeEntireTileRows")
-        parameter.text = "True"
-        parameter = ET.SubElement(parametersNode, "formatName")
-        parameter.text = "GeoTIFF"
         parameter = ET.SubElement(parametersNode, "file")
         parameter.text = str((self.outputs[0]).value)
-        
+        parameter = ET.SubElement(parametersNode, "formatName")
+        if (self.outputs[0]).value.lower().endswith(".dim"):
+            parameter.text = "BEAM-DIMAP"
+        else:
+            parameter.text = "GeoTIFF-BigTIFF"
         return graph
     
     def processAlgorithm(self, key, progress):
@@ -274,8 +269,7 @@ class GPFAlgorithm(GeoAlgorithm):
         
         # add node with this algorithm's operator
         graph = self.addGPFNode(graph)
-        # For now use command line option (in GPFUtils) to write output, not sure it this matters or not
-        #graph = self.addWriteNode(graph)
+        graph = self.addWriteNode(graph)
         
         # log the GPF 
         loglines = []

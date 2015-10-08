@@ -99,29 +99,30 @@ class GPFUtils:
         gpfPath = gpfFile.name
         gpfFile.close()  
         
-        # check if running on windows or other OS
-        if platform.system() == "Windows":
-            batchFile = "gpt.bat"
-        else:
-            batchFile = "gpt.sh"
         
         # execute the gpf
         if key == GPFUtils.beamKey():
+            # check if running on windows or other OS
+            if platform.system() == "Windows":
+                batchFile = "gpt.bat"
+            else:
+                batchFile = "gpt.sh"
             try:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.BEAM_THREADS)))
             except:
                 threads = 4
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " -t \"", output, "\" ", sourceFiles])
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " ", sourceFiles])
         elif key == GPFUtils.s1tbxKey():
+            # check if running on windows or other OS
+            if platform.system() == "Windows":
+                batchFile = "gpt.exe"
+            else:
+                batchFile = "gpt.sh"
             try:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.S1TBX_THREADS)))
             except:
                 threads = 4
-            if output.endswith(".tif") or output.endswith(".TIF"):
-                outputCmd = " -f \"GeoTIFF-BigTIFF\" -t \""
-            else:
-                outputCmd = " -t \""
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), outputCmd, output, "\" ", sourceFiles])      
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " ", sourceFiles])      
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         line =""
