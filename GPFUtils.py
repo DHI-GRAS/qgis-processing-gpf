@@ -34,6 +34,7 @@ import subprocess
 from decimal import Decimal 
 from processing.core.ProcessingConfig import ProcessingConfig
 from processing.core.ProcessingLog import ProcessingLog
+from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 
 class GPFUtils:
     
@@ -49,6 +50,16 @@ class GPFUtils:
     @staticmethod
     def s1tbxKey():
         return "S1Tbx"
+    
+    @staticmethod
+    def getKeyFromProviderName(providerName):
+        if providerName == "beam":
+            return GPFUtils.beamKey()
+        elif providerName == "s1tbx":
+            return GPFUtils.s1tbxKey()
+        else:
+            raise GeoAlgorithmExecutionException("Invalid GPF provider name!")
+            
     
     @staticmethod
     def programPath(key):
@@ -205,4 +216,21 @@ class GPFUtils:
                         pixels[key] = str(Decimal(line[1])*METERSPERDEGREE)
 
         return pixels
+    
+    @staticmethod
+    def indentXML(elem, level=0):
+        i = "\n" + level*"  "
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + "  "
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                GPFUtils.indentXML(elem, level+1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i
+        
             

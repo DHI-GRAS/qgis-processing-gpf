@@ -14,6 +14,7 @@ class GpfModelerDialog(ModelerDialog):
     def __init__(self, gpfAlgorithmProvider):
         self.gpfAlgorithmProvider = gpfAlgorithmProvider
         ModelerDialog.__init__(self)
+        self.alg = GpfModelerAlgorithm(gpfAlgorithmProvider)
     
     def editHelp(self):
         if self.alg.provider is None:
@@ -103,7 +104,7 @@ class GpfModelerDialog(ModelerDialog):
     
                 self.view.centerOn(0, 0)
                 self.hasChanged = False
-            
+                
             except WrongModelException, e:
                 ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
                     self.tr('Could not load model %s\n%s') % (filename, e.msg))
@@ -116,6 +117,7 @@ class GpfModelerDialog(ModelerDialog):
                 QMessageBox.critical(self, self.tr('Could not open model'),
                     self.tr('The selected model could not be loaded.\n'
                             'See the log for more information.'))
+            
                 
             
     def saveModel(self, saveAs):

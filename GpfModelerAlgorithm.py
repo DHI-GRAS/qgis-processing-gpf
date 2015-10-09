@@ -1,7 +1,10 @@
 import os
+import copy
 from processing.core.parameters import ParameterSelection, getParameterFromString
 from processing.modeler.ModelerAlgorithm import ModelerAlgorithm, Algorithm, ValueFromOutput, ValueFromInput, ModelerParameter
 from processing.modeler.WrongModelException import WrongModelException
+from processing.core.ProcessingLog import ProcessingLog
+from processing_gpf.GPFUtils import GPFUtils
 from PyQt4.QtCore import QPointF
 try:
     import xml.etree.cElementTree as ET
@@ -12,43 +15,50 @@ except ImportError:
 
 class GpfModelerAlgorithm (ModelerAlgorithm):
     
-    def __init__(self): #, gpfAlgorithmProvider):
+    def __init__(self, gpfAlgorithmProvider):
         ModelerAlgorithm.__init__(self)
-        #self.gpfAlgorithmProvider = gpfAlgorithmProvider
+        self.provider = gpfAlgorithmProvider
         self.name = self.tr('GpfModel', 'GpfModelerAlgorithm')
+    
+    def getCopy(self):
+        newone = GpfModelerAlgorithm(self.provider)
+        newone.algs = copy.deepcopy(self.algs)
+        newone.inputs = copy.deepcopy(self.inputs)
+        newone.defineCharacteristics()
+        newone.name = self.name
+        newone.group = self.group
+        newone.descriptionFile = self.descriptionFile
+        newone.helpContent = copy.deepcopy(self.helpContent)
+        return newone
         
     def processAlgorithm(self, progress):
-        pass
+        gpfXml = self.toXml(forExecution = True)
+        loglines = []
+        loglines.append("GPF Graph")
+        for line in gpfXml.splitlines():
+            loglines.append(line)
+        ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
+        GPFUtils.executeGpf(GPFUtils.getKeyFromProviderName(self.provider.getName()), gpfXml, progress)
     
     def commandLineName(self):
         if self.descriptionFile is None:
             return ''
         else:
-            return self.gpfAlgorithmProvider+':' + os.path.basename(self.descriptionFile)[:-4].lower()
-
-    def indent(self, elem, level=0):
-        i = "\n" + level*"  "
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-            for elem in elem:
-                self.indent(elem, level+1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
-    
+            return self.provider.getName()+':' + os.path.basename(self.descriptionFile)[:-4].lower()
         
-    def toXml(self):
+    def toXml(self, forExecution = False):
         graph = ET.Element("graph", {'id':"Graph"})
         version = ET.SubElement(graph, "version")
         version.text = "1.0"
     
-        # Copy also sets some internal model variables
-        modelInstance = self.getCopy()
+        # Copy also sets some internal model variables but if
+        # XML is created to execute the algorithm then the 
+        # copy was already made
+        if forExecution:
+            modelInstance = self
+        else:
+            modelInstance = self.getCopy()
+        
     
         # Set the connections between nodes
         for alg in modelInstance.algs.values():
@@ -69,7 +79,7 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
             ET.SubElement(node, "displayPosition", {"x":str(alg.pos.x()), "y":str(alg.pos.y())})     
         
         # Make it look nice in text file
-        self.indent(graph)
+        GPFUtils.indentXML(graph)
         
         return ET.tostring(graph)
         
@@ -88,7 +98,7 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
             tree = ET.parse(filename)
             root = tree.getroot()
             if root.tag == "graph" and "id" in root.attrib and root.attrib["id"] == "Graph":
-                model = GpfModelerAlgorithm()
+                model = GpfModelerAlgorithm(gpfAlgorithmProvider)
                 model.descriptionFile = filename
                 modelConnections = {}
                 # Process all graph nodes (algorithms)
