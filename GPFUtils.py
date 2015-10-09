@@ -111,7 +111,7 @@ class GPFUtils:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.BEAM_THREADS)))
             except:
                 threads = 4
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " ", sourceFiles])
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads)])
         elif key == GPFUtils.s1tbxKey():
             # check if running on windows or other OS
             if platform.system() == "Windows":
@@ -122,7 +122,7 @@ class GPFUtils:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.S1TBX_THREADS)))
             except:
                 threads = 4
-            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads), " ", sourceFiles])      
+            command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads)])      
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
         line =""

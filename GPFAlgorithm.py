@@ -155,14 +155,13 @@ class GPFAlgorithm(GeoAlgorithm):
                         match = re.match("^\d*ProductSet-Reader>(.*)",param.name)
                         if match:
                             paramName = match.group(1)
-                            productSetReaderNodeId = self.addProductSetReaderNode(graph, param.value)
-                            if sources.find(paramName) == None:
-                                source = ET.SubElement(sources, paramName)
-                                source.set("refid",productSetReaderNodeId)
+                            sourceNodeId = self.addProductSetReaderNode(graph, param.value)
                         else:
-                            source = ET.SubElement(sources, param.name)
-                            source.text = "${"+param.name+"}"
-                            self.sourceFiles = self.sourceFiles +"".join("-S"+param.name+"=\"" + param.value + "\" ")
+                            paramName = param.name
+                            sourceNodeId = self.addReadNode(graph, param.value)
+                        if sources.find(paramName) == None:
+                            source = ET.SubElement(sources, paramName)
+                            source.set("refid",sourceNodeId)
                     # else assume its a reference to a previous node and add a "source" element
                     else:
                         source = ET.SubElement(sources, param.name, {"refid":param.value}) 
@@ -239,10 +238,30 @@ class GPFAlgorithm(GeoAlgorithm):
             parameter = node.find(".//fileList")
             parameter.text +=","+filename
         return nodeID
+    
+    def addReadNode(self, graph, filename):
+        # Add read node
+        nodeID = self.nodeID+"_read_"+str(GPFAlgorithm.nodeIDNum)
+        GPFAlgorithm.nodeIDNum +=1
+        node = ET.SubElement(graph, "node", {"id":nodeID})
+        operator = ET.SubElement(node, "operator")
+        operator.text = "Read"
+        
+        # Add empty source
+        ET.SubElement(node, "sources")
+        
+        # Add file parameter with input file path
+        parametersNode = ET.SubElement(node, "parameters")
+        fileParameter = ET.SubElement(parametersNode, "file")
+        fileParameter.text = filename
+        
+        return nodeID
           
     def addWriteNode(self, graph, key):
         # add write node
-        node = ET.SubElement(graph, "node", {"id":self.nodeID+"_write"})
+        nodeID = self.nodeID+"_write_"+str(GPFAlgorithm.nodeIDNum)
+        GPFAlgorithm.nodeIDNum +=1
+        node = ET.SubElement(graph, "node", {"id":nodeID})
         operator = ET.SubElement(node, "operator")
         operator.text = "Write"
         
