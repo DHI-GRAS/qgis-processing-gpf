@@ -101,6 +101,8 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                 model = GpfModelerAlgorithm(gpfAlgorithmProvider)
                 model.descriptionFile = filename
                 modelConnections = {}
+                inConnections = {}
+                outConnections = {}
                 # Process all graph nodes (algorithms)
                 for node in root.findall("node"):
                     alg = gpfAlgorithmProvider.getAlgorithmFromOperator(node.find("operator").text)
@@ -124,15 +126,18 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                             # the main raster input to the graph    
                             if alg.operator == "Read":
                                 param = getParameterFromString("ParameterRaster|file|Source product")
-                                model.addParameter(ModelerParameter(param, QPointF( 100, 50)))
+                                modelParameter = ModelerParameter(param, QPointF(0, 0))
+                                model.addParameter(modelParameter)
                                 modelAlg.params["file"] = ValueFromInput("file")
+                                inConnections[modelAlg] = modelParameter
                             
                             # Special treatment for Write operator since it provides
                             # the main raster output from the graph    
                             if alg.operator == "Write":
-                                modelerOutput = ModelerOutput("Output file")
-                                modelerOutput.pos = QPointF( 200, 200)
-                                modelAlg.outputs["file"] = modelerOutput
+                                modelOutput = ModelerOutput("Output file")
+                                modelOutput.pos = QPointF(0, 0)
+                                modelAlg.outputs["file"] = modelOutput
+                                outConnections[modelAlg] = modelOutput
                                            
                         model.addAlgorithm(modelAlg) 
                 
@@ -153,7 +158,13 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                 for alg in model.algs.values():
                     position = presentation.find('node[@id="'+alg.description+'"]/displayPosition')
                     if position is not None:
-                        alg.pos = QPointF(float(position.attrib["x"]), float(position.attrib["y"]))       
+                        alg.pos = QPointF(float(position.attrib["x"]), float(position.attrib["y"])) 
+                        # For algorithms that have input or output model parameters set those parameters
+                        # in position relative to the algorithm
+                        if alg in inConnections:
+                            inConnections[alg].pos = QPointF(max(alg.pos.x()-50, 0), max(alg.pos.y()-50, 0))
+                        if alg in outConnections:
+                            outConnections[alg].pos = QPointF(alg.pos.x()+50, alg.pos.y()+50)     
             return model
         except:
             raise WrongModelException("Error reading GPF XML file")
