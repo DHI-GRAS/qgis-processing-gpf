@@ -240,7 +240,7 @@ class GPFAlgorithm(GeoAlgorithm):
             parameter.text +=","+filename
         return nodeID
           
-    def addWriteNode(self, graph):
+    def addWriteNode(self, graph, key):
         # add write node
         node = ET.SubElement(graph, "node", {"id":self.nodeID+"_write"})
         operator = ET.SubElement(node, "operator")
@@ -258,7 +258,10 @@ class GPFAlgorithm(GeoAlgorithm):
         if (self.outputs[0]).value.lower().endswith(".dim"):
             parameter.text = "BEAM-DIMAP"
         else:
-            parameter.text = "GeoTIFF-BigTIFF"
+            if key == GPFUtils.beamKey():
+                parameter.text = "GeoTIFF"
+            else:
+                parameter.text = "GeoTIFF-BigTIFF"
         return graph
     
     def processAlgorithm(self, key, progress):
@@ -269,7 +272,7 @@ class GPFAlgorithm(GeoAlgorithm):
         
         # add node with this algorithm's operator
         graph = self.addGPFNode(graph)
-        graph = self.addWriteNode(graph)
+        graph = self.addWriteNode(graph, key)
         
         # log the GPF 
         loglines = []
