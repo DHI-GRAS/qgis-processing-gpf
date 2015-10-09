@@ -291,7 +291,8 @@ class GPFAlgorithm(GeoAlgorithm):
         
         # add node with this algorithm's operator
         graph = self.addGPFNode(graph)
-        graph = self.addWriteNode(graph, key)
+        if len(self.outputs) >= 1:
+            graph = self.addWriteNode(graph, key)
         
         # log the GPF 
         loglines = []
@@ -300,9 +301,8 @@ class GPFAlgorithm(GeoAlgorithm):
         loglines.append(self.sourceFiles)
         ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
         
-        # Execute the GPF
-        # !!! should check that there is at least one output        
-        GPFUtils.executeGpf(key, ET.tostring(graph), (self.outputs[0]).value, self.sourceFiles, progress)
+        # Execute the GPF       
+        GPFUtils.executeGpf(key, ET.tostring(graph), progress)
         
     def commandLineName(self):
         return self.provider.getName().lower().replace(" ", "") + ":" + self.operator.lower().replace("-","")
