@@ -1,7 +1,7 @@
 import os
 import copy
 from processing.core.parameters import ParameterSelection, getParameterFromString
-from processing.modeler.ModelerAlgorithm import ModelerAlgorithm, Algorithm, ValueFromOutput, ValueFromInput, ModelerParameter
+from processing.modeler.ModelerAlgorithm import ModelerAlgorithm, Algorithm, ValueFromOutput, ValueFromInput, ModelerParameter, ModelerOutput
 from processing.modeler.WrongModelException import WrongModelException
 from processing.core.ProcessingLog import ProcessingLog
 from processing_gpf.GPFUtils import GPFUtils
@@ -104,19 +104,9 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                 # Process all graph nodes (algorithms)
                 for node in root.findall("node"):
                     alg = gpfAlgorithmProvider.getAlgorithmFromOperator(node.find("operator").text)
-                    
-                    # Special treatment for Read operator since it provides
-                    # the main raster input to the graph
-                    if alg is not None and alg.operator == "Read":
-                        modelAlg = Algorithm(alg.commandLineName())
-                        modelAlg.description = node.attrib["id"]
-                        param = getParameterFromString("ParameterRaster|file|Source product")
-                        model.addParameter(ModelerParameter(param, QPointF( 100, 50)))
-                        modelAlg.params["file"] = ValueFromInput("file")
-                        model.addAlgorithm(modelAlg) 
-                    
+                                            
                     # Process other operators
-                    elif alg is not None:
+                    if alg is not None:
                         modelAlg = Algorithm(alg.commandLineName())
                         modelAlg.description = node.attrib["id"]
                         for param in alg.parameters:
@@ -129,6 +119,21 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                             if node.find("sources/"+param.name) is not None:
                                 refid = node.find("sources/"+param.name).attrib["refid"]
                                 modelConnections[refid] = (modelAlg, param.name)
+                            
+                            # Special treatment for Read operator since it provides
+                            # the main raster input to the graph    
+                            if alg.operator == "Read":
+                                param = getParameterFromString("ParameterRaster|file|Source product")
+                                model.addParameter(ModelerParameter(param, QPointF( 100, 50)))
+                                modelAlg.params["file"] = ValueFromInput("file")
+                            
+                            # Special treatment for Write operator since it provides
+                            # the main raster output from the graph    
+                            if alg.operator == "Write":
+                                modelerOutput = ModelerOutput("Output file")
+                                modelerOutput.pos = QPointF( 200, 200)
+                                modelAlg.outputs["file"] = modelerOutput
+                                           
                         model.addAlgorithm(modelAlg) 
                 
                 # Set up connections between nodes of the graph
