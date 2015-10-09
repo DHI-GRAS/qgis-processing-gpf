@@ -81,7 +81,6 @@ class GPFAlgorithm(GeoAlgorithm):
         self.defineCharacteristicsFromFile()
         self.nodeID = ""+self.operator+"_"+str(GPFAlgorithm.nodeIDNum)
         GPFAlgorithm.nodeIDNum +=1
-        self.sourceFiles = ""
         self.previousAlgInGraph = None
         
     def helpFile(self, key):
@@ -309,8 +308,9 @@ class GPFAlgorithm(GeoAlgorithm):
         # Log the GPF 
         loglines = []
         loglines.append("GPF Graph")
-        loglines.append(ET.tostring(graph))
-        loglines.append(self.sourceFiles)
+        GPFUtils.indentXML(graph)
+        for line in ET.tostring(graph).splitlines(): 
+            loglines.append(line)
         ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
         
         # Execute the GPF       
