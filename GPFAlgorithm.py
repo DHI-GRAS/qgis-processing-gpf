@@ -216,6 +216,12 @@ class GPFAlgorithm(GeoAlgorithm):
                     else:          
                         parameter.text = str(param.value)
         
+        # For "Write" operator also save the output raster as a parameter
+        if self.operator == "Write":
+            fileParameter = ET.SubElement(parametersNode, "file")
+            fileParameter.text = str((self.outputs[0]).value)
+        
+        
         graph.append(node)
         return graph
         
@@ -257,7 +263,8 @@ class GPFAlgorithm(GeoAlgorithm):
         
         return nodeID
           
-    def addWriteNode(self, graph, key):
+    def addWriteNode(self, graph, output, key):
+           
         # add write node
         nodeID = self.nodeID+"_write_"+str(GPFAlgorithm.nodeIDNum)
         GPFAlgorithm.nodeIDNum +=1
@@ -267,15 +274,17 @@ class GPFAlgorithm(GeoAlgorithm):
         
         # add source
         sources = ET.SubElement(node, "sources")
-        ET.SubElement(sources, "source", {"refid":self.nodeID})
+        ET.SubElement(sources, "sourceProduct", {"refid":self.nodeID})
     
         # add some options
         parametersNode = ET.SubElement(node, "parameters")
         parameter = ET.SubElement(parametersNode, "file")
-        parameter.text = str((self.outputs[0]).value)
+        parameter.text = str(output.value)
         parameter = ET.SubElement(parametersNode, "formatName")
-        if (self.outputs[0]).value.lower().endswith(".dim"):
+        if output.value.lower().endswith(".dim"):
             parameter.text = "BEAM-DIMAP"
+        elif output.value.lower().endswith(".hdr"):
+            parameter.text = "ENVI"
         else:
             if key == GPFUtils.beamKey():
                 parameter.text = "GeoTIFF"
@@ -284,17 +293,20 @@ class GPFAlgorithm(GeoAlgorithm):
         return graph
     
     def processAlgorithm(self, key, progress):
-        # create a GFP for execution with BEAM's GPT
+        # Create a GFP for execution with BEAM's GPT
         graph = ET.Element("graph", {'id':self.operator+'_gpf'})
         version = ET.SubElement(graph, "version")
         version.text = "1.0"
         
-        # add node with this algorithm's operator
+        # Add node with this algorithm's operator
         graph = self.addGPFNode(graph)
-        if len(self.outputs) >= 1:
-            graph = self.addWriteNode(graph, key)
         
-        # log the GPF 
+        # Add outputs as write nodes (except for Write operator) 
+        if self.operator != "Write" and len(self.outputs) >= 1:
+            for output in self.outputs:
+                graph = self.addWriteNode(graph, output, key)
+        
+        # Log the GPF 
         loglines = []
         loglines.append("GPF Graph")
         loglines.append(ET.tostring(graph))
