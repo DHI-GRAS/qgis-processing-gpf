@@ -1,5 +1,6 @@
 import os
 import copy
+import ast
 from processing.core.parameters import ParameterSelection, getParameterFromString
 from processing.modeler.ModelerAlgorithm import ModelerAlgorithm, Algorithm, ValueFromOutput, ValueFromInput, ModelerParameter, ModelerOutput
 from processing.modeler.WrongModelException import WrongModelException
@@ -65,11 +66,23 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
             for param in alg.params.values():
                 if isinstance(param, ValueFromOutput):
                     alg.algorithm.getParameterFromName("sourceProduct").setValue(modelInstance.algs[param.alg].algorithm.nodeID)
-        
-        # Save model parameters
+                
+        # Save model algorithms
         for alg in modelInstance.algs.values():
             modelInstance.prepareAlgorithm(alg)
             graph = alg.algorithm.addGPFNode(graph)
+            # Save also the position and settings of model inputs. 
+            # They are saved as attributes of relevant parameter XML nodes.
+            # This way they do not interfere with the model when it's opened
+            # in SNAP.
+            if alg.algorithm.operator != "Read":
+                for param in alg.params.keys():
+                    paramValue = str(alg.params[param])
+                    if paramValue in modelInstance.inputs.keys():
+                        paramTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param)
+                        pos = modelInstance.inputs[paramValue].pos
+                        paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
+                        paramTag.attrib["qgisModelInputVars"] = str(modelInstance.inputs[paramValue].param.todict())
             
         # Save model layout
         presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation", "name":self.name, "group":self.group})
@@ -106,16 +119,27 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                 # Process all graph nodes (algorithms)
                 for node in root.findall("node"):
                     alg = gpfAlgorithmProvider.getAlgorithmFromOperator(node.find("operator").text)
-                                            
-                    # Process other operators
                     if alg is not None:
                         modelAlg = Algorithm(alg.commandLineName())
                         modelAlg.description = node.attrib["id"]
                         for param in alg.parameters:
                             modelAlg.params[param.name] = None
-                            # Process parameter settings
-                            if node.find("parameters/"+param.name) is not None:
-                                modelAlg.params[param.name] = GpfModelerAlgorithm.parseParameterValue(param, node.find("parameters/"+param.name).text)
+                            # Set algorithm parameter values
+                            paramNode = node.find("parameters/"+param.name)
+                            if paramNode is not None:
+                                modelAlg.params[param.name] = GpfModelerAlgorithm.parseParameterValue(param, paramNode.text)
+                                # Process model inputs which are saved as XML attributes
+                                # of a model parameters
+                                if "qgisModelInputPos" in paramNode.attrib and "qgisModelInputVars" in paramNode.attrib:
+                                    modelInput = ModelerParameter()
+                                    modelInput.param = copy.deepcopy(param)
+                                    modelInput.param.__dict__ = ast.literal_eval(paramNode.attrib["qgisModelInputVars"])
+                                    pos = paramNode.attrib["qgisModelInputPos"].split(',')
+                                    modelInput.pos = QPointF(float(pos[0]), float(pos[1]))
+                                    model.addParameter(modelInput)
+                                    modelAlg.params[param.name] = ValueFromInput(modelInput.param.name)
+                                    
+                                    
                             # Save the connections between nodes in the model
                             # Once all the nodes have been processed they will be processed
                             if node.find("sources/"+param.name) is not None:
