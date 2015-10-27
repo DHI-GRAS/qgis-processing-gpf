@@ -1,7 +1,9 @@
 import os
 import copy
 import ast
-from processing.core.parameters import ParameterSelection, getParameterFromString
+import re
+from qgis.core import QgsCoordinateReferenceSystem
+from processing.core.parameters import ParameterSelection, ParameterCrs, ParameterExtent, getParameterFromString
 from processing.modeler.ModelerAlgorithm import ModelerAlgorithm, Algorithm, ValueFromOutput, ValueFromInput, ModelerParameter, ModelerOutput
 from processing.modeler.WrongModelException import WrongModelException
 from processing.core.ProcessingLog import ProcessingLog
@@ -97,11 +99,28 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
         return ET.tostring(graph)
         
     # Need to set the parameter here while checking it's type to
-    # accommodate drop-down list, CRS and possibly extent
+    # accommodate drop-down list, CRS and extent
     @staticmethod
     def parseParameterValue(parameter, value):
         if isinstance(parameter, ParameterSelection):
             return parameter.options.index(value)
+        elif isinstance(parameter, ParameterCrs):
+            return QgsCoordinateReferenceSystem(value).authid()
+        elif isinstance(parameter, ParameterExtent):
+            match = re.match("POLYGON\s*\(\((.*)\)\)", value)
+            if match:
+                xmin, xmax, ymin, ymax = (None, None, None, None)
+                polygon = match.group(1)
+                for point in polygon.split(","):
+                    x = float(point.lstrip().split(" ")[0])
+                    y = float(point.lstrip().split(" ")[1])
+                    xmin = x if xmin is None else min(xmin, x)
+                    xmax = x if xmax is None else max(xmax, x)
+                    ymin = y if ymin is None else min(ymin, y)
+                    ymax = y if ymax is None else max(ymax, y)
+                if xmin is not None:
+                    return "("+str(xmin)+","+str(xmax)+","+str(ymin)+","+str(ymax)+")"
+            return ""    
         else:
             return value
 
