@@ -2,32 +2,59 @@ import os
 import copy
 import ast
 import re
-from qgis.core import QgsCoordinateReferenceSystem
-from processing.core.parameters import ParameterSelection, ParameterCrs, ParameterExtent, getParameterFromString
-from processing.modeler.ModelerAlgorithm import ModelerAlgorithm, Algorithm, ValueFromOutput, ValueFromInput, ModelerParameter, ModelerOutput
-from processing.modeler.WrongModelException import WrongModelException
+from qgis.core import QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
+from qgis.gui import QgsMessageBar
+from qgis.utils import iface
+from processing.core.parameters import getParameterFromString, ParameterSelection, ParameterCrs, ParameterRaster, ParameterVector, ParameterTable, ParameterTableField, ParameterBoolean, ParameterString, ParameterNumber, ParameterExtent, ParameterDataObject, ParameterMultipleInput
+from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 from processing.core.ProcessingLog import ProcessingLog
+from processing.tools import dataobjects
+from processing.modeler.ModelerAlgorithm import Algorithm, ValueFromOutput, ValueFromInput, ModelerParameter, ModelerOutput
+from processing.modeler.WrongModelException import WrongModelException
+from processing.gui.Help2Html import getHtmlFromDescriptionsDict
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.BEAMParametersDialog import BEAMParametersDialog
 from PyQt4.QtCore import QPointF
+from PyQt4.QtGui import QIcon
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
 
 import traceback
+from processing.core.GeoAlgorithm import GeoAlgorithm
 
-class GpfModelerAlgorithm (ModelerAlgorithm):
+# NOTE
+# GpfModelerAlgorithm should really be a subclass of ModelerAlgorithm.
+# However, that was causing EditModelAction to appear in the context menu
+# of GPF Models present in the Processing Toolbox. To overcome this issue
+# GpfModelerAlgorithm is now a subclass of GeoAlgorithm but still has the
+# same interface as ModelerAlgorithm 
+class GpfModelerAlgorithm (GeoAlgorithm):
     
     def __init__(self, gpfAlgorithmProvider):
-        ModelerAlgorithm.__init__(self)
-        self.provider = gpfAlgorithmProvider
-        self.programKey = GPFUtils.getKeyFromProviderName(self.provider.getName())
-        self.name = self.tr('GpfModel', 'GpfModelerAlgorithm')
+        
+        # The dialog where this model is being edited
+        self.modelerdialog = None
+        self.descriptionFile = None
+        self.helpContent = {}
+        # Geoalgorithms in this model. A dict of Algorithm objects, with names as keys
+        self.algs = {}
+        #Input parameters. A dict of Input objects, with names as keys
+        self.inputs = {}
         
         # NOTE:
         # This doesn't seem used so remove it later from BEAMParmetersPanel and S1TbxAlgorithm
         self.multipleRasterInput = False
+        
+        GeoAlgorithm.__init__(self)
+        
+        self.provider = gpfAlgorithmProvider
+        self.programKey = GPFUtils.getKeyFromProviderName(self.provider.getName())
+        self.name = self.tr('GpfModel', 'GpfModelerAlgorithm')
+    
+    def getIcon(self):
+        return  QIcon(os.path.dirname(__file__) + "/images/s1Tbx.png")
     
     # BEAM parameters dialog is the same as normal parameters dialog except
     # it has a button next to raster inputs to show band names
@@ -220,6 +247,258 @@ class GpfModelerAlgorithm (ModelerAlgorithm):
                         if alg in outConnections:
                             outConnections[alg].pos = QPointF(alg.pos.x()+50, alg.pos.y()+50)     
             return model
+        except Exception, e:
+            print e
+            print traceback.print_exc()
+        #    raise WrongModelException("Error reading GPF XML file")
+        
+        
+        
+        
+#####################################################################
+# Unmodified methods copied from ModelerAlgorithm
+
+    def addParameter(self, param):
+        self.inputs[param.param.name] = param
+        
+    def addAlgorithm(self, alg):
+        name = self.getNameForAlgorithm(alg)
+        alg.name = name
+        self.algs[name] = alg    
+    
+    def getNameForAlgorithm(self, alg):
+        i = 1
+        while alg.consoleName.upper().replace(":", "") + "_" + str(i) in self.algs.keys():
+            i += 1
+        return alg.consoleName.upper().replace(":", "") + "_" + str(i)
+    
+    def removeAlgorithm(self, name):
+        """Returns True if the algorithm could be removed, False if
+        others depend on it and could not be removed.
+        """
+        if self.hasDependencies(name):
+            return False
+        del self.algs[name]
+        self.modelerdialog.hasChanged = True
+        return True
+
+    def removeParameter(self, name):
+        """Returns True if the parameter could be removed, False if
+        others depend on it and could not be removed.
+        """
+        if self.hasDependencies(name):
+            return False
+        del self.inputs[name]
+        self.modelerdialog.hasChanged = True
+        return True
+
+    def hasDependencies(self, name):
+        """This method returns True if some other element depends on
+        the passed one.
+        """
+        for alg in self.algs.values():
+            for value in alg.params.values():
+                if value is None:
+                    continue
+                if isinstance(value, list):
+                    for v in value:
+                        if isinstance(v, ValueFromInput):
+                            if v.name == name:
+                                return True
+                        elif isinstance(v, ValueFromOutput):
+                            if v.alg == name:
+                                return True
+                if isinstance(value, ValueFromInput):
+                    if value.name == name:
+                        return True
+                elif isinstance(value, ValueFromOutput):
+                    if value.alg == name:
+                        return True
+        return False
+
+
+    def getDependsOnAlgorithms(self, name):
+        """This method returns a list with names of algorithms
+        a given one depends on.
+        """
+        alg = self.algs[name]
+        algs = set()
+        algs.update(set(alg.dependencies))
+        for value in alg.params.values():
+            if value is None:
+                continue
+            if isinstance(value, list):
+                for v in value:
+                    if isinstance(v, ValueFromOutput):
+                        algs.add(v.alg)
+                        algs.update(self.getDependsOnAlgorithms(v.alg))
+            elif isinstance(value, ValueFromOutput):
+                algs.add(value.alg)
+                algs.update(self.getDependsOnAlgorithms(value.alg))
+
+
+        return algs
+
+    def getDependentAlgorithms(self, name):
+        """This method returns a list with the names of algorithms
+        depending on a given one. It includes the algorithm itself
+        """
+        algs = set()
+        algs.add(name)
+        for alg in self.algs.values():
+            for value in alg.params.values():
+                if value is None:
+                    continue
+                if isinstance(value, list):
+                    for v in value:
+                        if isinstance(v, ValueFromOutput) and v.alg == name:
+                            algs.update(self.getDependentAlgorithms(alg.name))
+                elif isinstance(value, ValueFromOutput) and value.alg == name:
+                            algs.update(self.getDependentAlgorithms(alg.name))
+
+        return algs
+
+    def setPositions(self, paramPos, algPos, outputsPos):
+        for param, pos in paramPos.iteritems():
+            self.inputs[param].pos = pos
+        for alg, pos in algPos.iteritems():
+            self.algs[alg].pos = pos
+        for alg, positions in outputsPos.iteritems():
+            for output, pos in positions.iteritems():
+                self.algs[alg].outputs[output].pos = pos
+                
+    def prepareAlgorithm(self, alg):
+        algInstance = alg.algorithm
+        for param in algInstance.parameters:
+            if not param.hidden:
+                if param.name in alg.params:
+                    value = self.resolveValue(alg.params[param.name])
+                else:
+                    iface.messageBar().pushMessage(self.tr("Warning"),
+                                                   self.tr("Parameter %s in algorithm %s in the model is run with default value! Edit the model to make sure that this is correct." % (param.name, alg.name)), 
+                                                   QgsMessageBar.WARNING, 4)
+                    value = None
+                if value is None and isinstance(param, ParameterExtent):
+                    value = self.getMinCoveringExtent()
+                # We allow unexistent filepaths, since that allows
+                # algorithms to skip some conversion routines
+                if not param.setValue(value) and not isinstance(param,
+                        ParameterDataObject):
+                    raise GeoAlgorithmExecutionException(
+                        self.tr('Wrong value: %s', 'ModelerAlgorithm') % value)
+        for out in algInstance.outputs:
+            if not out.hidden:
+                if out.name in alg.outputs:
+                    name = self.getSafeNameForOutput(alg.name, out.name)
+                    modelOut = self.getOutputFromName(name)
+                    if modelOut:
+                        out.value = modelOut.value
+                else:
+                    out.value = None
+
+        return algInstance
+
+    def deactivateAlgorithm(self, algName):
+        dependent = self.getDependentAlgorithms(algName)
+        for alg in dependent:
+            self.algs[alg].active = False
+
+    def activateAlgorithm(self, algName):
+        parents = self.getDependsOnAlgorithms(algName)
+        for alg in parents:
+            if not self.algs[alg].active:
+                return False
+        self.algs[algName].active = True
+        return True
+
+    def getSafeNameForOutput(self, algName, outName):
+        return outName + '_ALG' + algName
+
+    def resolveValue(self, value):
+        if value is None:
+            return None
+        if isinstance(value, list):
+            return ";".join([self.resolveValue(v) for v in value])
+        if isinstance(value, ValueFromInput):
+            return self.getParameterFromName(value.name).value
+        elif isinstance(value, ValueFromOutput):
+            return self.algs[value.alg].algorithm.getOutputFromName(value.output).value
+        else:
+            return value
+
+    def getMinCoveringExtent(self):
+        first = True
+        found = False
+        for param in self.parameters:
+            if param.value:
+                if isinstance(param, (ParameterRaster, ParameterVector)):
+                    found = True
+                    if isinstance(param.value, (QgsRasterLayer, QgsVectorLayer)):
+                        layer = param.value
+                    else:
+                        layer = dataobjects.getObjectFromUri(param.value)
+                    self.addToRegion(layer, first)
+                    first = False
+                elif isinstance(param, ParameterMultipleInput):
+                    found = True
+                    layers = param.value.split(';')
+                    for layername in layers:
+                        layer = dataobjects.getObjectFromUri(layername)
+                        self.addToRegion(layer, first)
+                        first = False
+        if found:
+            return ','.join([str(v) for v in [self.xmin, self.xmax, self.ymin, self.ymax]])
+        else:
+            return None
+
+    def addToRegion(self, layer, first):
+        if first:
+            self.xmin = layer.extent().xMinimum()
+            self.xmax = layer.extent().xMaximum()
+            self.ymin = layer.extent().yMinimum()
+            self.ymax = layer.extent().yMaximum()
+        else:
+            self.xmin = min(self.xmin, layer.extent().xMinimum())
+            self.xmax = max(self.xmax, layer.extent().xMaximum())
+            self.ymin = min(self.ymin, layer.extent().yMinimum())
+            self.ymax = max(self.ymax, layer.extent().yMaximum())
+    
+    def defineCharacteristics(self):
+        classes = [ParameterRaster, ParameterVector, ParameterTable, ParameterTableField,
+                   ParameterBoolean, ParameterString, ParameterNumber]
+        self.parameters = []
+        for c in classes:
+            for inp in self.inputs.values():
+                if isinstance(inp.param, c):
+                    self.parameters.append(inp.param)
+        for inp in self.inputs.values():
+            if inp.param not in self.parameters:
+                self.parameters.append(inp.param)
+        self.outputs = []
+        for alg in self.algs.values():
+            if alg.active:
+                for out in alg.outputs:
+                    modelOutput = copy.deepcopy(alg.algorithm.getOutputFromName(out))
+                    modelOutput.name = self.getSafeNameForOutput(alg.name, out)
+                    modelOutput.description = alg.outputs[out].description
+                    self.outputs.append(modelOutput)
+    
+    def getAsCommand(self):
+        if self.descriptionFile:
+            return GeoAlgorithm.getAsCommand(self)
+        else:
+            return None
+        
+    def setModelerView(self, dialog):
+        self.modelerdialog = dialog
+
+    def updateModelerView(self):
+        if self.modelerdialog:
+            self.modelerdialog.repaintModel()
+
+    def help(self):
+        print self.helpContent
+        try:
+            return True, getHtmlFromDescriptionsDict(self, self.helpContent)
         except:
-            raise WrongModelException("Error reading GPF XML file")
-                    
+            return False, None

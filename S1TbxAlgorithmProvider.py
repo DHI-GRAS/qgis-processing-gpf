@@ -36,12 +36,14 @@ from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GpfModelerAlgorithm import GpfModelerAlgorithm
 from processing_gpf.S1TbxAlgorithm import S1TbxAlgorithm
 from processing_gpf.CreateNewGpfModelAction import CreateNewGpfModelAction
+from processing_gpf.EditGpfModelAction import EditGpfModelAction
 
 class S1TbxAlgorithmProvider(AlgorithmProvider):
 
     def __init__(self):
         AlgorithmProvider.__init__(self)
         self.actions = [CreateNewGpfModelAction(self)]
+        self.contextMenuActions = [EditGpfModelAction()]
         self.activate = False
         self.createAlgsList() #preloading algorithms to speed up
 

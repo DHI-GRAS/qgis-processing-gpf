@@ -12,9 +12,9 @@ from processing_gpf.GPFUtils import GPFUtils
 
 class GpfModelerDialog(ModelerDialog):
     
-    def __init__(self, gpfAlgorithmProvider):
+    def __init__(self, gpfAlgorithmProvider, alg=None):
         self.gpfAlgorithmProvider = gpfAlgorithmProvider
-        ModelerDialog.__init__(self)
+        ModelerDialog.__init__(self, alg)
         self.alg = GpfModelerAlgorithm(gpfAlgorithmProvider)
     
     def editHelp(self):
