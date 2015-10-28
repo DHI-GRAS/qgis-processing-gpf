@@ -8,6 +8,7 @@ from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.core.ProcessingLog import ProcessingLog
 from processing.modeler.WrongModelException import WrongModelException
 from processing_gpf.GpfModelerAlgorithm import GpfModelerAlgorithm
+from processing_gpf.GPFUtils import GPFUtils
 
 class GpfModelerDialog(ModelerDialog):
     
@@ -91,7 +92,7 @@ class GpfModelerDialog(ModelerDialog):
         
     def openModel(self):
         filename = unicode(QFileDialog.getOpenFileName(self,
-                           self.tr('Open GPF Model'), ModelerUtils.modelsFolder(),
+                           self.tr('Open GPF Model'), GPFUtils.modelsFolder(),
                            self.tr('GPF models (*.xml *.XML)')))
         if filename:
             try:
@@ -134,7 +135,7 @@ class GpfModelerDialog(ModelerDialog):
         else:
             filename = unicode(QFileDialog.getSaveFileName(self,
                                self.tr('Save GPF Model'),
-                               ModelerUtils.modelsFolder(),
+                               GPFUtils.modelsFolder(),
                                self.tr('GPF models (*.xml)')))
             if filename:
                 if not filename.endswith('.xml'):

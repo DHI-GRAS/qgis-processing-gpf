@@ -32,6 +32,7 @@ import re
 import tempfile
 import subprocess
 from decimal import Decimal 
+from processing.tools.system import userFolder, mkdir
 from processing.core.ProcessingConfig import ProcessingConfig
 from processing.core.ProcessingLog import ProcessingLog
 from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
@@ -42,6 +43,7 @@ class GPFUtils:
     BEAM_THREADS = "BEAM_THREADS"
     S1TBX_FOLDER = "S1TBX_FOLDER"
     S1TBX_THREADS = "S1TBX_THREADS"
+    MODELS_FOLDER = "MODELS_FOLDER"
     
     @staticmethod
     def beamKey():
@@ -91,7 +93,16 @@ class GPFUtils:
             return os.path.join(os.path.dirname(__file__), "s1tbx_doc") 
         else:
             return ""
-           
+    
+    @staticmethod
+    def modelsFolder():
+        folder = ProcessingConfig.getSetting(GPFUtils.MODELS_FOLDER)
+        if folder is None:
+            #folder = unicode(os.path.join(userFolder(), 'models'))
+            folder = unicode(os.path.dirname(__file__), 'gpf_models')
+        mkdir(folder)
+
+        return os.path.abspath(folder)       
     
     @staticmethod
     def executeGpf(key, gpf, progress):

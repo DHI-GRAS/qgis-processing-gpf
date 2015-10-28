@@ -31,7 +31,9 @@ from PyQt4.QtGui import *
 from processing.core.ProcessingConfig import ProcessingConfig, Setting
 from processing.core.AlgorithmProvider import AlgorithmProvider
 from processing.core.ProcessingLog import ProcessingLog
+from processing.modeler.WrongModelException import WrongModelException
 from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.GpfModelerAlgorithm import GpfModelerAlgorithm
 from processing_gpf.S1TbxAlgorithm import S1TbxAlgorithm
 from processing_gpf.CreateNewGpfModelAction import CreateNewGpfModelAction
 
@@ -47,6 +49,7 @@ class S1TbxAlgorithmProvider(AlgorithmProvider):
         AlgorithmProvider.initializeSettings(self)
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_FOLDER, "S1 Toolbox install directory", GPFUtils.programPath(GPFUtils.s1tbxKey())))
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_THREADS, "Maximum number of parallel (native) threads", 4))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.MODELS_FOLDER, "GPF models' directory", GPFUtils.modelsFolder()))
 
     def unload(self):
         AlgorithmProvider.unload(self)
@@ -61,14 +64,33 @@ class S1TbxAlgorithmProvider(AlgorithmProvider):
                 try:
                     alg = S1TbxAlgorithm(os.path.join(folder, descriptionFile))
                     if alg.name.strip() != "":
+                        alg.provider = self
                         self.preloadedAlgs.append(alg)
                     else:
                         ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S1 Toolbox algorithm: " + descriptionFile)
                 except Exception,e:
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, str(e))
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S1 Toolbox algorithm: " + descriptionFile)
-        # leave out for now as the functionality is not fully developed
-        #self.preloadedAlgs.append(MultinodeGPFCreator())  
+    
+    def loadGpfModels(self, folder):
+        if not os.path.exists(folder):
+            return
+        for path, subdirs, files in os.walk(folder):
+            for descriptionFile in files:
+                if descriptionFile.endswith('xml'):
+                    try:
+                        fullpath = os.path.join(path, descriptionFile)
+                        alg = GpfModelerAlgorithm.fromFile(fullpath, self)
+                        if alg and alg.name:
+                            #alg.provider = self
+                            alg.descriptionFile = fullpath
+                            self.algs.append(alg)
+                        else:
+                            ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
+                                self.tr('Could not load model %s', 'ModelerAlgorithmProvider') % descriptionFile)
+                    except WrongModelException, e:
+                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
+                            self.tr('Could not load model %s\n%s', 'ModelerAlgorithmProvider') % (descriptionFile, e.msg))
                     
     def getDescription(self):
         return "S1 Toolbox (SAR image analysis)"
@@ -87,6 +109,8 @@ class S1TbxAlgorithmProvider(AlgorithmProvider):
 
     def _loadAlgorithms(self):
         self.algs = self.preloadedAlgs
+        # Also load models
+        self.loadGpfModels(GPFUtils.modelsFolder())
 
     def getSupportedOutputRasterLayerExtensions(self):
         return ["tif", "dim", "hdr"]

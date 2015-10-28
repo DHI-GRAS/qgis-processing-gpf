@@ -8,20 +8,31 @@ from processing.modeler.ModelerAlgorithm import ModelerAlgorithm, Algorithm, Val
 from processing.modeler.WrongModelException import WrongModelException
 from processing.core.ProcessingLog import ProcessingLog
 from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.BEAMParametersDialog import BEAMParametersDialog
 from PyQt4.QtCore import QPointF
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
 
-
+import traceback
 
 class GpfModelerAlgorithm (ModelerAlgorithm):
     
     def __init__(self, gpfAlgorithmProvider):
         ModelerAlgorithm.__init__(self)
         self.provider = gpfAlgorithmProvider
+        self.programKey = GPFUtils.getKeyFromProviderName(self.provider.getName())
         self.name = self.tr('GpfModel', 'GpfModelerAlgorithm')
+        
+        # NOTE:
+        # This doesn't seem used so remove it later from BEAMParmetersPanel and S1TbxAlgorithm
+        self.multipleRasterInput = False
+    
+    # BEAM parameters dialog is the same as normal parameters dialog except
+    # it has a button next to raster inputs to show band names
+    def getCustomParametersDialog(self):
+        return BEAMParametersDialog(self)
     
     def getCopy(self):
         newone = GpfModelerAlgorithm(self.provider)
