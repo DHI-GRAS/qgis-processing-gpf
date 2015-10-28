@@ -51,12 +51,13 @@ class S1TbxAlgorithmProvider(AlgorithmProvider):
         AlgorithmProvider.initializeSettings(self)
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_FOLDER, "S1 Toolbox install directory", GPFUtils.programPath(GPFUtils.s1tbxKey())))
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_THREADS, "Maximum number of parallel (native) threads", 4))
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.MODELS_FOLDER, "GPF models' directory", GPFUtils.modelsFolder()))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.GPF_MODELS_FOLDER, "GPF models' directory", GPFUtils.modelsFolder()))
 
     def unload(self):
         AlgorithmProvider.unload(self)
         ProcessingConfig.removeSetting(GPFUtils.S1TBX_FOLDER)
         ProcessingConfig.removeSetting(GPFUtils.S1TBX_THREADS)
+        ProcessingConfig.removeSetting(GPFUtils.GPF_MODELS_FOLDER)
         
     def createAlgsList(self):
         self.preloadedAlgs = []

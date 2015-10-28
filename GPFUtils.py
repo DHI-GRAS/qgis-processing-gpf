@@ -43,7 +43,7 @@ class GPFUtils:
     BEAM_THREADS = "BEAM_THREADS"
     S1TBX_FOLDER = "S1TBX_FOLDER"
     S1TBX_THREADS = "S1TBX_THREADS"
-    MODELS_FOLDER = "MODELS_FOLDER"
+    GPF_MODELS_FOLDER = "GPF_MODELS_FOLDER"
     
     @staticmethod
     def beamKey():
@@ -96,12 +96,11 @@ class GPFUtils:
     
     @staticmethod
     def modelsFolder():
-        folder = ProcessingConfig.getSetting(GPFUtils.MODELS_FOLDER)
+        folder = ProcessingConfig.getSetting(GPFUtils.GPF_MODELS_FOLDER)
         if folder is None:
-            #folder = unicode(os.path.join(userFolder(), 'models'))
-            folder = unicode(os.path.dirname(__file__), 'gpf_models')
+            folder = unicode(os.path.join(userFolder(), 'models'))
+        folder = unicode(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'gpf_models'))
         mkdir(folder)
-
         return os.path.abspath(folder)       
     
     @staticmethod
