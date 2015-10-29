@@ -34,6 +34,8 @@ class GpfModelerAlgorithm (GeoAlgorithm):
     
     def __init__(self, gpfAlgorithmProvider):
         
+        self.name = self.tr('GpfModel', 'GpfModelerAlgorithm')
+        
         # The dialog where this model is being edited
         self.modelerdialog = None
         self.descriptionFile = None
@@ -51,7 +53,7 @@ class GpfModelerAlgorithm (GeoAlgorithm):
         
         self.provider = gpfAlgorithmProvider
         self.programKey = GPFUtils.getKeyFromProviderName(self.provider.getName())
-        self.name = self.tr('GpfModel', 'GpfModelerAlgorithm')
+        
     
     def getIcon(self):
         return  QIcon(os.path.dirname(__file__) + "/images/s1Tbx.png")
@@ -258,8 +260,33 @@ class GpfModelerAlgorithm (GeoAlgorithm):
 #####################################################################
 # Unmodified methods copied from ModelerAlgorithm
 
+    CANVAS_SIZE = 4000
+    
+    def defineCharacteristics(self):
+        classes = [ParameterRaster, ParameterVector, ParameterTable, ParameterTableField,
+                   ParameterBoolean, ParameterString, ParameterNumber]
+        self.parameters = []
+        for c in classes:
+            for inp in self.inputs.values():
+                if isinstance(inp.param, c):
+                    self.parameters.append(inp.param)
+        for inp in self.inputs.values():
+            if inp.param not in self.parameters:
+                self.parameters.append(inp.param)
+        self.outputs = []
+        for alg in self.algs.values():
+            if alg.active:
+                for out in alg.outputs:
+                    modelOutput = copy.deepcopy(alg.algorithm.getOutputFromName(out))
+                    modelOutput.name = self.getSafeNameForOutput(alg.name, out)
+                    modelOutput.description = alg.outputs[out].description
+                    self.outputs.append(modelOutput)
+    
     def addParameter(self, param):
         self.inputs[param.param.name] = param
+        
+    def updateParameter(self, param):
+        self.inputs[param.name].param = param
         
     def addAlgorithm(self, alg):
         name = self.getNameForAlgorithm(alg)
@@ -271,6 +298,17 @@ class GpfModelerAlgorithm (GeoAlgorithm):
         while alg.consoleName.upper().replace(":", "") + "_" + str(i) in self.algs.keys():
             i += 1
         return alg.consoleName.upper().replace(":", "") + "_" + str(i)
+    
+    def updateAlgorithm(self, alg):
+        alg.pos = self.algs[alg.name].pos
+        self.algs[alg.name] = alg
+
+        from processing.modeler.ModelerGraphicItem import ModelerGraphicItem
+        for i, out in enumerate(alg.outputs):
+            alg.outputs[out].pos = (alg.outputs[out].pos or
+                    alg.pos + QPointF(
+                        ModelerGraphicItem.BOX_WIDTH,
+                        (i + 1.5) * ModelerGraphicItem.BOX_HEIGHT))
     
     def removeAlgorithm(self, name):
         """Returns True if the algorithm could be removed, False if
@@ -462,26 +500,6 @@ class GpfModelerAlgorithm (GeoAlgorithm):
             self.xmax = max(self.xmax, layer.extent().xMaximum())
             self.ymin = min(self.ymin, layer.extent().yMinimum())
             self.ymax = max(self.ymax, layer.extent().yMaximum())
-    
-    def defineCharacteristics(self):
-        classes = [ParameterRaster, ParameterVector, ParameterTable, ParameterTableField,
-                   ParameterBoolean, ParameterString, ParameterNumber]
-        self.parameters = []
-        for c in classes:
-            for inp in self.inputs.values():
-                if isinstance(inp.param, c):
-                    self.parameters.append(inp.param)
-        for inp in self.inputs.values():
-            if inp.param not in self.parameters:
-                self.parameters.append(inp.param)
-        self.outputs = []
-        for alg in self.algs.values():
-            if alg.active:
-                for out in alg.outputs:
-                    modelOutput = copy.deepcopy(alg.algorithm.getOutputFromName(out))
-                    modelOutput.name = self.getSafeNameForOutput(alg.name, out)
-                    modelOutput.description = alg.outputs[out].description
-                    self.outputs.append(modelOutput)
     
     def getAsCommand(self):
         if self.descriptionFile:
