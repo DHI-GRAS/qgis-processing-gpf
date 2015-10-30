@@ -252,10 +252,8 @@ class GpfModelerAlgorithm (GeoAlgorithm):
                         if alg in outConnections:
                             outConnections[alg].pos = QPointF(alg.pos.x()+50, alg.pos.y()+50)     
             return model
-        except Exception, e:
-            print e
-            print traceback.print_exc()
-        #    raise WrongModelException("Error reading GPF XML file")
+        except:
+            raise WrongModelException("Error reading GPF XML file")
         
         
         
