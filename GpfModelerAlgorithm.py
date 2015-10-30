@@ -147,20 +147,23 @@ class GpfModelerAlgorithm (GeoAlgorithm):
         elif isinstance(parameter, ParameterCrs):
             return QgsCoordinateReferenceSystem(value).authid()
         elif isinstance(parameter, ParameterExtent):
-            match = re.match("POLYGON\s*\(\((.*)\)\)", value)
-            if match:
-                xmin, xmax, ymin, ymax = (None, None, None, None)
-                polygon = match.group(1)
-                for point in polygon.split(","):
-                    x = float(point.lstrip().split(" ")[0])
-                    y = float(point.lstrip().split(" ")[1])
-                    xmin = x if xmin is None else min(xmin, x)
-                    xmax = x if xmax is None else max(xmax, x)
-                    ymin = y if ymin is None else min(ymin, y)
-                    ymax = y if ymax is None else max(ymax, y)
-                if xmin is not None:
-                    return "("+str(xmin)+","+str(xmax)+","+str(ymin)+","+str(ymax)+")"
+            if value:
+                match = re.match("POLYGON\s*\(\((.*)\)\)", value)
+                if match:
+                    xmin, xmax, ymin, ymax = (None, None, None, None)
+                    polygon = match.group(1)
+                    for point in polygon.split(","):
+                        x = float(point.lstrip().split(" ")[0])
+                        y = float(point.lstrip().split(" ")[1])
+                        xmin = x if xmin is None else min(xmin, x)
+                        xmax = x if xmax is None else max(xmax, x)
+                        ymin = y if ymin is None else min(ymin, y)
+                        ymax = y if ymax is None else max(ymax, y)
+                    if xmin is not None:
+                        return "("+str(xmin)+","+str(xmax)+","+str(ymin)+","+str(ymax)+")"
             return ""    
+        elif isinstance(parameter, ParameterBoolean):
+            return value == "True"
         else:
             return value
 

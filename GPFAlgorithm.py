@@ -34,6 +34,10 @@ except ImportError:
     import xml.etree.ElementTree as ET
 from processing.core.GeoAlgorithm import GeoAlgorithm
 try:
+    from processing.parameters.ParameterFile import ParameterFile
+except:
+    from processing.core.parameters import ParameterFile
+try:
     from processing.parameters.ParameterRaster import ParameterRaster
 except:
     from processing.core.parameters import ParameterRaster
@@ -212,6 +216,11 @@ class GPFAlgorithm(GeoAlgorithm):
                             parameter.text += values[1] + ' ' + values[3] +", "
                             parameter.text += values[1] + ' ' + values[2] +", "
                             parameter.text += values[0] + ' ' + values[2] +"))"
+                    elif isinstance(param, ParameterFile):
+                        if param.value is None or param.value == "None":
+                            parameter.text = ""
+                        else:
+                            parameter.text = str(param.value)
                     else:          
                         parameter.text = str(param.value)
         
