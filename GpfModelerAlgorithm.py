@@ -6,6 +6,7 @@ from qgis.core import QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLay
 from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 from processing.core.parameters import getParameterFromString, ParameterSelection, ParameterCrs, ParameterRaster, ParameterVector, ParameterTable, ParameterTableField, ParameterBoolean, ParameterString, ParameterNumber, ParameterExtent, ParameterDataObject, ParameterMultipleInput
+from processing.core.outputs import OutputRaster
 from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 from processing.core.ProcessingLog import ProcessingLog
 from processing.tools import dataobjects
@@ -15,7 +16,7 @@ from processing.gui.Help2Html import getHtmlFromDescriptionsDict
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.BEAMParametersDialog import BEAMParametersDialog
 from PyQt4.QtCore import QPointF
-from PyQt4.QtGui import QIcon
+from PyQt4.QtGui import QIcon, QMessageBox
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -112,6 +113,15 @@ class GpfModelerAlgorithm (GeoAlgorithm):
         # Save model algorithms
         for alg in modelInstance.algs.values():
             modelInstance.prepareAlgorithm(alg)
+            
+            # Only Write operators can save raster outputs
+            for out in alg.algorithm.outputs:
+                if alg.algorithm.operator != "Write" and isinstance(out, OutputRaster):
+                    if out.name in alg.outputs:
+                        QMessageBox.warning(None, self.tr('Unable to save model'),
+                                self.tr('Output rasters can only be saved by Write operator. Remove the value of raster output in %s algorithm or add a Write operator' % (alg.algorithm.operator,) ))
+                        return
+            
             graph = alg.algorithm.addGPFNode(graph)
             # Save also the position and settings of model inputs. 
             # They are saved as attributes of relevant parameter XML nodes.
@@ -121,6 +131,11 @@ class GpfModelerAlgorithm (GeoAlgorithm):
                 for param in alg.params.keys():
                     paramValue = str(alg.params[param])
                     if paramValue in modelInstance.inputs.keys():
+                        # Only Read operators can read raster inputs
+                        if param == "sourceProduct":
+                            QMessageBox.warning(None, self.tr('Unable to save model'),
+                                self.tr('Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm' % (alg.algorithm.operator,) ))
+                            return
                         paramTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param)
                         pos = modelInstance.inputs[paramValue].pos
                         paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())

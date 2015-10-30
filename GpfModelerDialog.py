@@ -143,6 +143,8 @@ class GpfModelerDialog(ModelerDialog):
                 self.alg.descriptionFile = filename
         if filename:
             text = self.alg.toXml()
+            if not text:
+                return
             try:
                 fout = codecs.open(filename, 'w', encoding='utf-8')
             except:
