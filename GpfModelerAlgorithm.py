@@ -161,7 +161,7 @@ class GpfModelerAlgorithm (GeoAlgorithm):
                         ymax = y if ymax is None else max(ymax, y)
                     if xmin is not None:
                         return "("+str(xmin)+","+str(xmax)+","+str(ymin)+","+str(ymax)+")"
-            return ""    
+            return None    
         elif isinstance(parameter, ParameterBoolean):
             return value == "True"
         else:
