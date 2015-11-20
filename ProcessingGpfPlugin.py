@@ -31,7 +31,7 @@ import os, sys
 import inspect
 from processing.core.Processing import Processing
 from processing_gpf.BEAMAlgorithmProvider import BEAMAlgorithmProvider 
-from processing_gpf.S1TbxAlgorithmProvider import S1TbxAlgorithmProvider 
+from processing_gpf.SNAPAlgorithmProvider import SNAPAlgorithmProvider
 
 cmd_folder = os.path.split(inspect.getfile( inspect.currentframe() ))[0]
 if cmd_folder not in sys.path:
@@ -41,13 +41,15 @@ class ProcessingGpfPlugin:
 
     def __init__(self, iface):
         self.BeamProvider = BEAMAlgorithmProvider()
-        self.S1TbxProvider = S1TbxAlgorithmProvider()
+        self.SNAPProvider = SNAPAlgorithmProvider()
+        
         self.iface = iface
         
     def initGui(self):
         Processing.addProvider(self.BeamProvider, True)
-        Processing.addProvider(self.S1TbxProvider, True)
+        Processing.addProvider(self.SNAPProvider, True)
+        #Processing.addProvider(self.S1tbx, True)
 
     def unload(self):
         Processing.removeProvider(self.BeamProvider)
-        Processing.removeProvider(self.S1TbxProvider)
+        Processing.removeProvider(self.SNAPProvider)

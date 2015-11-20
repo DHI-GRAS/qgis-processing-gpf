@@ -1,7 +1,7 @@
 Calibration
 s1tbx_Calibration
 Calibration
-I/O
+Sentinel-1
 ParameterRaster|sourceProduct|Input image|False|False
 ParameterString|!sourceBands>band|The list of source bands||False|True
 ParameterSelection|auxFile|The auxiliary file|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|0

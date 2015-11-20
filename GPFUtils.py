@@ -41,9 +41,10 @@ class GPFUtils:
     
     BEAM_FOLDER = "BEAM_FOLDER"
     BEAM_THREADS = "BEAM_THREADS"
-    S1TBX_FOLDER = "S1TBX_FOLDER"
-    S1TBX_THREADS = "S1TBX_THREADS"
+    SNAP_FOLDER = "SNAP_FOLDER"
+    SNAP_THREADS = "SNAP_THREADS"
     GPF_MODELS_FOLDER = "GPF_MODELS_FOLDER"
+    S1TBX_ACTIVATE = "S1TBX_ACTIVATE"
     
     @staticmethod
     def beamKey():
@@ -52,6 +53,14 @@ class GPFUtils:
     @staticmethod
     def s1tbxKey():
         return "S1Tbx"
+    
+    @staticmethod
+    def snapKey():
+        return "SNAP"
+    
+    @staticmethod
+    def providerDescription():
+        return "SNAP Toolbox (Sentinels' satellite algorithms)"
     
     @staticmethod
     def getKeyFromProviderName(providerName):
@@ -68,7 +77,7 @@ class GPFUtils:
         if key == GPFUtils.beamKey():
             folder = ProcessingConfig.getSetting(GPFUtils.BEAM_FOLDER)
         elif key == GPFUtils.s1tbxKey():
-            folder = ProcessingConfig.getSetting(GPFUtils.S1TBX_FOLDER)
+            folder = ProcessingConfig.getSetting(GPFUtils.SNAP_FOLDER)
         else:
             folder = None
             
@@ -82,6 +91,8 @@ class GPFUtils:
             return os.path.join(os.path.dirname(__file__), "beam_description")
         elif key == GPFUtils.s1tbxKey():
             return os.path.join(os.path.dirname(__file__), "s1tbx_description")
+        elif key == GPFUtils.snapKey():
+            return os.path.join(os.path.dirname(__file__), "snap_generic_description")
         else:
             return ""
     
