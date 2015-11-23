@@ -240,7 +240,9 @@ class GpfModelerAlgorithm (GeoAlgorithm):
                                 modelAlg.outputs["file"] = modelOutput
                                 outConnections[modelAlg] = modelOutput
                                            
-                        model.addAlgorithm(modelAlg) 
+                        model.addAlgorithm(modelAlg)
+                    else:
+                        raise Exception("Unknown operator "+node.find("operator").text) 
                 
                 # Set up connections between nodes of the graph
                 for connection in modelConnections:
@@ -267,8 +269,8 @@ class GpfModelerAlgorithm (GeoAlgorithm):
                         if alg in outConnections:
                             outConnections[alg].pos = QPointF(alg.pos.x()+50, alg.pos.y()+50)     
                 return model
-        except:
-            raise WrongModelException("Error reading GPF XML file")
+        except Exception, e:
+            raise WrongModelException("Error reading GPF XML file: "+str(e))
         
         
 #####################################################################
