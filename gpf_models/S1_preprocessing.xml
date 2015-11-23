@@ -1,0 +1,104 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="LinearTodB_33">
+    <operator>LinearTodB</operator>
+    <sources>
+      <sourceProduct refid="Calibration_35" />
+    </sources>
+    <parameters>
+      <sourceBands />
+    </parameters>
+  </node>
+  <node id="Terrain-Correction_34">
+    <operator>Terrain-Correction</operator>
+    <sources>
+      <sourceProduct refid="LinearTodB_33" />
+    </sources>
+    <parameters>
+      <sourceBands />
+      <demName>SRTM 3Sec</demName>
+      <externalDEMFile />
+      <externalDEMNoDataValue>0</externalDEMNoDataValue>
+      <demResamplingMethod>NEAREST_NEIGHBOUR</demResamplingMethod>
+      <imgResamplingMethod>NEAREST_NEIGHBOUR</imgResamplingMethod>
+      <pixelSpacingInDegree>8.9e-05</pixelSpacingInDegree>
+      <pixelSpacingInMeter>10</pixelSpacingInMeter>
+      <nodataValueAtSea>False</nodataValueAtSea>
+      <saveDEM>False</saveDEM>
+      <saveLocalIncidenceAngle>False</saveLocalIncidenceAngle>
+      <saveProjectedLocalIncidenceAngle>False</saveProjectedLocalIncidenceAngle>
+      <saveSelectedSourceBand>True</saveSelectedSourceBand>
+      <applyRadiometricNormalization>False</applyRadiometricNormalization>
+      <saveSigmaNought>False</saveSigmaNought>
+      <saveGammaNought>False</saveGammaNought>
+      <saveBetaNought>False</saveBetaNought>
+      <incidenceAngleForSigma0>Use projected local incidence angle from DEM</incidenceAngleForSigma0>
+      <incidenceAngleForGamma0>Use projected local incidence angle from DEM</incidenceAngleForGamma0>
+      <auxFile>Product Auxiliary File</auxFile>
+      <externalAuxFile />
+    </parameters>
+  </node>
+  <node id="Calibration_35">
+    <operator>Calibration</operator>
+    <sources>
+      <sourceProduct refid="Subset_36" />
+    </sources>
+    <parameters>
+      <sourceBands />
+      <auxFile>Product Auxiliary File</auxFile>
+      <externalAuxFile />
+      <createBetaBand>False</createBetaBand>
+      <createGammaBand>False</createGammaBand>
+      <outputImageScaleInDb>True</outputImageScaleInDb>
+    </parameters>
+  </node>
+  <node id="Read_37">
+    <operator>Read</operator>
+    <sources />
+    <parameters />
+  </node>
+  <node id="Subset_36">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct refid="Read_37" />
+    </sources>
+    <parameters>
+      <geoRegion qgisModelInputPos="266.0,44.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'EXTENT_EXTENT', 'default': '0,1,0,1', 'hidden': False, 'value': None, 'description': u'Extent'}" />
+      <subSamplingX>1</subSamplingX>
+      <subSamplingY>1</subSamplingY>
+      <sourceBands />
+      <copyMetadata>True</copyMetadata>
+    </parameters>
+  </node>
+  <node id="Write_32">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Terrain-Correction_34" />
+    </sources>
+    <parameters>
+      <formatName>GeoTIFF-BigTIFF</formatName>
+      <file>None</file>
+    </parameters>
+  </node>
+  <applicationData group="S-1 Graphs" id="Presentation" name="S1 Preprocessing">
+    <Description />
+    <node id="LinearTodB_33">
+      <displayPosition x="424.0" y="353.0" />
+    </node>
+    <node id="Terrain-Correction_34">
+      <displayPosition x="193.0" y="444.0" />
+    </node>
+    <node id="Calibration_35">
+      <displayPosition x="164.0" y="287.0" />
+    </node>
+    <node id="Subset_36">
+      <displayPosition x="430.0" y="246.0" />
+    </node>
+    <node id="Read_37">
+      <displayPosition x="150.0" y="182.0" />
+    </node>
+    <node id="Write_32">
+      <displayPosition x="455.0" y="469.0" />
+    </node>
+  </applicationData>
+</graph>
