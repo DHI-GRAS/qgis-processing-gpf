@@ -1,0 +1,14 @@
+Subset
+SNAP_Subset
+Subset image
+I/O
+ParameterRaster|sourceProduct|The product which will be subseted|False|False
+ParameterExtent|geoRegion|Spatial extent|
+ParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|1|None|1
+ParameterNumber|subSamplingY|The pixel sub-sampling step in Y (horizontal image direction)|1|None|1
+ParameterString|!sourceBands>band|The comma-separated list of names of bands to be copied. If not given, all bands are copied.||False|True
+ParameterBoolean|copyMetadata|Copy metadata|False
+OutputRaster|-out|Output Image
+
+NOTE:
+The geoRegionExtent parameter is there to allow the geoRegion to be either typed in or selected from extent on canvas. 
