@@ -60,7 +60,7 @@ class GPFUtils:
     
     @staticmethod
     def providerDescription():
-        return "SNAP Toolbox (Sentinels' satellite algorithms)"
+        return "SNAP Toolbox (Sentinel Application Platform)"
     
     @staticmethod
     def getKeyFromProviderName(providerName):

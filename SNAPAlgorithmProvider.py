@@ -94,7 +94,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
         return "snap"
 
     def getIcon(self):
-        return QIcon(os.path.dirname(__file__) + "/images/s1tbx.png")
+        return QIcon(os.path.dirname(__file__) + "/images/snap.png")
     
     def getAlgorithmFromOperator(self, operatorName):
         for alg in self.algs:

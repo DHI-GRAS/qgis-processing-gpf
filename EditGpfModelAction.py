@@ -5,7 +5,7 @@ from processing_gpf.GpfModelerDialog import GpfModelerDialog
 class EditGpfModelAction(ContextAction):
 
     def __init__(self):
-        self.name = self.tr('Edit GPF model', 'EditGpfModelAction')
+        self.name = self.tr('Edit GPF Graph', 'EditGpfModelAction')
 
     def isEnabled(self):
         return isinstance(self.alg, GpfModelerAlgorithm)

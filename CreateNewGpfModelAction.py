@@ -5,6 +5,7 @@ class CreateNewGpfModelAction(CreateNewModelAction):
     
     def __init__(self, gpfAlgorithmProvider):
         CreateNewModelAction.__init__(self)
+        self.name = self.tr('GPF Graph Builder', 'CreateNewGpfModelAction')
         self.gpfAlgorithmProvider = gpfAlgorithmProvider
     
     def execute(self):

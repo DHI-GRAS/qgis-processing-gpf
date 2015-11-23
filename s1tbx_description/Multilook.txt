@@ -1,7 +1,7 @@
 Multilook
 s1tbx_Multilook
 Multilook
-Sentinel-1
+Radar
 ParameterRaster|sourceProduct|Input image|False|False
 ParameterString|!sourceBands>band|The list of source bands|
 ParameterNumber|nAzLooks|The user defined number of azimuth looks|1|None|1

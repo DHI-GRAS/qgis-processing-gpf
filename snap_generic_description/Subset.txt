@@ -1,7 +1,7 @@
 Subset
 SNAP_Subset
 Subset image
-I/O
+Raster
 ParameterRaster|sourceProduct|The product which will be subseted|False|False
 ParameterExtent|geoRegion|Spatial extent|
 ParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|1|None|1

@@ -1,7 +1,7 @@
 CreateStack
 s1tbx_CreateStack
 Create Stack
-I/O
+Radar
 ParameterRaster|1ProductSet-Reader>sourceProduct|Input product 1|False|False
 ParameterRaster|2ProductSet-Reader>sourceProduct|Input product 2|False|False
 *ParameterRaster|3ProductSet-Reader>sourceProduct|Input product 3|True|False

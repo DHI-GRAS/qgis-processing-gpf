@@ -1,7 +1,7 @@
 Speckle-Filter
 s1tbx_Speckle-Filter
 Speckle Filter
-Sentinel-1
+Radar
 ParameterRaster|sourceProduct|The product which will be despeckled|False|False
 ParameterString|!sourceBands>band|The list of source bands||False|True
 ParameterSelection|filter|filter type|Mean;Median;Frost;Gamma Map;Lee;Refined Lee

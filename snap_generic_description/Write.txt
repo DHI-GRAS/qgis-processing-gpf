@@ -1,7 +1,7 @@
 Write
 SNAP_Write
 Write
-I/O
+Input-Output
 ParameterRaster|sourceProduct|Source product|False|False
 ParameterSelection|formatName|Format name|CSV;GeoTIFF-BigTIFF;ENVI;NetCDF-BEAM;NetCDF4-BEAM;HDF5;Gamma;BEAM-DIMAP;Generic Binary;GeoTIFF;Snaphu;PolSARPro;GeoTIFF+XML;NetCDF-CF;JP2;JPG;PNG;BMP;GIF;BTF;NetCDF4-CF
 OutputRaster|file|Output Image

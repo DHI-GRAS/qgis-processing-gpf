@@ -1,6 +1,6 @@
 Read
 SNAP_Read
 Read
-I/O
+Input-Output
 ParameterRaster|file|Source product|False|False
 OutputRaster|-out|Output Image

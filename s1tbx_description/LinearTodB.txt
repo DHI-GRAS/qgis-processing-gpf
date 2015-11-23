@@ -1,7 +1,7 @@
 LinearTodB
 s1tbx_LinearTodB
 Linear to dB
-Sentinel-1
+Raster
 ParameterRaster|sourceProduct|Input image|False|False
 ParameterString|!sourceBands>band|The list of source bands||False|True
 OutputRaster|-out|Output Image

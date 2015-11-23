@@ -1,7 +1,7 @@
 Terrain-Correction
 s1tbx_Terrain-Correction
 Range Doppler Terrain Correction
-Sentinel-1
+Radar
 ParameterRaster|sourceProduct|Input image|False|False
 ParameterString|!sourceBands>band|The list of source bands||False|True
 ParameterSelection|demName|The digital elevation model|ACE;GETASSE30;SRTM 3Sec|2

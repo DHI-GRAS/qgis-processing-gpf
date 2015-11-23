@@ -84,7 +84,7 @@ class SNAPAlgorithm(GPFAlgorithm):
         GPFAlgorithm.helpFile(self, GPFUtils.snapKey())
         
     def getIcon(self):
-        return  QIcon(os.path.dirname(__file__) + "/images/s1Tbx.png")
+        return  QIcon(os.path.dirname(__file__) + "/images/snap.png")
     
     def getCopy(self):
         newone = SNAPAlgorithm(self.descriptionFile)
