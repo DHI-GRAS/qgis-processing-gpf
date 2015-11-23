@@ -57,7 +57,7 @@ class GpfModelerAlgorithm (GeoAlgorithm):
         
     
     def getIcon(self):
-        return  QIcon(os.path.dirname(__file__) + "/images/s1Tbx.png")
+        return  QIcon(os.path.dirname(__file__) + "/images/snap_graph.png")
     
     # BEAM parameters dialog is the same as normal parameters dialog except
     # it has a button next to raster inputs to show band names
