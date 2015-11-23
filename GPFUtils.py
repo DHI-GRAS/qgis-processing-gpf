@@ -68,6 +68,8 @@ class GPFUtils:
             return GPFUtils.beamKey()
         elif providerName == "s1tbx":
             return GPFUtils.s1tbxKey()
+        elif providerName == "snap":
+            return GPFUtils.snapKey()
         else:
             raise GeoAlgorithmExecutionException("Invalid GPF provider name!")
             

@@ -266,11 +266,9 @@ class GpfModelerAlgorithm (GeoAlgorithm):
                             inConnections[alg].pos = QPointF(max(alg.pos.x()-50, 0), max(alg.pos.y()-50, 0))
                         if alg in outConnections:
                             outConnections[alg].pos = QPointF(alg.pos.x()+50, alg.pos.y()+50)     
-            return model
+                return model
         except:
             raise WrongModelException("Error reading GPF XML file")
-        
-        
         
         
 #####################################################################
