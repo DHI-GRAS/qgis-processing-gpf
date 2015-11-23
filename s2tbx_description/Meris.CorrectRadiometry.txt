@@ -1,0 +1,13 @@
+Meris.CorrectRadiometry
+beam_Meris.CorrectRadiometry
+Radiometric correction
+Optical
+ParameterRaster|sourceProduct|MERIS L1b source product|False|False
+ParameterBoolean|doCalibration|Perform calibration|True
+ParameterFile|sourceRacFile|The radiometric correction auxiliary file for the source product|False|True
+ParameterFile|targetRacFile|The radiometric correction auxiliary file for the target product|False|True
+ParameterBoolean|doSmile|Perform Smile-effect correction|True
+ParameterBoolean|doEqualization|Perform equalization, the removal of detector-to-detector systematic radiometric differences in MERIS L1b data products|True
+ParameterSelection|reproVersion|The version of the reprocessing the product comes from. Is only used if equalisation is enabled|AUTO_DETECT;REPROCESSING_2;REPROCESSING_3|0
+ParameterBoolean|doRadToRefl|Perform radiance-to-reflectance conversion|False
+OutputRaster|-out|Output Image

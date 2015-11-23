@@ -1,0 +1,11 @@
+KMeansClusterAnalysis
+beam_KMeansClusterAnalysis
+K Means Cluster Analysis
+Raster
+ParameterRaster|sourceProduct|The product to be classified|False|False
+OutputRaster|-out|Output Image
+ParameterNumber|clusterCount|Number of clusters|0|100|14
+*ParameterNumber|iterationCount|Number of iterations|0|1000|30
+*ParameterNumber|randomSeed|Seed for the random generator, used for initialising the algorithm|0|1000000|31415
+ParameterString|sourceBandNames|The names of the bands being used for the cluster analysis|
+*ParameterString|roiMaskName|The name of the ROI-Mask that should be used.|
