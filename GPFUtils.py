@@ -71,10 +71,6 @@ class GPFUtils:
     def getKeyFromProviderName(providerName):
         if providerName == "beam":
             return GPFUtils.beamKey()
-        elif providerName == "s1tbx":
-            return GPFUtils.s1tbxKey()
-        elif providerName == "s2tbx":
-            return GPFUtils.s1tbxKey()
         elif providerName == "snap":
             return GPFUtils.snapKey()
         else:
@@ -85,7 +81,7 @@ class GPFUtils:
     def programPath(key):
         if key == GPFUtils.beamKey():
             folder = ProcessingConfig.getSetting(GPFUtils.BEAM_FOLDER)
-        elif key == GPFUtils.s1tbxKey():
+        elif key == GPFUtils.snapKey():
             folder = ProcessingConfig.getSetting(GPFUtils.SNAP_FOLDER)
         else:
             folder = None
@@ -105,7 +101,7 @@ class GPFUtils:
         elif key == GPFUtils.snapKey():
             return os.path.join(os.path.dirname(__file__), "snap_generic_description")
         else:
-            return ""
+            return ""      
     
     @staticmethod
     def gpfDocPath(key):
@@ -157,12 +153,12 @@ class GPFUtils:
             except:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads)])
-        elif key == GPFUtils.s1tbxKey():
+        elif key == GPFUtils.snapKey():
             # check if running on windows or other OS
             if platform.system() == "Windows":
-                batchFile = "gpt.exe"
+                batchFile = os.path.join("bin", "gpt.exe")
             else:
-                batchFile = "gpt.sh"
+                batchFile = os.path.join("bin", "gpt.sh")
             try:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.S1TBX_THREADS)))
             except:

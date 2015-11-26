@@ -35,7 +35,8 @@ class S1TbxAlgorithm(SNAPAlgorithm):
     
     def __init__(self, descriptionfile):
         SNAPAlgorithm.__init__(self, descriptionfile)
-        self.programKey = GPFUtils.s1tbxKey()
+        #self.programKey = GPFUtils.s1tbxKey()
+        self.programKey = GPFUtils.snapKey()
                        
     def getIcon(self):
         return  QIcon(os.path.dirname(__file__) + "/images/s1Tbx.png")

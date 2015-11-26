@@ -24,7 +24,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
 
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.SNAP_FOLDER, "SNAP install directory", GPFUtils.programPath(GPFUtils.s1tbxKey())))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.SNAP_FOLDER, "SNAP install directory", GPFUtils.programPath(GPFUtils.snapKey())))
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.SNAP_THREADS, "Maximum number of parallel (native) threads", 4))
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.GPF_MODELS_FOLDER, "GPF models' directory", GPFUtils.modelsFolder()))
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_ACTIVATE, "Activate Sentinel-1 toolbox", False))
@@ -37,54 +37,22 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
         ProcessingConfig.removeSetting(GPFUtils.GPF_MODELS_FOLDER)
         ProcessingConfig.removeSetting(GPFUtils.S1TBX_ACTIVATE)
         ProcessingConfig.removeSetting(GPFUtils.S2TBX_ACTIVATE)
-        
-    def createAlgsList(self):
+ 
+    def createAlgsList(self, key, gpfAlgorithm):
         self.preloadedAlgs = []
-        folder = GPFUtils.gpfDescriptionPath(GPFUtils.snapKey())
+        folder = GPFUtils.gpfDescriptionPath(key)
         for descriptionFile in os.listdir(folder):
             if descriptionFile.endswith("txt"):
                 try:
-                    alg = SNAPAlgorithm(os.path.join(folder, descriptionFile))
+                    alg = gpfAlgorithm(os.path.join(folder, descriptionFile))
                     if alg.name.strip() != "":
                         alg.provider = self
                         self.preloadedAlgs.append(alg)
                     else:
-                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open SNAP generic algorithm: " + descriptionFile)
+                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open " + key + " SNAP generic algorithm: " + descriptionFile)
                 except Exception,e:
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, str(e))
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open SNAP generic algorithm: " + descriptionFile)
-                    
-    def createS1AlgsList(self):
-        self.preloadedS1Algs = []
-        folder = GPFUtils.gpfDescriptionPath(GPFUtils.s1tbxKey())
-        for descriptionFile in os.listdir(folder):
-            if descriptionFile.endswith("txt"):
-                try:
-                    alg = S1TbxAlgorithm(os.path.join(folder, descriptionFile))
-                    if alg.name.strip() != "":
-                        alg.provider = self
-                        self.preloadedS1Algs.append(alg)
-                    else:
-                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S1 Toolbox algorithm: " + descriptionFile)
-                except Exception,e:
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, str(e))
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S1 Toolbox algorithm: " + descriptionFile)
-
-    def createS2AlgsList(self):
-        self.preloadedS2Algs = []
-        folder = GPFUtils.gpfDescriptionPath(GPFUtils.s2tbxKey())
-        for descriptionFile in os.listdir(folder):
-            if descriptionFile.endswith("txt"):
-                try:
-                    alg = S2TbxAlgorithm(os.path.join(folder, descriptionFile))
-                    if alg.name.strip() != "":
-                        alg.provider = self
-                        self.preloadedS2Algs.append(alg)
-                    else:
-                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S2 Toolbox algorithm: " + descriptionFile)
-                except Exception,e:
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, str(e))
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open S2 Toolbox algorithm: " + descriptionFile)
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open " + key + " generic algorithm: " + descriptionFile)
     
     def loadGpfModels(self, folder):
         if not os.path.exists(folder):
@@ -122,15 +90,15 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
         return None
 
     def _loadAlgorithms(self):
-        self.createAlgsList()
+        self.createAlgsList(GPFUtils.snapKey(), SNAPAlgorithm)
         self.algs = self.preloadedAlgs
         if ProcessingConfig.getSetting(GPFUtils.S1TBX_ACTIVATE) == True:
-            self.createS1AlgsList()
-            for alg in self.preloadedS1Algs:
+            self.createAlgsList(GPFUtils.s1tbxKey(), S1TbxAlgorithm)
+            for alg in self.preloadedAlgs:
                 self.algs.append(alg)
         if ProcessingConfig.getSetting(GPFUtils.S2TBX_ACTIVATE) == True:
-            self.createS2AlgsList()
-            for alg in self.preloadedS2Algs:
+            self.createAlgsList(GPFUtils.s2tbxKey(), S2TbxAlgorithm)
+            for alg in self.preloadedAlgs:
                 self.algs.append(alg)
         # Also load models
         self.loadGpfModels(GPFUtils.modelsFolder())
