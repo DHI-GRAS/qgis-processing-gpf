@@ -44,7 +44,7 @@ class SNAPAlgorithm(GPFAlgorithm):
         self.programKey = GPFUtils.snapKey()
         
     def processAlgorithm(self, progress):
-        GPFAlgorithm.processAlgorithm(self, GPFUtils.s1tbxKey(), progress)
+        GPFAlgorithm.processAlgorithm(self, GPFUtils.snapKey(), progress)
         
     def addGPFNode(self, graph):
         graph = GPFAlgorithm.addGPFNode(self, graph)

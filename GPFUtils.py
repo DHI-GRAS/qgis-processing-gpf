@@ -108,11 +108,13 @@ class GPFUtils:
     @staticmethod
     def gpfDocPath(key):
         if key == GPFUtils.beamKey():
-            return os.path.join(os.path.dirname(__file__), "beam_doc") 
+            return os.path.join(os.path.dirname(__file__), "beam_doc")
         elif key == GPFUtils.s1tbxKey():
             return os.path.join(os.path.dirname(__file__), "s1tbx_doc")
         elif key == GPFUtils.s2tbxKey():
             return os.path.join(os.path.dirname(__file__), "s2tbx_doc")
+        elif key == GPFUtils.snapKey():
+            return os.path.join(os.path.dirname(__file__), "snap_generic_doc") 
         else:
             return ""
     
@@ -127,11 +129,12 @@ class GPFUtils:
     
     @staticmethod
     def executeGpf(key, gpf, progress):
+        print key
         loglines = []
         if key == GPFUtils.beamKey():
             loglines.append("BEAM execution console output")
-        elif key == GPFUtils.s1tbxKey():
-            loglines.append("Sentinel-1 Toolbox execution console output")
+        elif key == GPFUtils.snapKey():
+            loglines.append("SNAP execution console output")
         else:
             ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Unknown GPF algorithm provider")
             return    
