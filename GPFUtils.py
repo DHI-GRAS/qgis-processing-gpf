@@ -31,6 +31,8 @@ import platform
 import re
 import tempfile
 import subprocess
+import sys
+import logging
 from decimal import Decimal 
 from processing.tools.system import userFolder, mkdir
 from processing.core.ProcessingConfig import ProcessingConfig
@@ -248,20 +250,43 @@ class GPFUtils:
         return pixels
     
     @staticmethod
-    def SNAPProductReaderBand(product):
-        import sys
-        sys.path.append(os.path.join(os.path.dirname(__file__), "..", "snap", "snap-python"))
+    def SNAPProductReaderBand(productPath, secondAttempt = False):
+        bands = []
+        
+        if productPath == "":
+            return bands
+        
+        # Temporarily disable logging because otherwise
+        # snappy throws an IO error. 
+        logging.disable(logging.INFO)
+        
+        # Import snappy which should be located in the user's home directory
+        snappyPath = os.path.join(os.path.expanduser("~"), ".snap", "snap-python")
+        if not snappyPath in sys.path:
+            sys.path.append(snappyPath)
         try:
             import snappy
             hasSnappy = True
         except:
             hasSnappy = False
-            print 'Python module snappy not installed. Please run snap installer'
+            ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, 'Python module snappy is not installed in the user directory. Please run SNAP installer')
+            bands = ['Python module snappy is not installed in the user directory', 'Please run SNAP installer']
+
         if hasSnappy == True:
-            bands = []
-            product = snappy.ProductIO.readProduct(product)
-            for band in product.getBands():
-                bands.append(band.getName())
+            try:
+                product = snappy.ProductIO.readProduct(productPath)
+                for band in product.getBands():
+                    bands.append(band.getName())
+            except Exception, e:
+                # Snappy sometimes throws an error on first try but returns band names 
+                # on second try
+                if not secondAttempt:
+                    bands = GPFUtils.SNAPProductReaderBand(productPath, secondAttempt = True)
+                else:
+                    bands = ['Snappy exception', 'See Processing log for more details']
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Snappy exception: "+str(e))
+        
+        logging.disable(logging.NOTSET)
         return bands
     
     
