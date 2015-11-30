@@ -200,16 +200,17 @@ class GPFUtils:
             filename = ""
         else:
             filename = str(filename)    # in case it's a QString
-        
-        command = "\""+os.path.dirname(__file__)+os.sep+"processing_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+bandDelim+" "+str(appendProductName)
-        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
-        for line in iter(proc.readline, ""):
-            if bandDelim in line:
-                line = line[len(bandDelim):].strip()
-                #if appendFilename:
-                #    line +="::"+os.path.basename(filename)
-                bands.append(line)
-                
+        if programKey == GPFUtils.beamKey():
+            command = "\""+os.path.dirname(__file__)+os.sep+"processing_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+bandDelim+" "+str(appendProductName)
+            proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
+            for line in iter(proc.readline, ""):
+                if bandDelim in line:
+                    line = line[len(bandDelim):].strip()
+                    #if appendFilename:
+                    #    line +="::"+os.path.basename(filename)
+                    bands.append(line)
+        elif programKey == GPFUtils.snapKey():
+            bands = GPFUtils.SNAPProductReaderBand(filename)
         return bands
     
     # Special functionality for S1 Toolbox terrain-correction
@@ -244,8 +245,25 @@ class GPFUtils:
                     elif line[2] == "deg":
                         key = line[0]+" (m)"
                         pixels[key] = str(Decimal(line[1])*METERSPERDEGREE)
-
         return pixels
+    
+    @staticmethod
+    def SNAPProductReaderBand(product):
+        import sys
+        sys.path.append(os.path.join(os.path.dirname(__file__), "..", "snap", "snap-python"))
+        try:
+            import snappy
+            hasSnappy = True
+        except:
+            hasSnappy = False
+            print 'Python module snappy not installed. Please run snap installer'
+        if hasSnappy == True:
+            bands = []
+            product = snappy.ProductIO.readProduct(product)
+            for band in product.getBands():
+                bands.append(band.getName())
+        return bands
+    
     
     @staticmethod
     def indentXML(elem, level=0):
