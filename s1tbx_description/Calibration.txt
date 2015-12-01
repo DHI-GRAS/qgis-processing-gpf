@@ -3,7 +3,7 @@ s1tbx_Calibration
 Calibration
 Radar
 ParameterRaster|sourceProduct|Input image|False|False
-ParameterString|!sourceBands>band|The list of source bands||False|True
+ParameterString|sourceBands|The list of source bands||False|True
 ParameterSelection|auxFile|The auxiliary file|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|0
 ParameterFile|externalAuxFile|The antenne elevation pattern gain auxiliary data file|False|True
 *ParameterBoolean|createBetaBand|Create Beta band|False

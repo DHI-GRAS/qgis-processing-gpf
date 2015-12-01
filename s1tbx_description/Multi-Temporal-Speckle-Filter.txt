@@ -3,6 +3,6 @@ s1tbx_Multi-Temporal-Speckle-Filter
 Apply Multi Temporal Speckle Filter
 Radar
 ParameterRaster|sourceProduct|The product which will be despeckled|False|False
-ParameterString|!sourceBands>band|The list of source bands|
+ParameterString|sourceBands|The list of source bands|
 ParameterSelection|windowSize|Window size|3x3;5x5;7x7;9x9;11x11
 OutputRaster|-out|Output Image

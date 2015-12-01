@@ -3,7 +3,7 @@ s1tbx_Terrain-Correction
 Range Doppler Terrain Correction
 Radar
 ParameterRaster|sourceProduct|Input image|False|False
-ParameterString|!sourceBands>band|The list of source bands||False|True
+ParameterString|sourceBands|The list of source bands||False|True
 ParameterSelection|demName|The digital elevation model|ACE;GETASSE30;SRTM 3Sec|2
 ParameterFile|externalDEMFile|External DEM file|False|True
 ParameterNumber|externalDEMNoDataValue|External DEM no-data value|None|None|0.0
