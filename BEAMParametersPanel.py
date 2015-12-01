@@ -56,7 +56,7 @@ class BEAMParametersPanel(ParametersPanel):
                 items.append((layer.name(), layer))
             item = BEAMInputLayerSelectorPanel(items, param, self.parent, self.alg.programKey, self.alg.multipleRasterInput)
         # special treatment for S1 Toolbox Terrain-Correction to get pixel sizes from SAR image
-        elif isinstance(param, ParameterNumber) and (param.name == "pixelSpacingInMeter" or param.name == "pixelSpacingInDegree") and self.alg.commandLineName() == "s1tbx:terraincorrection":
+        elif isinstance(param, ParameterNumber) and (param.name == "pixelSpacingInMeter" or param.name == "pixelSpacingInDegree") and self.alg.commandLineName() == "snap:terraincorrection":
             item = S1TbxPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
         else:
             item = ParametersPanel.getWidgetFromParameter(self, param)
@@ -67,16 +67,22 @@ class BEAMParametersPanel(ParametersPanel):
 # S1 Toolbox pixel size input panel is the same as normal number
 # input panel except that it has a button next to it
 # to show selected products pixel size.     
-class S1TbxPixelSizeInputPanel(NumberInputPanel):
+class S1TbxPixelSizeInputPanel(QtGui.QWidget):
     
     def __init__(self, default, isInteger, parent, programKey):
+        QtGui.QWidget.__init__(self)
         self.parent = parent
         self.programKey = programKey
-        NumberInputPanel.__init__(self, default, None, None, isInteger)
+        self.numberPanel = QtGui.QLineEdit()
+        self.numberPanel.setText(str(default))
         self.metadataButton = QtGui.QPushButton()
         self.metadataButton.setMaximumWidth(75)
         self.metadataButton.setText("Pixel Size")
         self.metadataButton.clicked.connect(self.showMetadataDialog)
+        self.horizontalLayout = QtGui.QHBoxLayout(self)
+        self.horizontalLayout.setSpacing(2)
+        self.horizontalLayout.setMargin(0)
+        self.horizontalLayout.addWidget(self.numberPanel)
         self.horizontalLayout.addWidget(self.metadataButton)
 
     def showMetadataDialog(self):
@@ -84,6 +90,9 @@ class S1TbxPixelSizeInputPanel(NumberInputPanel):
         pixelSizes = GPFUtils.getS1TbxPixelSize(sourceProduct, self.programKey)
         dlg = S1TbxPixelSizeInputDialog(pixelSizes, sourceProduct, self.parent)
         dlg.show()
+        
+    def getValue(self):
+        return self.numberPanel.text()
         
 # Simple dialog displaying SAR image pixel sizes           
 class S1TbxPixelSizeInputDialog(QtGui.QDialog): 

@@ -218,6 +218,24 @@ class GPFUtils:
             bands = GPFUtils.SNAPProductReaderBand(filename)
         return bands
     
+    # Import snappy which should be located in the user's home directory
+    @staticmethod
+    def importSnappy():
+        snappyPath = os.path.join(os.path.expanduser("~"), ".snap", "snap-python")
+        if not snappyPath in sys.path:
+            sys.path.append(snappyPath)
+        
+        try:
+            import snappy
+            import jpy
+            # Temporarily disable logging because otherwise
+            # snappy throws an IO error. 
+            logging.disable(logging.INFO)
+            return snappy, jpy
+        except:
+            ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, 'Python module snappy is not installed in the user directory. Please run SNAP installer')
+            return None, None
+    
     # Special functionality for S1 Toolbox terrain-correction
     # Get the SAR image pixel sizes by calling a java program that uses S1 Toolbox functionality 
     @staticmethod
@@ -228,29 +246,35 @@ class GPFUtils:
         # both latitude and longitude
         METERSPERDEGREE = Decimal(111319.4907932735600086975208)
         
-        pixels = {}
-        delim = ":::"
-        if filename == None:
-            filename = ""
-        else:
-            filename = str(filename)    # in case it's a QString
+        pixelSpacingDict = {}
         
-        command = "\""+os.path.dirname(__file__)+os.sep+"processing_s1tbx_java"+os.sep+"getS1TbxPixelSizes.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+delim
-        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
-        for line in iter(proc.readline, ""):
-            ProcessingLog.addToLog(ProcessingLog.LOG_INFO, line)
-            if delim in line:
-                line = line.strip().split(delim)
-                if len(line)>=3:
-                    key = line[0]+" ("+line[2]+")"
-                    pixels[key] = line[1]
-                    if line[2] == "m":
-                        key = line[0]+" (deg)"
-                        pixels[key] = str(Decimal(line[1])/METERSPERDEGREE)
-                    elif line[2] == "deg":
-                        key = line[0]+" (m)"
-                        pixels[key] = str(Decimal(line[1])*METERSPERDEGREE)
-        return pixels
+        if filename == None:
+            return pixelSpacingDict
+        
+        snappy, jpy = GPFUtils.importSnappy()
+        if snappy is not None:
+            
+            def setSpacing(spacingName, spacingUnit, spacingData, spacingDict):
+                spacingDict[spacingName+" ("+spacingUnit+")"] = spacingData
+                if spacingUnit == "m":
+                    spacingDict[spacingName+" (deg)"] = str(Decimal(spacingData)/METERSPERDEGREE)
+                elif spacingUnit == "deg":
+                    spacingDict[spacingName+" (m)"] = str(Decimal(spacingData)*METERSPERDEGREE)
+                return spacingDict
+                    
+            product = snappy.ProductIO.readProduct(filename)
+            metadata = jpy.get_type('org.esa.snap.engine_utilities.datamodel.AbstractMetadata').getAbstractedMetadata(product)
+            range_spacing = metadata.getAttribute("range_spacing");
+            azimuth_spacing = metadata.getAttribute("azimuth_spacing")
+            if range_spacing and azimuth_spacing:
+                pixelSpacingDict = setSpacing("Range spacing", range_spacing.getUnit(), range_spacing.getData().getElemDouble(), pixelSpacingDict)
+                pixelSpacingDict = setSpacing("Azimuth spacing", azimuth_spacing.getUnit(), azimuth_spacing.getData().getElemDouble(), pixelSpacingDict)
+        
+        else:
+            pixelSpacingDict['!'] = 'Python module snappy is not installed in the user directory. Please run SNAP installer'
+        
+        logging.disable(logging.NOTSET)
+        return pixelSpacingDict
     
     @staticmethod
     def SNAPProductReaderBand(productPath, secondAttempt = False):
@@ -259,23 +283,8 @@ class GPFUtils:
         if productPath == "":
             return bands
         
-        # Temporarily disable logging because otherwise
-        # snappy throws an IO error. 
-        logging.disable(logging.INFO)
-        
-        # Import snappy which should be located in the user's home directory
-        snappyPath = os.path.join(os.path.expanduser("~"), ".snap", "snap-python")
-        if not snappyPath in sys.path:
-            sys.path.append(snappyPath)
-        try:
-            import snappy
-            hasSnappy = True
-        except:
-            hasSnappy = False
-            ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, 'Python module snappy is not installed in the user directory. Please run SNAP installer')
-            bands = ['Python module snappy is not installed in the user directory', 'Please run SNAP installer']
-
-        if hasSnappy == True:
+        snappy, _ = GPFUtils.importSnappy()
+        if snappy is not None:
             try:
                 product = snappy.ProductIO.readProduct(productPath)
                 for band in product.getBands():
@@ -288,6 +297,8 @@ class GPFUtils:
                 else:
                     bands = ['Snappy exception', 'See Processing log for more details']
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Snappy exception: "+str(e))
+        else:
+            bands = ['Python module snappy is not installed in the user directory', 'Please run SNAP installer'] 
         
         logging.disable(logging.NOTSET)
         return bands
