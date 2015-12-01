@@ -7,14 +7,14 @@ from processing.gui.HelpEditionDialog import HelpEditionDialog
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.core.ProcessingLog import ProcessingLog
 from processing.modeler.WrongModelException import WrongModelException
-from processing_gpf.GpfModelerAlgorithm import GpfModelerAlgorithm
+from processing_gpf.GPFModelerAlgorithm import GPFModelerAlgorithm
 from processing_gpf.GPFUtils import GPFUtils
 
-class GpfModelerDialog(ModelerDialog):
+class GPFModelerDialog(ModelerDialog):
     
     def __init__(self, gpfAlgorithmProvider, alg=None):
         self.gpfAlgorithmProvider = gpfAlgorithmProvider
-        self.alg = GpfModelerAlgorithm(gpfAlgorithmProvider)
+        self.alg = GPFModelerAlgorithm(gpfAlgorithmProvider)
         ModelerDialog.__init__(self, alg)
     
     def editHelp(self):
@@ -96,7 +96,7 @@ class GpfModelerDialog(ModelerDialog):
                            self.tr('GPF models (*.xml *.XML)')))
         if filename:
             try:
-                alg = GpfModelerAlgorithm.fromFile(filename, self.gpfAlgorithmProvider)
+                alg = GPFModelerAlgorithm.fromFile(filename, self.gpfAlgorithmProvider)
                 self.alg = alg
                 self.alg.setModelerView(self)
                 self.textGroup.setText(alg.group)

@@ -5,7 +5,7 @@ from processing.core.AlgorithmProvider import AlgorithmProvider
 from processing.core.ProcessingLog import ProcessingLog
 from processing.modeler.WrongModelException import WrongModelException
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.GpfModelerAlgorithm import GpfModelerAlgorithm
+from processing_gpf.GPFModelerAlgorithm import GPFModelerAlgorithm
 from processing_gpf.S1TbxAlgorithm import S1TbxAlgorithm
 from processing_gpf.S2TbxAlgorithm import S2TbxAlgorithm
 from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
@@ -62,7 +62,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
                 if descriptionFile.endswith('xml'):
                     try:
                         fullpath = os.path.join(path, descriptionFile)
-                        alg = GpfModelerAlgorithm.fromFile(fullpath, self)
+                        alg = GPFModelerAlgorithm.fromFile(fullpath, self)
                         if alg and alg.name:
                             #alg.provider = self
                             alg.descriptionFile = fullpath

@@ -14,7 +14,7 @@ from processing.modeler.ModelerAlgorithm import Algorithm, ValueFromOutput, Valu
 from processing.modeler.WrongModelException import WrongModelException
 from processing.gui.Help2Html import getHtmlFromDescriptionsDict
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.BEAMParametersDialog import BEAMParametersDialog
+from processing_gpf.GPFParametersDialog import GPFParametersDialog
 from PyQt4.QtCore import QPointF
 from PyQt4.QtGui import QIcon, QMessageBox
 try:
@@ -26,12 +26,12 @@ import traceback
 from processing.core.GeoAlgorithm import GeoAlgorithm
 
 # NOTE
-# GpfModelerAlgorithm should really be a subclass of ModelerAlgorithm.
+# GPFModelerAlgorithm should really be a subclass of ModelerAlgorithm.
 # However, that was causing EditModelAction to appear in the context menu
 # of GPF Models present in the Processing Toolbox. To overcome this issue
-# GpfModelerAlgorithm is now a subclass of GeoAlgorithm but still has the
+# GPFModelerAlgorithm is now a subclass of GeoAlgorithm but still has the
 # same interface as ModelerAlgorithm 
-class GpfModelerAlgorithm (GeoAlgorithm):
+class GPFModelerAlgorithm (GeoAlgorithm):
     
     def __init__(self, gpfAlgorithmProvider):
         
@@ -62,10 +62,10 @@ class GpfModelerAlgorithm (GeoAlgorithm):
     # BEAM parameters dialog is the same as normal parameters dialog except
     # it has a button next to raster inputs to show band names
     def getCustomParametersDialog(self):
-        return BEAMParametersDialog(self)
+        return GPFParametersDialog(self)
     
     def getCopy(self):
-        newone = GpfModelerAlgorithm(self.provider)
+        newone = GPFModelerAlgorithm(self.provider)
         newone.algs = copy.deepcopy(self.algs)
         newone.inputs = copy.deepcopy(self.inputs)
         newone.defineCharacteristics()
@@ -188,7 +188,7 @@ class GpfModelerAlgorithm (GeoAlgorithm):
             tree = ET.parse(filename)
             root = tree.getroot()
             if root.tag == "graph" and "id" in root.attrib and root.attrib["id"] == "Graph":
-                model = GpfModelerAlgorithm(gpfAlgorithmProvider)
+                model = GPFModelerAlgorithm(gpfAlgorithmProvider)
                 model.descriptionFile = filename
                 modelConnections = {}
                 inConnections = {}
@@ -204,7 +204,7 @@ class GpfModelerAlgorithm (GeoAlgorithm):
                             # Set algorithm parameter values
                             paramNode = node.find("parameters/"+param.name)
                             if paramNode is not None:
-                                modelAlg.params[param.name] = GpfModelerAlgorithm.parseParameterValue(param, paramNode.text)
+                                modelAlg.params[param.name] = GPFModelerAlgorithm.parseParameterValue(param, paramNode.text)
                                 # Process model inputs which are saved as XML attributes
                                 # of a model parameters
                                 if "qgisModelInputPos" in paramNode.attrib and "qgisModelInputVars" in paramNode.attrib:

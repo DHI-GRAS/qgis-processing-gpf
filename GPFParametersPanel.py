@@ -1,6 +1,6 @@
 """
 ***************************************************************************
-    BEAMParametersPanel.py
+    GPFParametersPanel.py
 -------------------------------------
     Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
@@ -33,7 +33,7 @@ from PyQt4 import QtGui, QtCore
 
 # BEAM parameters panel is the same as normal parameters panel except
 # it has a button next to raster inputs to show band names
-class BEAMParametersPanel(ParametersPanel):
+class GPFParametersPanel(ParametersPanel):
     
     def getWidgetFromParameter(self, param):
         if isinstance(param, ParameterBands):

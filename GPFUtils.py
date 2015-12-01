@@ -214,7 +214,7 @@ class GPFUtils:
                     #    line +="::"+os.path.basename(filename)
                     bands.append(line)
         elif programKey == GPFUtils.snapKey():
-            bands = GPFUtils.SNAPProductReaderBand(filename)
+            bands = GPFUtils.getSnapBandNames(filename)
         return bands
     
     # Import snappy which should be located in the user's home directory
@@ -237,7 +237,7 @@ class GPFUtils:
             return None, None
     
     # Special functionality for S1 Toolbox terrain-correction
-    # Get the SAR image pixel sizes by calling a java program that uses S1 Toolbox functionality 
+    # Get the SAR image pixel sizes by using snappy functionality  
     @staticmethod
     def getS1TbxPixelSize(filename, programKey):
         
@@ -276,8 +276,9 @@ class GPFUtils:
         logging.disable(logging.NOTSET)
         return pixelSpacingDict
     
+    # Use sanppy to get a list of band names of a given raster
     @staticmethod
-    def SNAPProductReaderBand(productPath, secondAttempt = False):
+    def getSnapBandNames(productPath, secondAttempt = False):
         bands = []
         
         if productPath == "":

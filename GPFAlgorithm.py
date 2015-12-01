@@ -65,7 +65,7 @@ except:
     from processing.core.outputs import getOutputFromString
 from processing.core.ProcessingLog import ProcessingLog
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.BEAMParametersDialog import BEAMParametersDialog
+from processing_gpf.GPFParametersDialog import GPFParametersDialog
 from processing_gpf import GPFParameters
 
 class GPFAlgorithm(GeoAlgorithm):
@@ -99,7 +99,7 @@ class GPFAlgorithm(GeoAlgorithm):
     # For now S1Tbx uses the same dialog, maybe later that might have to change
     # if BEAM can't read band name from S1Tbx images.
     def getCustomParametersDialog(self):
-        return BEAMParametersDialog(self)
+        return GPFParametersDialog(self)
     
     def defineCharacteristicsFromFile(self):
         lines = open(self.descriptionFile)

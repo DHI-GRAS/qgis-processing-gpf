@@ -1,6 +1,6 @@
 """
 ***************************************************************************
-    BEAMParametersDialog.py
+    GPFParametersDialog.py
 -------------------------------------
     Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
@@ -30,18 +30,18 @@
 #from processing.gui.ParametersDialog import ParametersDialog
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.AlgorithmDialogBase import AlgorithmDialogBase
-from processing_gpf.BEAMParametersPanel import BEAMParametersPanel
+from processing_gpf.GPFParametersPanel import GPFParametersPanel
 from qgis.core import QgsRasterLayer
 
 # BEAM parameters dialog is the same as normal parameters dialog except
 # it has a button next to raster inputs to show band names
-class BEAMParametersDialog(AlgorithmDialog):
+class GPFParametersDialog(AlgorithmDialog):
     def __init__(self, alg):
         AlgorithmDialogBase.__init__(self, alg)
 
         self.alg = alg
 
-        self.mainWidget = BEAMParametersPanel(self, alg)
+        self.mainWidget = GPFParametersPanel(self, alg)
         self.setMainWidget()
         
     def getRasterParamPath(self, paramName):
