@@ -225,11 +225,12 @@ class GPFUtils:
             sys.path.append(snappyPath)
         
         try:
+            # Temporarily disable logging because otherwise
+            # snappy throws an IO error.
+            logging.disable(logging.INFO)
+            
             import snappy
             import jpy
-            # Temporarily disable logging because otherwise
-            # snappy throws an IO error. 
-            logging.disable(logging.INFO)
             return snappy, jpy
         except:
             ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, 'Python module snappy is not installed in the user directory. Please run SNAP installer')
