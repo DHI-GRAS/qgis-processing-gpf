@@ -136,10 +136,13 @@ class GPFBandsSelectorPanel(QtGui.QWidget):
         self.horizontalLayout.setMargin(0)
         self.horizontalLayout.addWidget(self.bandsPanel)
         self.horizontalLayout.addWidget(self.bandsButton)
+    
+    def setBandsPanel(self, bands):
+        self.bandsPanel.setText(bands)
        
     def showBandsDialog(self):
         bands = GPFUtils.getBeamBandNames(self.getFilePath(), self.programKey, self.appendProductName)
-        dlg = BEAMBandsListDialog(bands, self.getFilePath(), self.parent)
+        dlg = GPFBandsListDialog(bands, self.getFilePath(), self)
         dlg.show()
         
     def getFilePath(self):
@@ -147,12 +150,13 @@ class GPFBandsSelectorPanel(QtGui.QWidget):
         return value
         
 # Simple dialog displaying a list of bands            
-class BEAMBandsListDialog(QtGui.QDialog):
+class GPFBandsListDialog(QtGui.QDialog):
     def __init__(self, bands, filename, parent):
         self.bands = bands
         self.selectedBands = []
         self.filename = filename
         QtGui.QDialog.__init__(self, parent)
+        self.parent = parent
         self.setWindowModality(0)
         self.setupUi()
 
@@ -172,6 +176,9 @@ class BEAMBandsListDialog(QtGui.QDialog):
         self.copyButton = QtGui.QPushButton()
         self.copyButton.setText("Copy band names")
         self.buttonBox.addButton(self.copyButton, QtGui.QDialogButtonBox.ActionRole)
+        self.setButton = QtGui.QPushButton()
+        self.setButton.setText("Set band names")
+        self.buttonBox.addButton(self.setButton, QtGui.QDialogButtonBox.ActionRole)
         self.table = QtGui.QTableWidget()
         self.table.setColumnCount(1)
         self.table.setColumnWidth(0,270)
@@ -190,6 +197,7 @@ class BEAMBandsListDialog(QtGui.QDialog):
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
         QtCore.QObject.connect(self.selectAllButton, QtCore.SIGNAL("clicked()"), self.selectAll)
         QtCore.QObject.connect(self.copyButton, QtCore.SIGNAL("clicked()"), self.copyBands)
+        QtCore.QObject.connect(self.setButton, QtCore.SIGNAL("clicked()"), self.setBands)
         QtCore.QMetaObject.connectSlotsByName(self)
         
     def setTableContent(self):
@@ -227,7 +235,10 @@ class BEAMBandsListDialog(QtGui.QDialog):
     def copyBands(self):
         clipboard = QtGui.QApplication.clipboard()
         clipboard.setText(self.bandList.text())
+    
+    def setBands(self):
+        self.parent.setBandsPanel(self.bandList.text())
+        QtGui.QDialog.close(self)
         
     def close(self):
-        self.copyBands()
         QtGui.QDialog.close(self)
