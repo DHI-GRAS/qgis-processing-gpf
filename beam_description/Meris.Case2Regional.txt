@@ -12,8 +12,8 @@ ParameterSelection|outputReflecAs|Select if reflectances shall be written as rad
 ParameterBoolean|outputPath|Output water leaving path reflectance|True
 ParameterBoolean|outputTransmittance|output downwelling irradiance transmittance|False
 ParameterBoolean|outputNormReflec|Output normalised reflectances|False
-ParameterString|landExpression|The arithmetic expression used for land detection|toa_reflec_10 > toa_reflec_6 AND toa_reflec_13 > 0.0475
-ParameterString|cloudIceExpression|The arithmetic expression used for cloud/ice detection|toa_reflec_14 > 0.2
+ParameterBands|landExpression|The arithmetic expression used for land detection|toa_reflec_10 > toa_reflec_6 AND toa_reflec_13 > 0.0475|sourceProduct
+ParameterBands|cloudIceExpression|The arithmetic expression used for cloud/ice detection|toa_reflec_14 > 0.2|sourceProduct
 *ParameterSelection|algorithm|The algorithm used for IOP computation|REGIONAL|0
 *ParameterNumber|tsmConversionExponent|Exponent for conversion from TSM to B_TSM|None|None|1.0
 *ParameterNumber|tsmConversionFactor|Factor for conversion from TSM to B_TSM|None|None|1.73

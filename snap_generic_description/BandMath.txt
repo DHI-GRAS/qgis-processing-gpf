@@ -4,7 +4,7 @@ Band Maths
 Raster
 ParameterRaster|sourceProduct|The product with the bands|False|False
 OutputRaster|-out|Output Image
-ParameterString|!targetBands>!targetBand>expression|Expression|
+ParameterBands|!targetBands>!targetBand>expression|Expression||sourceProduct
 ParameterString|targetBands>targetBand>name|Name of output band|result
 ParameterString|targetBands>targetBand>type|Data type for out band|float32
 ParameterString|targetBands>targetBand>noDataValue|No data value|NaN

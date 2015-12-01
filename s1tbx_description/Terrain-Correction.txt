@@ -3,14 +3,14 @@ s1tbx_Terrain-Correction
 Range Doppler Terrain Correction
 Radar
 ParameterRaster|sourceProduct|Input image|False|False
-ParameterString|sourceBands|The list of source bands||False|True
+ParameterBands|sourceBands|The list of source bands||sourceProduct|True
 ParameterSelection|demName|The digital elevation model|ACE;GETASSE30;SRTM 3Sec|2
 ParameterFile|externalDEMFile|External DEM file|False|True
 ParameterNumber|externalDEMNoDataValue|External DEM no-data value|None|None|0.0
 ParameterSelection|demResamplingMethod|DEM resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION|1
 ParameterSelection|imgResamplingMethod|Image resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION|1
-ParameterNumber|pixelSpacingInDegree|The pixel spacing in degrees|0.0|None|99999.9
-ParameterNumber|pixelSpacingInMeter|The pixel spacing in meters|0.0|None|99999.9
+ParameterPixelSize|pixelSpacingInDegree|The pixel spacing in degrees|0.0|None|99999.9
+ParameterPixelSize|pixelSpacingInMeter|The pixel spacing in meters|0.0|None|99999.9
 *ParameterCrs|mapProjection|Map projection|
 *ParameterBoolean|nodataValueAtSea|No data value at sea|True
 *ParameterBoolean|saveDEM|Save DEM|False

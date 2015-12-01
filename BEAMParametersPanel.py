@@ -27,19 +27,8 @@
 """
 
 from processing.gui.ParametersPanel import ParametersPanel
-from processing.gui.InputLayerSelectorPanel import InputLayerSelectorPanel
-from processing.gui.NumberInputPanel import NumberInputPanel
-from processing.tools import dataobjects 
-from qgis.core import QgsRasterLayer
-try: 
-    from processing.parameters.ParameterRaster import ParameterRaster
-except:
-    from processing.core.parameters import ParameterRaster
-try:
-    from processing.parameters.ParameterNumber import ParameterNumber
-except:
-    from processing.core.parameters import ParameterNumber
 from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.GPFParameters import ParameterBands, ParameterPixelSize
 from PyQt4 import QtGui, QtCore
 
 # BEAM parameters panel is the same as normal parameters panel except
@@ -47,22 +36,16 @@ from PyQt4 import QtGui, QtCore
 class BEAMParametersPanel(ParametersPanel):
     
     def getWidgetFromParameter(self, param):
-        if isinstance(param, ParameterRaster):
-            layers = dataobjects.getRasterLayers()
-            items = []
-            if (param.optional):
-                items.append((self.NOT_SELECTED, None))
-            for layer in layers:
-                items.append((layer.name(), layer))
-            item = BEAMInputLayerSelectorPanel(items, param, self.parent, self.alg.programKey, self.alg.multipleRasterInput)
-        # special treatment for S1 Toolbox Terrain-Correction to get pixel sizes from SAR image
-        elif isinstance(param, ParameterNumber) and (param.name == "pixelSpacingInMeter" or param.name == "pixelSpacingInDegree") and self.alg.commandLineName() == "snap:terraincorrection":
+        if isinstance(param, ParameterBands):
+            item = GPFBandsSelectorPanel(param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
+        # Sspecial treatment for S1 Toolbox Terrain-Correction to get pixel sizes from SAR image
+        elif isinstance(param, ParameterPixelSize):
             item = S1TbxPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
         else:
             item = ParametersPanel.getWidgetFromParameter(self, param)
-            
         return item
-
+    
+    
 # Special functionality for S1 Toolbox terrain-correction
 # S1 Toolbox pixel size input panel is the same as normal number
 # input panel except that it has a button next to it
@@ -86,7 +69,7 @@ class S1TbxPixelSizeInputPanel(QtGui.QWidget):
         self.horizontalLayout.addWidget(self.metadataButton)
 
     def showMetadataDialog(self):
-        sourceProduct = self.parent.mainWidget.valueItems["sourceProduct"].getFilePath()
+        sourceProduct = self.parent.getRasterParamPath("sourceProduct")
         pixelSizes = GPFUtils.getS1TbxPixelSize(sourceProduct, self.programKey)
         dlg = S1TbxPixelSizeInputDialog(pixelSizes, sourceProduct, self.parent)
         dlg.show()
@@ -131,36 +114,38 @@ class S1TbxPixelSizeInputDialog(QtGui.QDialog):
             item.setText(text)
             self.table.setCellWidget(i,0, item)
             i += 1     
+             
+# GPF bands selector panel is the same as normal text panel
+# except that it has a button next to it to show band names 
+class GPFBandsSelectorPanel(QtGui.QWidget):
     
-# BEAM input layer selecor panel is the same as normal input layer
-# selector panel except that it has a button next to it
-# to show band names            
-class BEAMInputLayerSelectorPanel(InputLayerSelectorPanel):
-    
-    def __init__(self, options, param, parent, programKey, appendProductName):
+    def __init__(self, default, parent, programKey, bandSourceRaster, appendProductName):
+        QtGui.QWidget.__init__(self)
         self.parent = parent
-        InputLayerSelectorPanel.__init__(self, options, param)
+        self.appendProductName = appendProductName
+        self.bandSourceRaster = bandSourceRaster
+        self.programKey = programKey
+        self.bandsPanel = QtGui.QLineEdit()
+        self.bandsPanel.setText(str(default))
         self.bandsButton = QtGui.QPushButton()
         self.bandsButton.setMaximumWidth(75)
         self.bandsButton.setText("Bands")
         self.bandsButton.clicked.connect(self.showBandsDialog)
+        self.horizontalLayout = QtGui.QHBoxLayout(self)
+        self.horizontalLayout.setSpacing(2)
+        self.horizontalLayout.setMargin(0)
+        self.horizontalLayout.addWidget(self.bandsPanel)
         self.horizontalLayout.addWidget(self.bandsButton)
-        self.appendProductName = appendProductName
-        self.programKey = programKey
-        
+       
     def showBandsDialog(self):
         bands = GPFUtils.getBeamBandNames(self.getFilePath(), self.programKey, self.appendProductName)
         dlg = BEAMBandsListDialog(bands, self.getFilePath(), self.parent)
         dlg.show()
         
     def getFilePath(self):
-        obj = self.getValue()
-        if isinstance(obj, QgsRasterLayer):
-            value = unicode(obj.dataProvider().dataSourceUri())
-        else:
-            value = self.getValue()
+        value = self.parent.getRasterParamPath(self.bandSourceRaster)
         return value
-
+        
 # Simple dialog displaying a list of bands            
 class BEAMBandsListDialog(QtGui.QDialog):
     def __init__(self, bands, filename, parent):

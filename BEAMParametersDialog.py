@@ -31,6 +31,7 @@
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.AlgorithmDialogBase import AlgorithmDialogBase
 from processing_gpf.BEAMParametersPanel import BEAMParametersPanel
+from qgis.core import QgsRasterLayer
 
 # BEAM parameters dialog is the same as normal parameters dialog except
 # it has a button next to raster inputs to show band names
@@ -42,3 +43,12 @@ class BEAMParametersDialog(AlgorithmDialog):
 
         self.mainWidget = BEAMParametersPanel(self, alg)
         self.setMainWidget()
+        
+    def getRasterParamPath(self, paramName):
+        param = self.mainWidget.valueItems[paramName]
+        obj = param.getValue()
+        if isinstance(obj, QgsRasterLayer):
+            value = unicode(obj.dataProvider().dataSourceUri())
+        else:
+            value = param.getValue()
+        return value

@@ -66,7 +66,7 @@ except:
 from processing.core.ProcessingLog import ProcessingLog
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.BEAMParametersDialog import BEAMParametersDialog
-
+from processing_gpf import GPFParameters
 
 class GPFAlgorithm(GeoAlgorithm):
 
@@ -115,10 +115,18 @@ class GPFAlgorithm(GeoAlgorithm):
         while line != "":
             try:
                 if line.startswith("Parameter"):
-                    param = getParameterFromString(line)
+                    # Initialize GPF specific parameters ...
+                    if line.startswith("ParameterBands") or line.startswith("ParameterPixelSize"):
+                        param = GPFParameters.getParameterFromString(line)
+                    # ... and generic Processing parameters
+                    else:
+                        param = getParameterFromString(line)
                     self.addParameter(param)
                 elif line.startswith("*Parameter"):
-                    param = getParameterFromString(line[1:])
+                    if line[1:].startswith("ParameterBands") or line[1:].startswith("ParameterPixelSize"):
+                        param = GPFParameters.getParameterFromString(line[1:])
+                    else:
+                        param = getParameterFromString(line[1:])
                     param.isAdvanced = True
                     self.addParameter(param)
                 else:
