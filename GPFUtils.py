@@ -129,7 +129,6 @@ class GPFUtils:
     
     @staticmethod
     def executeGpf(key, gpf, progress):
-        print key
         loglines = []
         if key == GPFUtils.beamKey():
             loglines.append("BEAM execution console output")
