@@ -13,9 +13,6 @@ def getParameterFromString(s):
 # this parameter. It also has a different parameter panel (see GPFParametersPanel)
 class ParameterBands(ParameterString):
     
-    NEWLINE = '\n'
-    ESCAPED_NEWLINE = '\\n'
-    
     def __init__(self, name='', description='', default='', bandSourceRaster = '', optional = False):
         ParameterString.__init__(self, name, description, default, multiline=False, optional=optional)
         self.bandSourceRaster = bandSourceRaster
@@ -26,4 +23,4 @@ class ParameterPixelSize(ParameterNumber):
     
     def __init__(self, name='', description='', minValue=None, maxValue=None,
                  default=0.0):
-        ParameterNumber.__init__(self)     
+        ParameterNumber.__init__(self, name, description, minValue, maxValue, default)     
