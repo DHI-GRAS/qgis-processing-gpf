@@ -17,7 +17,7 @@ about=
 	This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
 version=1.2.2
-qgisMinimumVersion=2.8
+qgisMinimumVersion=2.12
 
 # Optional items:
 

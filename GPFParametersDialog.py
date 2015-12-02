@@ -26,8 +26,7 @@
 ***************************************************************************
 """
 
-#from processing.gui.AlgorithmExecutionDialog import AlgorithmExecutionDialog
-#from processing.gui.ParametersDialog import ParametersDialog
+from PyQt4.QtGui import  QPushButton, QWidget, QVBoxLayout
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.AlgorithmDialogBase import AlgorithmDialogBase
 from processing_gpf.GPFParametersPanel import GPFParametersPanel
@@ -43,6 +42,17 @@ class GPFParametersDialog(AlgorithmDialog):
 
         self.mainWidget = GPFParametersPanel(self, alg)
         self.setMainWidget()
+        
+        # Same look as AlgorithmDialog
+        cornerWidget = QWidget()
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 5)
+        self.tabWidget.setStyleSheet("QTabBar::tab { height: 30px; }")
+        runAsBatchButton = QPushButton("Run as batch process...")
+        runAsBatchButton.clicked.connect(self.runAsBatch)
+        layout.addWidget(runAsBatchButton)
+        cornerWidget.setLayout(layout)
+        self.tabWidget.setCornerWidget(cornerWidget)
         
     def getRasterParamPath(self, paramName):
         param = self.mainWidget.valueItems[paramName]
