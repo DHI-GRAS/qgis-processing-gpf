@@ -76,6 +76,9 @@ class S1TbxPixelSizeInputPanel(QtGui.QWidget):
         
     def getValue(self):
         return self.numberPanel.text()
+    
+    def text(self):
+        return self.getValue()
         
 # Simple dialog displaying SAR image pixel sizes           
 class S1TbxPixelSizeInputDialog(QtGui.QDialog): 
@@ -148,6 +151,12 @@ class GPFBandsSelectorPanel(QtGui.QWidget):
     def getFilePath(self):
         value = self.parent.getRasterParamPath(self.bandSourceRaster)
         return value
+    
+    def getValue(self):
+        return self.bandsPanel.text()
+    
+    def text(self):
+        return self.getValue()
         
 # Simple dialog displaying a list of bands            
 class GPFBandsListDialog(QtGui.QDialog):
