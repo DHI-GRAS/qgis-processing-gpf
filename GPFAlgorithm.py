@@ -353,6 +353,6 @@ class GPFAlgorithm(GeoAlgorithm):
         msg = GeoAlgorithm._checkParameterValuesBeforeExecuting(self)
         # .safe, .zip, .dim and .xml file formats can be opened with Sentinel Toolbox
         # even though they can't be opened by GDAL. 
-        if msg and (msg.endswith(".safe") or msg.endswith(".zip") or msg.endswith(".dim") or msg.endswith(".xml")):
+        if msg and (msg.endswith(".safe") or msg.endswith(".zip") or msg.endswith(".dim") or msg.endswith(".xml") or msg.endswith(".N1")):
             msg = None
         return msg  
