@@ -4,5 +4,5 @@ Apply Multi Temporal Speckle Filter
 Radar
 ParameterRaster|sourceProduct|The product which will be despeckled|False|False
 ParameterBands|sourceBands|The list of source bands||sourceProduct
-ParameterSelection|windowSize|Window size|3x3;5x5;7x7;9x9;11x11
+ParameterNumber|gradThreshold|The gradient threshold for Refined Lee Filter|0.0|None|5000.0
 OutputRaster|-out|Output Image

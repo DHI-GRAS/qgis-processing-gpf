@@ -3,5 +3,7 @@ s1tbx_Apply-Orbit-File
 Apply Orbit File
 Radar
 ParameterRaster|sourceProduct|Input image|False|False
-ParameterSelection|orbitType|Orbit type|Sentinel Precise (Auto Download);Sentinel Restituted;DORIS Preliminary POR (ENVISAT);DORIS Precise VOR (ENVISAT) (Auto Download);DELFT Precise (ENVISAT, ERS1&2) (Auto Download);PRARE Precise (ERS1&2) (Auto Download)|1
+ParameterSelection|orbitType|Orbit type|Sentinel Precise (Auto Download);Sentinel Restituted (Auto Download);DORIS Preliminary POR (ENVISAT);DORIS Precise VOR (ENVISAT) (Auto Download);DELFT Precise (ENVISAT, ERS1&2) (Auto Download);PRARE Precise (ERS1&2) (Auto Download)|0
+ParameterNumber|polyDegree|Polynomial Degree|1|10|3
+ParameterBoolean|continueOnFail|Do not fail if new orbit file is not found|False
 OutputRaster|-out|Output Image

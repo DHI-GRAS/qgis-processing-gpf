@@ -7,5 +7,5 @@ ParameterBands|sourceBands|The list of source bands||sourceProduct
 ParameterNumber|nAzLooks|The user defined number of azimuth looks|1|None|1
 ParameterNumber|nRgLooks|The user defined number of range looks|1|None|1
 ParameterBoolean|outputIntensity|Output intensity for complex products? Otherwise output i and q.|True
-ParameterString|note|Note|Currently, detection for complex data is performed without any resampling
+ParameterBoolean|grSquarePixel|Use ground square pixel|True
 OutputRaster|-out|Output Image
