@@ -4,7 +4,7 @@ Speckle Filter
 Radar
 ParameterRaster|sourceProduct|The product which will be despeckled|False|False
 ParameterBands|sourceBands|The list of source bands||sourceProduct|True
-ParameterSelection|filter|filter type|Mean;Median;Frost;Gamma Map;Lee;Refined Lee
+ParameterSelection|filter|filter type|None;Mean;Median;Frost;Gamma Map;Lee;Refined Lee|6
 ParameterNumber|filterSizeX|The kernel X dimension|1|100|3
 ParameterNumber|filterSizeY|The kernel Y dimension|1|100|3
 *ParameterNumber|dampingFactor|The damping factor (Frost filter only)|0|100|2
