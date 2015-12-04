@@ -7,5 +7,5 @@ OutputRaster|-out|Output Image
 ParameterNumber|clusterCount|Number of clusters|0|100|14
 *ParameterNumber|iterationCount|Number of iterations|0|1000|30
 *ParameterNumber|randomSeed|Seed for the random generator, used for initialising the algorithm|0|1000000|31415
-ParameterBands|sourceBandNames|The names of the bands being used for the cluster analysis||sourceProduct
+ParameterBands|sourceBandNames|The names of the bands being used for the cluster analysis||sourceProduct|True
 *ParameterString|roiMaskName|The name of the ROI-Mask that should be used.|

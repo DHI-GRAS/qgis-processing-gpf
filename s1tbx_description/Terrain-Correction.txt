@@ -11,7 +11,7 @@ ParameterSelection|demResamplingMethod|DEM resampling method|NEAREST_NEIGHBOUR;B
 ParameterSelection|imgResamplingMethod|Image resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION;BISINC_5_POINT_INTERPOLATION;BISINC_11_POINT_INTERPOLATION;BISINC_21_POINT_INTERPOLATION;BICUBIC_INTERPOLATION;DELAUNAY_INTERPOLATION|1
 ParameterPixelSize|pixelSpacingInDegree|The pixel spacing in degrees|0.0|None|99999.9
 ParameterPixelSize|pixelSpacingInMeter|The pixel spacing in meters|0.0|None|99999.9
-*ParameterCrs|mapProjection|Map projection|
+*ParameterCrs|mapProjection|Map projection||True
 *ParameterBoolean|nodataValueAtSea|No data value at sea|True
 *ParameterBoolean|saveDEM|Save DEM|False
 *ParameterBoolean|saveLatLon|Save latitude and longitude|False 
@@ -27,3 +27,4 @@ ParameterSelection|incidenceAngleForSigma0|Incidence angle for Sigma 0|Use incid
 ParameterSelection|incidenceAngleForGamma0|Incidence angle for Gamma 0|Use incidence angle from Ellipsoid;Use projected local incidence angle from DEM|1
 ParameterSelection|auxFile|The auxiliary file|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|0
 ParameterFile|externalAuxFile|The antenne elevation pattern gain auxiliary data file|False|True
+OutputRaster|-out|Output Image

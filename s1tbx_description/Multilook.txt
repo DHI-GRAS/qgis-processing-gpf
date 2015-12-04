@@ -3,9 +3,9 @@ s1tbx_Multilook
 Multilook
 Radar
 ParameterRaster|sourceProduct|Input image|False|False
-ParameterBands|sourceBands|The list of source bands||sourceProduct
+ParameterBands|sourceBands|The list of source bands||sourceProduct|True
 ParameterNumber|nAzLooks|The user defined number of azimuth looks|1|None|1
 ParameterNumber|nRgLooks|The user defined number of range looks|1|None|1
 ParameterBoolean|outputIntensity|Output intensity for complex products? Otherwise output i and q.|True
-ParameterBoolean|grSquarePixel|Use ground square pixel|True
+ParameterBoolean|grSquarePixel|Use ground square pixel? Otherwise range and azimuth looks are independent|True
 OutputRaster|-out|Output Image

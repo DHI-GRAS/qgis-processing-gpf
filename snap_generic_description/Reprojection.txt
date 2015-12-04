@@ -8,7 +8,8 @@ OutputRaster|-out|Output Image
 *ParameterRaster|collocateWith|The source product will be collocated with this product|True|False
 *ParameterFile|wktFile|A file which contains the target Coordinate Reference System in WKT format|False
 ParameterSelection|resampling|The method used for resampling of floating-point raster data|Nearest;Bilinear;Bicubic
-ParameterBoolean|includeTiePointGrids|Whether tie-point grids should be included in the output product|True
+ParameterBoolean|includeTiePointGrids|Include tie point grids|True
+ParameterBoolean|addDeltaBands|Add delta bands|False
 *ParameterNumber|noDataValue|The value used to indicate no-data|None|None|99999.9
 *ParameterNumber|pixelSizeX|The pixel size in X direction given in CRS units|0.0|None|99999.9
 *ParameterNumber|pixelSizeY|The pixel size in Y direction given in CRS units|0.0|None|99999.9 
