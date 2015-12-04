@@ -13,7 +13,7 @@ def getParameterFromString(s):
 # this parameter. It also has a different parameter panel (see GPFParametersPanel)
 class ParameterBands(ParameterString):
     
-    def __init__(self, name='', description='', default='', bandSourceRaster = '', optional = False):
+    def __init__(self, name='', description='', default='', bandSourceRaster = '', optional = True):
         ParameterString.__init__(self, name, description, default, multiline=False, optional=optional)
         self.bandSourceRaster = bandSourceRaster
 

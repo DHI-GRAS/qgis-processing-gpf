@@ -137,9 +137,10 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                                 self.tr('Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm' % (alg.algorithm.operator,) ))
                             return
                         paramTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param)
-                        pos = modelInstance.inputs[paramValue].pos
-                        paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
-                        paramTag.attrib["qgisModelInputVars"] = str(modelInstance.inputs[paramValue].param.todict())
+                        if paramTag is not None:
+                            pos = modelInstance.inputs[paramValue].pos
+                            paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
+                            paramTag.attrib["qgisModelInputVars"] = str(modelInstance.inputs[paramValue].param.todict())
             
         # Save model layout
         presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation", "name":self.name, "group":self.group})
@@ -434,12 +435,17 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                     value = None
                 if value is None and isinstance(param, ParameterExtent):
                     value = self.getMinCoveringExtent()
+                elif value is None:
+                    try:
+                        value = param.default
+                    except:
+                        pass
                 # We allow unexistent filepaths, since that allows
                 # algorithms to skip some conversion routines
                 if not param.setValue(value) and not isinstance(param,
                         ParameterDataObject):
                     raise GeoAlgorithmExecutionException(
-                        self.tr('Wrong value: %s', 'ModelerAlgorithm') % value)
+                        self.tr('Wrong value: %s for parameter %s', 'ModelerAlgorithm') % (value, param.name))
         for out in algInstance.outputs:
             if not out.hidden:
                 if out.name in alg.outputs:
@@ -531,8 +537,28 @@ class GPFModelerAlgorithm (GeoAlgorithm):
             self.modelerdialog.repaintModel()
 
     def help(self):
-        print self.helpContent
         try:
             return True, getHtmlFromDescriptionsDict(self, self.helpContent)
         except:
             return False, None
+        
+    ##############################################################################            
+    # Below are GeoAlgorithm functions which need to be overwritten to support 
+    # non-GDAL inputs (.safe, .zip, .dim) and outputs (.dim) in Processing toolbox.
+
+    def convertUnsupportedFormats(self, progress):
+        pass
+    
+    def checkOutputFileExtensions(self):
+        pass
+    
+    def checkInputCRS(self):
+        return True
+        
+    def _checkParameterValuesBeforeExecuting(self):
+        msg = GeoAlgorithm._checkParameterValuesBeforeExecuting(self)
+        # .safe, .zip, .dim and .xml file formats can be opened with Sentinel Toolbox
+        # even though they can't be opened by GDAL. 
+        if msg and (msg.endswith(".safe") or msg.endswith(".zip") or msg.endswith(".dim") or msg.endswith(".xml") or msg.endswith(".N1")):
+            msg = None
+        return msg 

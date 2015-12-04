@@ -14,8 +14,10 @@ class GPFModelerDialog(ModelerDialog):
     
     def __init__(self, gpfAlgorithmProvider, alg=None):
         self.gpfAlgorithmProvider = gpfAlgorithmProvider
-        self.alg = GPFModelerAlgorithm(gpfAlgorithmProvider)
         ModelerDialog.__init__(self, alg)
+        if alg is None:
+            self.alg = GPFModelerAlgorithm(gpfAlgorithmProvider)
+            self.alg.modelerdialog = self
     
     def editHelp(self):
         if self.alg.provider is None:

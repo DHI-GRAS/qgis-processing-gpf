@@ -153,84 +153,83 @@ class GPFAlgorithm(GeoAlgorithm):
         parametersNode = ET.SubElement(node, "parameters")
         
         for param in self.parameters:
-            # ignore parameters which should have no value unless set by user 
-            if param.value == None or param.value == GPFAlgorithm.NOVALUEINT or param.value == GPFAlgorithm.NOVALUEDOUBLE:
-                continue
-            else:
-                # add a source product
-                if isinstance(param, ParameterRaster) and operator.text != "Read":
-                    # if the source is a file, then add an external "source product" file
-                    if os.path.isfile(param.value):
-                        # check if the file should be added individually or through the
-                        # ProductSet-Reader used sometimes by S1 Toolbox
-                        match = re.match("^\d*ProductSet-Reader>(.*)",param.name)
-                        if match:
-                            paramName = match.group(1)
-                            sourceNodeId = self.addProductSetReaderNode(graph, param.value)
-                        else:
-                            paramName = param.name
-                            sourceNodeId = self.addReadNode(graph, param.value)
-                        if sources.find(paramName) == None:
-                            source = ET.SubElement(sources, paramName)
-                            source.set("refid",sourceNodeId)
-                    # else assume its a reference to a previous node and add a "source" element
+        
+            # add a source product
+            if isinstance(param, ParameterRaster) and operator.text != "Read":
+                # if the source is a file, then add an external "source product" file
+                if os.path.isfile(param.value):
+                    # check if the file should be added individually or through the
+                    # ProductSet-Reader used sometimes by S1 Toolbox
+                    match = re.match("^\d*ProductSet-Reader>(.*)",param.name)
+                    if match:
+                        paramName = match.group(1)
+                        sourceNodeId = self.addProductSetReaderNode(graph, param.value)
                     else:
-                        source = ET.SubElement(sources, param.name, {"refid":param.value}) 
-                # add parameters
+                        paramName = param.name
+                        sourceNodeId = self.addReadNode(graph, param.value)
+                    if sources.find(paramName) == None:
+                        source = ET.SubElement(sources, paramName)
+                        source.set("refid",sourceNodeId)
+                # else assume its a reference to a previous node and add a "source" element
                 else:
-                    # Set the name of the parameter
-                    # First check if there are nested tags
-                    tagList = param.name.split(">")
-                    parentElement = parametersNode
-                    parameter = None
-                    for tag in tagList:
-                        # if this is the last tag or there are no nested tags create the parameter element
-                        if tag == tagList[-1]:
-                            # special treatment for geoRegionExtent parameter in Subset operator
-                            if tag == "geoRegionExtent":
-                                tag = "geoRegion"
-                            # there can be only one parameter element in each parent element 
-                            if len(parentElement.findall(tag)) > 0:
-                                parameter = parentElement.findall(tag)[0]
-                            else:
-                                parameter = ET.SubElement(parentElement, tag)
-                        # "!" means that a new element in the graph should be created as child of the parent element and set as a parent    
-                        elif tag.startswith("!"):
-                            parentElement = ET.SubElement(parentElement, tag[1:])
-                        # otherwise just find the last element with required name and set it as parent of the parameter element
-                        # or create a new one if it can't be found    
+                    source = ET.SubElement(sources, param.name, {"refid":param.value}) 
+            # add parameters
+            else:
+                # Set the name of the parameter
+                # First check if there are nested tags
+                tagList = param.name.split(">")
+                parentElement = parametersNode
+                parameter = None
+                for tag in tagList:
+                    # if this is the last tag or there are no nested tags create the parameter element
+                    if tag == tagList[-1]:
+                        # special treatment for geoRegionExtent parameter in Subset operator
+                        if tag == "geoRegionExtent":
+                            tag = "geoRegion"
+                        # there can be only one parameter element in each parent element 
+                        if len(parentElement.findall(tag)) > 0:
+                            parameter = parentElement.findall(tag)[0]
                         else:
-                            if len(parentElement.findall(tag)) > 0:
-                                parentElement = (parentElement.findall(tag))[-1]
-                            else:
-                                parentElement = ET.SubElement(parentElement, tag)
-                    
-                    # Set the value of the parameter    
-                    if isinstance(param, ParameterBoolean):
-                        if param.value:
-                            parameter.text = "True"
+                            parameter = ET.SubElement(parentElement, tag)
+                    # "!" means that a new element in the graph should be created as child of the parent element and set as a parent    
+                    elif tag.startswith("!"):
+                        parentElement = ET.SubElement(parentElement, tag[1:])
+                    # otherwise just find the last element with required name and set it as parent of the parameter element
+                    # or create a new one if it can't be found    
+                    else:
+                        if len(parentElement.findall(tag)) > 0:
+                            parentElement = (parentElement.findall(tag))[-1]
                         else:
-                            parameter.text = "False"
-                    elif isinstance(param, ParameterSelection):
-                        idx = int(param.value)
-                        parameter.text = str(param.options[idx])
-                    # create at WKT polygon from the extent values, used in Subset Operator
-                    elif isinstance(param, ParameterExtent):
-                        values = param.value.split(",")
-                        if len(values) == 4:
-                            parameter.text = "POLYGON(("
-                            parameter.text += values[0] + ' ' + values[2] +", "
-                            parameter.text += values[0] + ' ' + values[3] +", "
-                            parameter.text += values[1] + ' ' + values[3] +", "
-                            parameter.text += values[1] + ' ' + values[2] +", "
-                            parameter.text += values[0] + ' ' + values[2] +"))"
-                    elif isinstance(param, ParameterFile):
-                        if param.value is None or param.value == "None":
-                            parameter.text = ""
-                        else:
-                            parameter.text = str(param.value)
-                    else:          
+                            parentElement = ET.SubElement(parentElement, tag)
+                
+                # Set the value of the parameter
+                if param.value == None or param.value == GPFAlgorithm.NOVALUEINT or param.value == GPFAlgorithm.NOVALUEDOUBLE:
+                    pass    
+                elif isinstance(param, ParameterBoolean):
+                    if param.value:
+                        parameter.text = "True"
+                    else:
+                        parameter.text = "False"
+                elif isinstance(param, ParameterSelection):
+                    idx = int(param.value)
+                    parameter.text = str(param.options[idx])
+                # create at WKT polygon from the extent values, used in Subset Operator
+                elif isinstance(param, ParameterExtent):
+                    values = param.value.split(",")
+                    if len(values) == 4:
+                        parameter.text = "POLYGON(("
+                        parameter.text += values[0] + ' ' + values[2] +", "
+                        parameter.text += values[0] + ' ' + values[3] +", "
+                        parameter.text += values[1] + ' ' + values[3] +", "
+                        parameter.text += values[1] + ' ' + values[2] +", "
+                        parameter.text += values[0] + ' ' + values[2] +"))"
+                elif isinstance(param, ParameterFile):
+                    if param.value is None or param.value == "None":
+                        parameter.text = ""
+                    else:
                         parameter.text = str(param.value)
+                else:          
+                    parameter.text = str(param.value)
         
         # For "Write" operator also save the output raster as a parameter
         if self.operator == "Write":
