@@ -11,13 +11,14 @@ from processing_gpf.S2TbxAlgorithm import S2TbxAlgorithm
 from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
 from processing_gpf.CreateNewGpfModelAction import CreateNewGpfModelAction
 from processing_gpf.EditGpfModelAction import EditGpfModelAction
+from processing_gpf.DeleteGpfModelAction import DeleteGpfModelAction
 
 class SNAPAlgorithmProvider(AlgorithmProvider):
 
     def __init__(self):
         AlgorithmProvider.__init__(self)
         self.actions = [CreateNewGpfModelAction(self)]
-        self.contextMenuActions = [EditGpfModelAction()]
+        self.contextMenuActions = [EditGpfModelAction(), DeleteGpfModelAction()]
         self.activate = False
         
         #self.createAlgsList() #preloading algorithms to speed up
