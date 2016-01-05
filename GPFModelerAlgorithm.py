@@ -59,8 +59,8 @@ class GPFModelerAlgorithm (GeoAlgorithm):
     def getIcon(self):
         return  QIcon(os.path.dirname(__file__) + "/images/snap_graph.png")
     
-    # BEAM parameters dialog is the same as normal parameters dialog except
-    # it has a button next to raster inputs to show band names
+    # GPF parameters dialog is the same as normal parameters dialog except
+    # it can handle special GPF parameters.
     def getCustomParametersDialog(self):
         return GPFParametersDialog(self)
     
@@ -103,7 +103,6 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         else:
             modelInstance = self.getCopy()
         
-    
         # Set the connections between nodes
         for alg in modelInstance.algs.values():
             for param in alg.params.values():

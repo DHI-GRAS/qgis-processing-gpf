@@ -33,36 +33,13 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 from processing.core.GeoAlgorithm import GeoAlgorithm
-try:
-    from processing.parameters.ParameterFile import ParameterFile
-except:
-    from processing.core.parameters import ParameterFile
-try:
-    from processing.parameters.ParameterRaster import ParameterRaster
-except:
-    from processing.core.parameters import ParameterRaster
-try:	
-    from processing.parameters.ParameterBoolean import ParameterBoolean
-except:
-    from processing.core.parameters import ParameterBoolean
-try:
-    from processing.parameters.ParameterSelection import ParameterSelection
-except:
-    from processing.core.parameters import ParameterSelection
-try:
-    from processing.parameters.ParameterExtent import ParameterExtent
-except:
-    from processing.core.parameters import ParameterExtent
-try:
-    from processing.parameters.ParameterFactory import ParameterFactory
-    getParameterFromString = ParameterFactory.getFromString 
-except:
-    from processing.core.parameters import getParameterFromString
-try:
-    from processing.outputs.OutputFactory import OutputFactory
-    getOutputFromString = OutputFactory.getFromString
-except:
-    from processing.core.outputs import getOutputFromString
+from processing.core.parameters import ParameterFile
+from processing.core.parameters import ParameterRaster
+from processing.core.parameters import ParameterBoolean
+from processing.core.parameters import ParameterSelection
+from processing.core.parameters import ParameterExtent
+from processing.core.parameters import getParameterFromString
+from processing.core.outputs import getOutputFromString
 from processing.core.ProcessingLog import ProcessingLog
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFParametersDialog import GPFParametersDialog
@@ -94,10 +71,8 @@ class GPFAlgorithm(GeoAlgorithm):
             return helpfile
         return None
     
-    # BEAM parameters dialog is the same as normal parameters dialog except
-    # it has a button next to raster inputs to show band names
-    # For now S1Tbx uses the same dialog, maybe later that might have to change
-    # if BEAM can't read band name from S1Tbx images.
+    # GPF parameters dialog is the same as normal parameters dialog except
+    # it can handle special GPF parameters.
     def getCustomParametersDialog(self):
         return GPFParametersDialog(self)
     
@@ -308,7 +283,7 @@ class GPFAlgorithm(GeoAlgorithm):
         return graph
     
     def processAlgorithm(self, key, progress):
-        # Create a GFP for execution with BEAM's GPT
+        # Create a GFP for execution with SNAP's GPT
         graph = ET.Element("graph", {'id':self.operator+'_gpf'})
         version = ET.SubElement(graph, "version")
         version.text = "1.0"

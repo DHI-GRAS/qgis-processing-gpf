@@ -31,6 +31,7 @@ from PyQt4.QtGui import *
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
 
+# Sentinel-2 Toolbox specific algorithms
 class S2TbxAlgorithm(SNAPAlgorithm):
     
     def __init__(self, descriptionfile):

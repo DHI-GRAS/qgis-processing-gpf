@@ -31,8 +31,9 @@ from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFParameters import ParameterBands, ParameterPixelSize
 from PyQt4 import QtGui, QtCore
 
-# BEAM parameters panel is the same as normal parameters panel except
-# it has a button next to raster inputs to show band names
+# GPF parameters panel is the same as normal parameters panel except
+# it can also handle ParameterBands and ParameterPixelSize with
+# special UI
 class GPFParametersPanel(ParametersPanel):
     
     def getWidgetFromParameter(self, param):

@@ -37,6 +37,7 @@ try:
 except:
     from processing.core.parameters import ParameterRaster
 
+# General SNAP algorithms (e.g. from Raster or Input-Output menus)
 class SNAPAlgorithm(GPFAlgorithm):
     
     def __init__(self, descriptionfile):
