@@ -28,6 +28,7 @@
 
 import os
 import re
+import GPFRasterOutput
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -104,6 +105,8 @@ class GPFAlgorithm(GeoAlgorithm):
                         param = getParameterFromString(line[1:])
                     param.isAdvanced = True
                     self.addParameter(param)
+                elif line.startswith("OutputRaster"):
+                    self.addOutput(GPFRasterOutput.getOutputFromString(line))
                 else:
                     self.addOutput(getOutputFromString(line))
                 line = lines.readline().strip("\n").strip()
