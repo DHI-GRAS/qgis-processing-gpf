@@ -6,23 +6,27 @@
 # This file should be included when you package your plugin.
 
 [general]
-name=Processing BEAM and S-1 Toolbox Provider
-description= QGIS Processing provider for GPF-based algorithms (BEAM and Sentinel-1 Toolbox). 
+name=Processing BEAM and SNAP algorithm Provider
+description= QGIS Processing provider for GPF-based algorithms (BEAM and SNAP). 
 
 about= 
-	QGIS Processing provider for GPF (Graph Processing Framework)-based algorithms. Currently supports selected algorithms from BEAM (http://www.brockmann-consult.de/cms/web/beam/) and Sentinel-1 Toolbox (https://sentinel.esa.int/web/sentinel/toolboxes/sentinel-1). In the future support will be extended to other Sentinel Toolboxes (https://sentinel.esa.int/web/sentinel/toolboxes). 
+	QGIS Processing provider for GPF (Graph Processing Framework)-based algorithms. Currently supports selected algorithms from BEAM 5.0 (http://www.brockmann-consult.de/cms/web/beam/) and SNAP 2.0  (http://step.esa.int).
 	
-	The plugin requires BEAM and/or S-1 Toolbox (version 1.1.1) to be installed for it to be able to access their GPF algorithms. 
+	The plugin requires BEAM and/or SNAP to be installed for it to be able to access their GPF algorithms. See README in code repository for further instructions.
 	
 	This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
-version=1.2.2
-qgisMinimumVersion=2.12
+version=1.3.0
+qgisMinimumVersion=2.14
 
 # Optional items:
 
 
-Changelog=1.2.2
+Changelog=1.3.0
+	- Swap Sentinel-1 Toolbox support for SNAP support.
+	- Add functionality to create and run SNAP-only GPF graphs.
+	- Update code for compatibility with QGIS 2.14.0 Processing.
+	1.2.2
 	- Save Sentinel-1 Toolbox TIFF output in BigTIFF format.
 	- Make band selection parameters optional in S1 pre-processing algorithms. Makes it easier to use in Processing models.
 	- Enable the use of .zip and .safe files as algorithm inputs in newer versions of Processing.
@@ -35,11 +39,11 @@ Changelog=1.2.2
 
 # tags are comma separated with spaces allowed
 
-tags=processing, SAR, Envisat, Sentinel, BEAM, NEST, S-1 Toolbox
+tags=processing, SAR, Envisat, Sentinel, BEAM, NEST, Sentinel Application Platform, SNAP
 
 homepage=http://www.tiger-net.org
-tracker=https://github.com/TIGER-NET/Processing-GPF/issues
-repository=https://github.com/TIGER-NET/Processing-GPF
+tracker=https://github.com/DHI-GRAS/processing_gpf/issues
+repository=https://github.com/DHI-GRAS/processing_gpf
 
 #icon=
 experimental=False
@@ -50,7 +54,7 @@ deprecated=False
 
 # Author contact information
 author=Radoslaw Guzinski
-email=rmgu@dhi-gras.com
+email=radoslaw.guzinski@esa.int
 
 
 
