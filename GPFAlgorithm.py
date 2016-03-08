@@ -135,7 +135,7 @@ class GPFAlgorithm(GeoAlgorithm):
             # add a source product
             if isinstance(param, ParameterRaster) and operator.text != "Read":
                 # if the source is a file, then add an external "source product" file
-                if os.path.isfile(param.value):
+                if param.value and os.path.isfile(param.value):
                     # check if the file should be added individually or through the
                     # ProductSet-Reader used sometimes by S1 Toolbox
                     match = re.match("^\d*ProductSet-Reader>(.*)",param.name)

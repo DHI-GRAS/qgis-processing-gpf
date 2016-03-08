@@ -30,7 +30,7 @@ from PyQt4.QtGui import  QPushButton, QWidget, QVBoxLayout
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.AlgorithmDialogBase import AlgorithmDialogBase
 from processing_gpf.GPFParametersPanel import GPFParametersPanel
-from qgis.core import QgsRasterLayer
+from qgis.core import QgsRasterLayer, QgsMapLayerRegistry
 
 # GPF parameters dialog is the same as normal parameters dialog except
 # it can handle special GPF parameters
@@ -53,6 +53,9 @@ class GPFParametersDialog(AlgorithmDialog):
         layout.addWidget(runAsBatchButton)
         cornerWidget.setLayout(layout)
         self.tabWidget.setCornerWidget(cornerWidget)
+        
+        QgsMapLayerRegistry.instance().layerWasAdded.connect(self.mainWidget.layerAdded)
+        QgsMapLayerRegistry.instance().layersWillBeRemoved.connect(self.mainWidget.layersWillBeRemoved)
         
     def getRasterParamPath(self, paramName):
         param = self.mainWidget.valueItems[paramName]
