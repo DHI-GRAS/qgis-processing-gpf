@@ -149,7 +149,7 @@ class GPFAlgorithm(GeoAlgorithm):
                         source = ET.SubElement(sources, paramName)
                         source.set("refid",sourceNodeId)
                 # else assume its a reference to a previous node and add a "source" element
-                else:
+                elif param.value:
                     source = ET.SubElement(sources, param.name, {"refid":param.value}) 
             # add parameters
             else:
