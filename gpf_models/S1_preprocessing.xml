@@ -1,18 +1,36 @@
 <graph id="Graph">
   <version>1.0</version>
-  <node id="LinearTodB_87">
-    <operator>LinearTodB</operator>
+  <node id="LinearToFromdB_101">
+    <operator>LinearToFromdB</operator>
     <sources>
-      <sourceProduct refid="Calibration_89" />
+      <sourceProduct refid="Calibration_103" />
     </sources>
     <parameters>
       <sourceBands />
     </parameters>
   </node>
-  <node id="Terrain-Correction_88">
+  <node id="Speckle-Filter_107">
+    <operator>Speckle-Filter</operator>
+    <sources>
+      <sourceProduct refid="Terrain-Correction_102" />
+    </sources>
+    <parameters>
+      <sourceBands />
+      <filter>Gamma Map</filter>
+      <filterSizeX>3</filterSizeX>
+      <filterSizeY>3</filterSizeY>
+      <dampingFactor>2</dampingFactor>
+      <targetWindowSizeStr>3x3</targetWindowSizeStr>
+      <sigmaStr>0.9</sigmaStr>
+      <anSize>50</anSize>
+      <estimateENL>True</estimateENL>
+      <enl>1</enl>
+    </parameters>
+  </node>
+  <node id="Terrain-Correction_102">
     <operator>Terrain-Correction</operator>
     <sources>
-      <sourceProduct refid="LinearTodB_87" />
+      <sourceProduct refid="LinearToFromdB_101" />
     </sources>
     <parameters>
       <sourceBands />
@@ -40,10 +58,10 @@
       <externalAuxFile />
     </parameters>
   </node>
-  <node id="Calibration_89">
+  <node id="Calibration_103">
     <operator>Calibration</operator>
     <sources>
-      <sourceProduct refid="Subset_91" />
+      <sourceProduct refid="Subset_104" />
     </sources>
     <parameters>
       <sourceBands />
@@ -57,10 +75,10 @@
       <outputImageInComplex>False</outputImageInComplex>
     </parameters>
   </node>
-  <node id="Subset_91">
+  <node id="Subset_104">
     <operator>Subset</operator>
     <sources>
-      <sourceProduct refid="Read_90" />
+      <sourceProduct refid="Read_105" />
     </sources>
     <parameters>
       <geoRegion qgisModelInputPos="377.0,51.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'extent', 'default': '0,1,0,1', 'hidden': False, 'optional': False, 'value': None, 'description': u'Extent'}" />
@@ -70,17 +88,17 @@
       <copyMetadata>True</copyMetadata>
     </parameters>
   </node>
-  <node id="Read_90">
+  <node id="Read_105">
     <operator>Read</operator>
     <sources />
     <parameters>
       <file />
     </parameters>
   </node>
-  <node id="Write_86">
+  <node id="Write_108">
     <operator>Write</operator>
     <sources>
-      <sourceProduct refid="Terrain-Correction_88" />
+      <sourceProduct refid="Speckle-Filter_107" />
     </sources>
     <parameters>
       <formatName>GeoTIFF-BigTIFF</formatName>
@@ -89,23 +107,26 @@
   </node>
   <applicationData group="S1 Graphs" id="Presentation" name="S1 Preprocessing">
     <Description />
-    <node id="LinearTodB_87">
+    <node id="LinearToFromdB_101">
       <displayPosition x="415.0" y="345.0" />
     </node>
-    <node id="Terrain-Correction_88">
+    <node id="Speckle-Filter_107">
+      <displayPosition x="433.0" y="481.0" />
+    </node>
+    <node id="Terrain-Correction_102">
       <displayPosition x="127.0" y="413.0" />
     </node>
-    <node id="Calibration_89">
+    <node id="Calibration_103">
       <displayPosition x="147.0" y="285.0" />
     </node>
-    <node id="Read_90">
+    <node id="Subset_104">
+      <displayPosition x="423.0" y="185.0" />
+    </node>
+    <node id="Read_105">
       <displayPosition x="145.0" y="156.0" />
     </node>
-    <node id="Subset_91">
-      <displayPosition x="411.0" y="210.0" />
-    </node>
-    <node id="Write_86">
-      <displayPosition x="362.0" y="446.0" />
+    <node id="Write_108">
+      <displayPosition x="274.0" y="573.0" />
     </node>
   </applicationData>
 </graph>
