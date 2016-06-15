@@ -131,26 +131,33 @@ class GPFAlgorithm(GeoAlgorithm):
         parametersNode = ET.SubElement(node, "parameters")
         
         for param in self.parameters:
-        
+            
             # add a source product
-            if isinstance(param, ParameterRaster) and operator.text != "Read":
-                # if the source is a file, then add an external "source product" file
-                if param.value and os.path.isfile(param.value):
-                    # check if the file should be added individually or through the
-                    # ProductSet-Reader used sometimes by S1 Toolbox
-                    match = re.match("^\d*ProductSet-Reader>(.*)",param.name)
-                    if match:
-                        paramName = match.group(1)
-                        sourceNodeId = self.addProductSetReaderNode(graph, param.value)
-                    else:
-                        paramName = param.name
-                        sourceNodeId = self.addReadNode(graph, param.value)
-                    if sources.find(paramName) == None:
-                        source = ET.SubElement(sources, paramName)
-                        source.set("refid",sourceNodeId)
-                # else assume its a reference to a previous node and add a "source" element
-                elif param.value:
-                    source = ET.SubElement(sources, param.name, {"refid":param.value}) 
+            if isinstance(param, ParameterRaster):
+                if param.value:
+                    param.value, dataFormat = GPFUtils.gdalPathToSnapPath(param.value)
+                    # if the source is a file, then add an external "source product" file
+                    if os.path.isfile(param.value):
+                        # check if the file should be added individually or through the
+                        # ProductSet-Reader used sometimes by S1 Toolbox
+                        match = re.match("^\d*ProductSet-Reader>(.*)",param.name)
+                        if match:
+                            paramName = match.group(1)
+                            sourceNodeId = self.addProductSetReaderNode(graph, param.value)
+                        else:
+                            paramName = param.name
+                            if operator.text == "Read":
+                                sourceNodeId = self.addReadNode(graph, param.value, dataFormat, self.nodeID)
+                                return graph
+                            else:
+                                sourceNodeId = self.addReadNode(graph, param.value, dataFormat)
+                                if sources.find(paramName) == None:
+                                    source = ET.SubElement(sources, paramName)
+                                    source.set("refid",sourceNodeId)
+                    # else assume its a reference to a previous node and add a "source" element
+                    elif param.value:
+                        source = ET.SubElement(sources, param.name, {"refid":param.value})
+                        
             # add parameters
             else:
                 # Set the name of the parameter
@@ -238,9 +245,10 @@ class GPFAlgorithm(GeoAlgorithm):
             parameter.text +=","+filename
         return nodeID
     
-    def addReadNode(self, graph, filename):
+    def addReadNode(self, graph, filename, dataFormat = "", nodeID = ""):
         # Add read node
-        nodeID = self.nodeID+"_read_"+str(GPFAlgorithm.nodeIDNum)
+        if not nodeID:
+            nodeID = self.nodeID+"_read_"+str(GPFAlgorithm.nodeIDNum)
         GPFAlgorithm.nodeIDNum +=1
         node = ET.SubElement(graph, "node", {"id":nodeID})
         operator = ET.SubElement(node, "operator")
@@ -253,6 +261,9 @@ class GPFAlgorithm(GeoAlgorithm):
         parametersNode = ET.SubElement(node, "parameters")
         fileParameter = ET.SubElement(parametersNode, "file")
         fileParameter.text = filename
+        if dataFormat:
+            dataFormatParameter = ET.SubElement(parametersNode, "formatName")
+            dataFormatParameter.text = dataFormat
         
         return nodeID
           

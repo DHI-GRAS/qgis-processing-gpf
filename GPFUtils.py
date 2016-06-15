@@ -33,6 +33,7 @@ import tempfile
 import subprocess
 import sys
 import logging
+from osgeo import gdal
 from decimal import Decimal 
 from processing.tools.system import userFolder, mkdir
 from processing.core.ProcessingConfig import ProcessingConfig
@@ -281,6 +282,8 @@ class GPFUtils:
     def getSnapBandNames(productPath, secondAttempt = False):
         bands = []
         
+        productPath, _ = GPFUtils.gdalPathToSnapPath(productPath)
+        
         if productPath == "":
             return bands
         
@@ -294,7 +297,7 @@ class GPFUtils:
                 # Snappy sometimes throws an error on first try but returns band names 
                 # on second try
                 if not secondAttempt:
-                    bands = GPFUtils.SNAPProductReaderBand(productPath, secondAttempt = True)
+                    bands = GPFUtils.getSnapBandNames(productPath, secondAttempt = True)
                 else:
                     bands = ['Snappy exception', 'See Processing log for more details']
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Snappy exception: "+str(e))
@@ -320,5 +323,36 @@ class GPFUtils:
         else:
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
+    
+    # GDAL has ability to open S1 and S2 data since version 2.1. However, GDAL has
+    # different opening options than SNAP (e.g. SNAP can open S1 manifest.safe files and
+    # zipped S1 files, while GDAL can open manifest.safe and .SAFE directory), and sometimes
+    # prepends or postpends text to the file path (especially in case of S2 images with
+    # sub-datasets). Those discrepancies have to be resolved before the path can be used in
+    # a SNAP GPF graph.     
+    @staticmethod
+    def gdalPathToSnapPath(gdalPath):
+        snapPath = gdalPath
+        dataFormat = ""
         
-            
+        # Sentinel-1 data
+        # SNAP can't open .SAFE directories
+        if gdalPath.endswith(".SAFE") and not gdalPath.endswith("manifest.safe") and os.path.exists(gdalPath):
+                snapPath = os.path.join(gdalPath, "manifest.safe")
+        # Sentinel-2 data
+        # The path to S2 XML file and data format has to be extracted from GDAL path string.
+        else:
+            match = re.match("SENTINEL2_L[123][ABC](_TILE)?:(/vsizip/)?(.[:]?[^:]+):([^:]*):?(.*)", gdalPath)
+            if match:
+                path = match.group(3)
+                res = match.group(4)
+                proj = match.group(5)
+                if not proj:
+                    f = gdal.Open(gdalPath, gdal.GA_ReadOnly)
+                    proj = f.GetProjection()
+                    proj = "EPSG_"+re.search('AUTHORITY\[\"EPSG\",\"([0-9]{5})\"\]\]$', proj).group(1)
+                    f = None
+                snapPath = path
+                hemisphere = "N" if proj[7]=='6' else "S"
+                dataFormat = "SENTINEL-2-MSI-"+res.upper()+"-UTM"+proj[8:10]+ hemisphere
+        return snapPath, dataFormat    
