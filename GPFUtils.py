@@ -344,15 +344,19 @@ class GPFUtils:
         else:
             match = re.match("SENTINEL2_L[123][ABC](_TILE)?:(/vsizip/)?(.[:]?[^:]+):([^:]*):?(.*)", gdalPath)
             if match:
+                isZipped = match.group(2)
                 path = match.group(3)
                 res = match.group(4)
                 proj = match.group(5)
-                if not proj:
-                    f = gdal.Open(gdalPath, gdal.GA_ReadOnly)
-                    proj = f.GetProjection()
-                    proj = "EPSG_"+re.search('AUTHORITY\[\"EPSG\",\"([0-9]{5})\"\]\]$', proj).group(1)
-                    f = None
-                snapPath = path
-                hemisphere = "N" if proj[7]=='6' else "S"
-                dataFormat = "SENTINEL-2-MSI-"+res.upper()+"-UTM"+proj[8:10]+ hemisphere
+                if isZipped:
+                    snapPath = "Error: SNAP cannot process zipped Sentinel-2 datasets. Please extract the archive before processing."
+                else:
+                    if not proj:
+                        f = gdal.Open(gdalPath, gdal.GA_ReadOnly)
+                        proj = f.GetProjection()
+                        proj = "EPSG_"+re.search('AUTHORITY\[\"EPSG\",\"([0-9]{5})\"\]\]$', proj).group(1)
+                        f = None
+                    snapPath = path
+                    hemisphere = "N" if proj[7]=='6' else "S"
+                    dataFormat = "SENTINEL-2-MSI-"+res.upper()+"-UTM"+proj[8:10]+ hemisphere
         return snapPath, dataFormat    

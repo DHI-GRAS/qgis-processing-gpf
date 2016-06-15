@@ -42,6 +42,7 @@ from processing.core.parameters import ParameterExtent
 from processing.core.parameters import getParameterFromString
 from processing.core.outputs import getOutputFromString
 from processing.core.ProcessingLog import ProcessingLog
+from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFParametersDialog import GPFParametersDialog
 from processing_gpf import GPFParameters
@@ -136,6 +137,8 @@ class GPFAlgorithm(GeoAlgorithm):
             if isinstance(param, ParameterRaster):
                 if param.value:
                     param.value, dataFormat = GPFUtils.gdalPathToSnapPath(param.value)
+                    if param.value.startswith("Error:"):
+                        raise GeoAlgorithmExecutionException(param.value)
                     # if the source is a file, then add an external "source product" file
                     if os.path.isfile(param.value):
                         # check if the file should be added individually or through the
