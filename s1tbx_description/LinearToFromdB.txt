@@ -1,5 +1,5 @@
 LinearToFromdB
-s1tbx_LinearTodB
+s1tbx_LinearToFromdB
 Linear to/from dB
 Raster
 ParameterRaster|sourceProduct|Input image|False|False
