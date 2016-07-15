@@ -17,4 +17,10 @@ class CreateNewGpfModelAction(CreateNewModelAction):
         dlg = GPFModelerDialog(self.gpfAlgorithmProvider)
         dlg.exec_()
         if dlg.update:
-            self.toolbox.updateProvider(self.gpfAlgorithmProvider.getName())
+            try:
+                # QGIS 2.16 (and up?) Processing implementation
+                from processing.core.alglist import algList
+                algList.reloadProvider(self.gpfAlgorithmProvider.getName())
+            except ImportError:
+                # QGIS 2.14 Processing implementation
+                self.toolbox.updateProvider(self.gpfAlgorithmProvider.getName())
