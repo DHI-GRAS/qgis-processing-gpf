@@ -2,7 +2,6 @@ import codecs
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QMessageBox, QTreeWidget, QTreeWidgetItem, QFileDialog
 from processing.modeler.ModelerDialog import ModelerDialog, TreeAlgorithmItem
-from processing.modeler.ModelerUtils import ModelerUtils
 from processing.gui.HelpEditionDialog import HelpEditionDialog
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.core.ProcessingLog import ProcessingLog
@@ -22,7 +21,7 @@ class GPFModelerDialog(ModelerDialog):
     def editHelp(self):
         if self.alg.provider is None:
             # Might happen if model is opened from modeler dialog
-            self.alg.provider = ModelerUtils.providers[self.gpfAlgorithmProvider.getName()]
+            self.alg.provider = self.gpfAlgorithmProvider
         alg = self.alg.getCopy()
         dlg = HelpEditionDialog(alg)
         dlg.exec_()
@@ -38,7 +37,7 @@ class GPFModelerDialog(ModelerDialog):
 
         if self.alg.provider is None:
             # Might happen if model is opened from modeler dialog
-            self.alg.provider = ModelerUtils.providers[self.gpfAlgorithmProvider.getName()]
+            self.alg.provider = self.gpfAlgorithmProvider
         alg = self.alg.getCopy()
         dlg = AlgorithmDialog(alg)
         dlg.exec_()
@@ -57,7 +56,6 @@ class GPFModelerDialog(ModelerDialog):
         self.algorithmTree.clear()
         text = unicode(self.searchBox.text())
         groups = {}
-        providerName = self.gpfAlgorithmProvider.getName()
         
         # Add only GPF algorithms
         for alg in self.gpfAlgorithmProvider.algs:
@@ -77,11 +75,11 @@ class GPFModelerDialog(ModelerDialog):
         if len(groups) > 0:
             providerItem = QTreeWidgetItem()
             providerItem.setText(0,
-                    ModelerUtils.providers[providerName].getDescription())
+                    self.gpfAlgorithmProvider.getDescription())
             providerItem.setToolTip(0,
-                    ModelerUtils.providers[providerName].getDescription())
+                    self.gpfAlgorithmProvider.getDescription())
             providerItem.setIcon(0,
-                    ModelerUtils.providers[providerName].getIcon())
+                    self.gpfAlgorithmProvider.getIcon())
             for groupItem in groups.values():
                 providerItem.addChild(groupItem)
             self.algorithmTree.addTopLevelItem(providerItem)
