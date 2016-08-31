@@ -1,0 +1,10 @@
+MERIS.MPH
+beam_MERIS.MPH
+MERIS MPH Processor
+Analysis - MERIS
+ParameterRaster|sourceProduct|Source product|False|False
+ParameterSring|validPixelExpression|Valid pixel expression|not (l1_flags.LAND_OCEAN or l1_flags.INVALID)|
+ParameterNumber|cyanoMaxValue|Cyano max value|None|None|1000.0
+ParameterNumber|chlThreshForFloatFlag|Chl thresh for float flag|None|None|350.0
+ParameterBoolean|exportMph|Export mph|False
+OutputRaster|-out|Target Product

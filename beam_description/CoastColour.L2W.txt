@@ -1,0 +1,26 @@
+CoastColour.L2W
+beam_CoastColour.L2W
+CoastColour In-Water Processing
+Analysis - MERIS - CoastColour
+ParameterRaster|sourceProduct|Source Product (CC L2R, CC L1P or MERIS L1B product)|False|False
+ParameterBoolean|doCalibration|[L1P] Perform re-calibration|False
+ParameterBoolean|doSmile|[L1P] Perform Smile-effect correction|True
+ParameterBoolean|doEqualization|[L1P] Perform equalization|True
+ParameterBoolean|ccIgnoreSeaIceClimatology|[L1P] Check for sea/lake ice also outside sea ice climatology area|False
+ParameterNumber|ccCloudBufferWidth|[L1P] Width of cloud buffer (# of pixels)|None|None|2
+ParameterNumber|ccCloudScreeningAmbiguous|[L1P] Cloud screening 'ambiguous' threshold|None|None|1.4
+ParameterNumber|ccCloudScreeningSure|[L1P] Cloud screening 'sure' threshold|None|None|1.8
+ParameterNumber|ccGlintCloudThresholdAddition|[L1P] Cloud screening threshold addition in case of glint|None|None|0.1
+ParameterBoolean|ccOutputCloudProbabilityFeatureValue|[L1P] Write Cloud Probability Feature Value to the target product|False
+ParameterBoolean|useSnTMap|Use climatology map for salinity and temperature|True
+ParameterNumber|averageSalinity|Average salinity (PSU)|None|None|35.0
+ParameterNumber|averageTemperature|Average temperature (C)|None|None|15.0
+ParameterBoolean|useExtremeCaseMode|Use NNs for maximum ranges of CoastColour IOPs|True
+ParameterString|landExpression|Land masking expression|l1p_flags.CC_LAND|
+ParameterString|cloudIceExpression|Cloud/Ice masking expression|(l1p_flags.CC_CLOUD && not l1p_flags.CC_CLOUD_AMBIGUOUS) \|\| l1p_flags.CC_SNOW_ICE|
+ParameterBoolean|outputL2RToa|Write TOA reflectances to the target product|False
+ParameterSelection|outputL2RReflecAs|Write all reflectances as|RADIANCE_REFLECTANCES;IRRADIANCE_REFLECTANCES|0
+ParameterBoolean|outputKdSpectrum|Write Kd spectrum to target product|True
+ParameterBoolean|outputAOT550|Write AOT (550nm) to the target product
+ParameterSelection|owtType|OWT classifiction type|COASTAL;INLAND;INLAND_NO_BLUE_BAND;GLASS_5C;GLASS_6C;GLASS_6C_NORMALIZED|0
+OutputRaster|-out|Target Product
