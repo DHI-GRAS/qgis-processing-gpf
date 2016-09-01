@@ -1,0 +1,17 @@
+Binning
+beam_Binning
+Level-3 Binning
+Miscellaneous
+ParameterRaster|1ProductSet-Reader>sourceProductPaths|Input product 1|False|False
+ParameterRaster|2ProductSet-Reader>sourceProductPaths|Input product 2|True|False
+ParameterRaster|3ProductSet-Reader>sourceProductPaths|Input product 3|True|False
+ParameterRaster|4ProductSet-Reader>sourceProductPaths|Input product 4|True|False
+ParameterExtent|region|Region|None|False
+ParameterSelection|timeFilterMethod|Time filter method|NONE;TIME_RANGE;SPATIOTEMPORAL_DATA_DAY|0
+ParameterString|startDateTime|Start date yyyy-MM-dd( HH:mm:ss)|None|False|True
+ParameterNumber|periodDuration|Period duration|None|None|0|True
+ParameterString|maskExpr|Valid Pixel expression|true|False|False
+ParameterNumber|numRows|#Rows (90N - 90S) (spatial resolution will be derived automatically.)|None|None|0|False
+ParameterNumber|superSampling|Super-sampling|None|None|1|False
+
+ParameterBands|!targetBands>!targetBand>expression|Expression||sourceProduct
