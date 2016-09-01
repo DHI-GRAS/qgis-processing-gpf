@@ -3,10 +3,10 @@ from processing.core.parameters import ParameterNumber, ParameterString
 
 # Copied from processing.core.parameters
 def getParameterFromString(s):
-    barsub = '<bar>'
-    s = s.replace('\|', barsub)
+    barsub = '<barsub>'
+    s = s.replace('\\|', barsub)
     tokens = s.split("|")
-    tokens = [t.replcae(barsub, '|') for t in tokens]
+    tokens = [t.replace(barsub, '|') for t in tokens]
     params = [t if unicode(t) != "None" else None for t in tokens[1:]]
     clazz = getattr(sys.modules[__name__], tokens[0])
     return clazz(*params)
