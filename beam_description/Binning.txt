@@ -10,8 +10,11 @@ ParameterExtent|region|Region|None|False
 ParameterSelection|timeFilterMethod|Time filter method|NONE;TIME_RANGE;SPATIOTEMPORAL_DATA_DAY|0
 ParameterString|startDateTime|Start date yyyy-MM-dd( HH:mm:ss)|None|False|True
 ParameterNumber|periodDuration|Period duration|None|None|0|True
+ParameterNumber|minDataHour|Min data hour|None|None|0|True
 ParameterString|maskExpr|Valid Pixel expression|true|False|False
 ParameterNumber|numRows|#Rows (90N - 90S) (spatial resolution will be derived automatically.)|None|None|0|False
 ParameterNumber|superSampling|Super-sampling|None|None|1|False
 
-ParameterBands|!targetBands>!targetBand>expression|Expression||sourceProduct
+[missing: intermediate source bands (variables), aggregator expressions]
+
+ParameterString|metadataAggregatorName|Metadata Aggregator Name|NAME|False|False
