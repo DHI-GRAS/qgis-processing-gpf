@@ -1,0 +1,10 @@
+Meris.Brr
+beam_Meris.Brr
+MERIS Rayleigh Correction
+Analysis - MERIS
+ParameterRaster|sourceProduct|MERIS L1B source product|False|False
+ParameterBoolean|copyAllTiePoints|Write all tie points to the target product|True
+ParameterBoolean|copyL1Flags|Write L1 flags to the target product|True
+ParameterBoolean|outputToar|Write TOA reflectances to the target product|False
+ParameterSelection|correctionSurface|Perform Rayleigh correction over|ALL_SURFACES;LAND;WATER|0
+OutputRaster|-out|Target Product
