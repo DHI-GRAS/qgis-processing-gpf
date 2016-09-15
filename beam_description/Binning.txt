@@ -14,7 +14,12 @@ ParameterNumber|minDataHour|Min data hour|None|None|0|True
 ParameterString|maskExpr|Valid Pixel expression|true|False|False
 ParameterNumber|numRows|#Rows (90N - 90S) (spatial resolution will be derived automatically.)|None|None|0|False
 ParameterNumber|superSampling|Super-sampling|None|None|1|False
-
-[missing: intermediate source bands (variables), aggregator expressions]
-
-ParameterString|metadataAggregatorName|Metadata Aggregator Name|NAME|False|False
+*ParameterString|variables>variable>name|Variable 1 name|None|False|True
+*ParameterBands|variables>variable>expr|Variable 1 expr|None|False|True
+*ParameterString|variables>variable>name|Variable 2 name|None|False|True
+*ParameterBands|variables>variable>expr|Variable 2 expr|None|False|True
+ParameterSelection|aggregators>aggregator>type|Aggregator 1 type|MIN_MAX;AVG;PERCENTILE|0
+ParameterBands|aggregators>aggregator>varname|Aggregator 1 source band|||
+ParameterNumber|aggregators>aggregator>percentage|Aggregator 1 percentage (valid only for PERCENTILE aggregator)|0|100|50
+ParameterNumber|aggregators>aggregator>weightCoeff|Aggregator 1 weight coefficient (valid only for AVG aggregator)|0.0|1.0|0.1
+OutputRaster|-out|Target Product
