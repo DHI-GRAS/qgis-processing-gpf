@@ -66,7 +66,10 @@ class GPFModelerAlgorithm (GeoAlgorithm):
     
     def getCopy(self):
         newone = GPFModelerAlgorithm(self.provider)
-        newone.algs = copy.deepcopy(self.algs)
+        newone.algs = {}
+        for algname, alg in self.algs.iteritems():
+            newone.algs[algname] = Algorithm()
+            newone.algs[algname].__dict__.update(copy.deepcopy(alg.todict()))
         newone.inputs = copy.deepcopy(self.inputs)
         newone.defineCharacteristics()
         newone.name = self.name
