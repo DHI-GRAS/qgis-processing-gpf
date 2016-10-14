@@ -66,7 +66,10 @@ class GPFModelerAlgorithm (GeoAlgorithm):
     
     def getCopy(self):
         newone = GPFModelerAlgorithm(self.provider)
-        newone.algs = copy.deepcopy(self.algs)
+        newone.algs = {}
+        for algname, alg in self.algs.iteritems():
+            newone.algs[algname] = Algorithm()
+            newone.algs[algname].__dict__.update(copy.deepcopy(alg.todict()))
         newone.inputs = copy.deepcopy(self.inputs)
         newone.defineCharacteristics()
         newone.name = self.name
@@ -95,23 +98,20 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         version = ET.SubElement(graph, "version")
         version.text = "1.0"
     
-        # Copy also sets some internal model variables but if
-        # XML is created to execute the algorithm then the 
-        # copy was already made
-        if forExecution:
-            modelInstance = self
-        else:
-            modelInstance = self.getCopy()
-        
+        # If the XML is made to be saved then set parameters and outputs.
+        # If it is made for execution then parameters and outputs are already set.
+        if not forExecution:
+            self.defineCharacteristics()
+            
         # Set the connections between nodes
-        for alg in modelInstance.algs.values():
+        for alg in self.algs.values():
             for param in alg.params.values():
                 if isinstance(param, ValueFromOutput):
-                    alg.algorithm.getParameterFromName("sourceProduct").setValue(modelInstance.algs[param.alg].algorithm.nodeID)
+                    alg.algorithm.getParameterFromName("sourceProduct").setValue(self.algs[param.alg].algorithm.nodeID)
                 
         # Save model algorithms
-        for alg in modelInstance.algs.values():
-            modelInstance.prepareAlgorithm(alg)
+        for alg in self.algs.values():
+            self.prepareAlgorithm(alg)
             
             # Only Write operators can save raster outputs
             for out in alg.algorithm.outputs:
@@ -129,7 +129,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
             if alg.algorithm.operator != "Read":
                 for param in alg.params.keys():
                     paramValue = str(alg.params[param])
-                    if paramValue in modelInstance.inputs.keys():
+                    if paramValue in self.inputs.keys():
                         # Only Read operators can read raster inputs
                         if param == "sourceProduct":
                             QMessageBox.warning(None, self.tr('Unable to save model'),
@@ -137,9 +137,9 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                             return
                         paramTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param)
                         if paramTag is not None:
-                            pos = modelInstance.inputs[paramValue].pos
+                            pos = self.inputs[paramValue].pos
                             paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
-                            paramTag.attrib["qgisModelInputVars"] = str(modelInstance.inputs[paramValue].param.todict())
+                            paramTag.attrib["qgisModelInputVars"] = str(self.inputs[paramValue].param.todict())
             
         # Save model layout
         presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation", "name":self.name, "group":self.group})
