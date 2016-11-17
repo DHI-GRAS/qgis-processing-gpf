@@ -126,20 +126,19 @@ class GPFModelerAlgorithm (GeoAlgorithm):
             # They are saved as attributes of relevant parameter XML nodes.
             # This way they do not interfere with the model when it's opened
             # in SNAP.
-            if alg.algorithm.operator != "Read":
-                for param in alg.params.keys():
-                    paramValue = str(alg.params[param])
-                    if paramValue in self.inputs.keys():
-                        # Only Read operators can read raster inputs
-                        if param == "sourceProduct":
-                            QMessageBox.warning(None, self.tr('Unable to save model'),
-                                self.tr('Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm' % (alg.algorithm.operator,) ))
-                            return
-                        paramTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param)
-                        if paramTag is not None:
-                            pos = self.inputs[paramValue].pos
-                            paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
-                            paramTag.attrib["qgisModelInputVars"] = str(self.inputs[paramValue].param.todict())
+            for param in alg.params.keys():
+                paramValue = str(alg.params[param])
+                if paramValue in self.inputs.keys():
+                    # Only Read operators can read raster inputs
+                    if param == "sourceProduct" and alg.algorithm.operator != "Read":
+                        QMessageBox.warning(None, self.tr('Unable to save model'),
+                            self.tr('Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm' % (alg.algorithm.operator,) ))
+                        return
+                    paramTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param)
+                    if paramTag is not None:
+                        pos = self.inputs[paramValue].pos
+                        paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
+                        paramTag.attrib["qgisModelInputVars"] = str(self.inputs[paramValue].param.todict())
             
         # Save model layout
         presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation", "name":self.name, "group":self.group})
@@ -224,8 +223,10 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                                 modelConnections[refid] = (modelAlg, param.name)
                             
                             # Special treatment for Read operator since it provides
-                            # the main raster input to the graph    
-                            if alg.operator == "Read":
+                            # the main raster input to the graph. This is used in case
+                            # the graph comes straight from SNAP and the Read operator
+                            # does not have a QGIS ParameterRaster.   
+                            if alg.operator == "Read" and not modelAlg.params["file"]:
                                 param = getParameterFromString("ParameterRaster|file|Source product")
                                 modelParameter = ModelerParameter(param, QPointF(0, 0))
                                 model.addParameter(modelParameter)
