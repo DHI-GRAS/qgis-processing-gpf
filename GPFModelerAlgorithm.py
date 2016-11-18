@@ -189,7 +189,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
             if root.tag == "graph" and "id" in root.attrib and root.attrib["id"] == "Graph":
                 model = GPFModelerAlgorithm(gpfAlgorithmProvider)
                 model.descriptionFile = filename
-                modelConnections = {}
+                modelConnections = []
                 inConnections = {}
                 outConnections = {}
                 # Process all graph nodes (algorithms)
@@ -220,7 +220,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                             # Once all the nodes have been processed they will be processed
                             if node.find("sources/"+param.name) is not None:
                                 refid = node.find("sources/"+param.name).attrib["refid"]
-                                modelConnections[refid] = (modelAlg, param.name)
+                                modelConnections.append((refid, modelAlg, param.name))
                             
                             # Special treatment for Read operator since it provides
                             # the main raster input to the graph. This is used in case
@@ -240,17 +240,17 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                                 modelOutput.pos = QPointF(0, 0)
                                 modelAlg.outputs["file"] = modelOutput
                                 outConnections[modelAlg] = modelOutput
-                                           
+                                
                         model.addAlgorithm(modelAlg)
                     else:
                         raise Exception("Unknown operator "+node.find("operator").text) 
-                
+               
                 # Set up connections between nodes of the graph
                 for connection in modelConnections:
                     for alg in model.algs.values():
-                        if alg.description == connection:
-                            modelAlg = modelConnections[connection][0]
-                            paramName = modelConnections[connection][1]
+                        if alg.description == connection[0]:
+                            modelAlg = connection[1]
+                            paramName = connection[2]
                             modelAlg.params[paramName] = ValueFromOutput(alg.name, "-out")
                             break
                 
