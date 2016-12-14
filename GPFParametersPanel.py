@@ -28,17 +28,19 @@
 
 from processing.gui.ParametersPanel import ParametersPanel
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.GPFParameters import ParameterBands, ParameterPixelSize
+from processing_gpf.GPFParameters import ParameterBands, ParameterPolarisations, ParameterPixelSize
 from PyQt4 import QtGui, QtCore
 
 # GPF parameters panel is the same as normal parameters panel except
-# it can also handle ParameterBands and ParameterPixelSize with
-# special UI
+# it can also handle ParameterBands, ParameterPolarisations and 
+# ParameterPixelSize with special UI
 class GPFParametersPanel(ParametersPanel):
     
     def getWidgetFromParameter(self, param):
         if isinstance(param, ParameterBands):
             item = GPFBandsSelectorPanel(param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
+        elif isinstance(param, ParameterPolarisations):
+            item = GPFPolarisationsSelectorPanel(param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
         # Sspecial treatment for S1 Toolbox Terrain-Correction to get pixel sizes from SAR image
         elif isinstance(param, ParameterPixelSize):
             item = S1TbxPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
@@ -132,7 +134,7 @@ class GPFBandsSelectorPanel(QtGui.QWidget):
         self.bandsPanel = QtGui.QLineEdit()
         self.bandsPanel.setText(str(default))
         self.bandsButton = QtGui.QPushButton()
-        self.bandsButton.setMaximumWidth(75)
+        self.bandsButton.setMaximumWidth(85)
         self.bandsButton.setText("Bands")
         self.bandsButton.clicked.connect(self.showBandsDialog)
         self.horizontalLayout = QtGui.QHBoxLayout(self)
@@ -200,8 +202,8 @@ class GPFBandsListDialog(QtGui.QDialog):
         self.horizontalLayout.addWidget(self.buttonBox)
         self.setLayout(self.horizontalLayout)
         self.verticalLayout.addLayout(self.horizontalLayout)
-        label = QtGui.QLabel("Selected bands:")
-        self.verticalLayout.addWidget(label)
+        self.label = QtGui.QLabel("Selected bands:")
+        self.verticalLayout.addWidget(self.label)
         self.bandList = QtGui.QLineEdit()
         self.verticalLayout.addWidget(self.bandList)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.close)
@@ -252,3 +254,22 @@ class GPFBandsListDialog(QtGui.QDialog):
         
     def close(self):
         QtGui.QDialog.close(self)
+        
+class GPFPolarisationsSelectorPanel(GPFBandsSelectorPanel):
+    def __init__(self, default, parent, programKey, bandSourceRaster, appendProductName):
+        super(GPFPolarisationsSelectorPanel, self).__init__(default, parent, programKey, bandSourceRaster, appendProductName)
+        self.bandsButton.setText("Polarisations")
+        
+    def showBandsDialog(self):
+        polarisations = GPFUtils.getPolarisations(self.getFilePath())
+        dlg = GPFPolarisationsListDialog(polarisations, self.getFilePath(), self)
+        dlg.show()
+        
+class GPFPolarisationsListDialog(GPFBandsListDialog): 
+    def setupUi(self):
+        super(GPFPolarisationsListDialog, self).setupUi()
+        self.setWindowTitle("Polarisations: "+str(self.filename))
+        self.copyButton.setText("Copy polarisations")
+        self.setButton.setText("Set polarisations")
+        self.label.setText("Selected polarisations:")
+        

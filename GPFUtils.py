@@ -277,7 +277,7 @@ class GPFUtils:
         logging.disable(logging.NOTSET)
         return pixelSpacingDict
     
-    # Use sanppy to get a list of band names of a given raster
+    # Use snappy to get a list of band names of a given raster
     @staticmethod
     def getSnapBandNames(productPath, secondAttempt = False):
         bands = []
@@ -307,6 +307,36 @@ class GPFUtils:
         logging.disable(logging.NOTSET)
         return bands
     
+    # Use snappy to get a list of polarisations names of a given (S1) raster
+    @staticmethod
+    def getPolarisations(productPath, secondAttempt = False):
+        polarisations = []
+        
+        productPath, _ = GPFUtils.gdalPathToSnapPath(productPath)
+        
+        if productPath == "":
+            return polarisations
+        
+        snappy, jpy = GPFUtils.importSnappy()
+        if snappy is not None:
+            try:
+                product = snappy.ProductIO.readProduct(productPath)
+                metadata = jpy.get_type('org.esa.snap.engine_utilities.datamodel.AbstractMetadata').getAbstractedMetadata(product)
+                polarisations = \
+                    jpy.get_type('org.esa.s1tbx.insar.gpf.support.Sentinel1Utils').getProductPolarizations(metadata)
+            except Exception, e:
+                # Snappy sometimes throws an error on first try but returns band names 
+                # on second try
+                if not secondAttempt:
+                    polarisations = GPFUtils.getPolarisations(productPath, secondAttempt = True)
+                else:
+                    polarisations = ['Snappy exception', 'See Processing log for more details']
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Snappy exception: "+str(e))
+        else:
+            polarisations = ['Python module snappy is not installed in the user directory', 'Please run SNAP installer'] 
+        
+        logging.disable(logging.NOTSET)
+        return polarisations
     
     @staticmethod
     def indentXML(elem, level=0):
