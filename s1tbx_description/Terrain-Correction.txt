@@ -4,9 +4,10 @@ Range Doppler Terrain Correction
 Radar
 ParameterRaster|sourceProduct|Input image|False|False
 ParameterBands|sourceBands|The list of source bands||sourceProduct|True
-ParameterSelection|demName|The digital elevation model|ACE2_5Min;ACE30;ASTER 1sec GDEM;GETASSE30;SRTM 1Sec Grid;SRTM 1Sec HGT;SRTM 3Sec|6
-ParameterFile|externalDEMFile|External DEM file|False|True
-ParameterNumber|externalDEMNoDataValue|External DEM no-data value|None|None|0.0
+ParameterSelection|demName|The digital elevation model|ACE2_5Min;ACE30;ASTER 1sec GDEM;GETASSE30;SRTM 1Sec Grid;SRTM 1Sec HGT;SRTM 3Sec;External DEM|6
+*ParameterFile|externalDEMFile|External DEM file|False|True
+*ParameterNumber|externalDEMNoDataValue|External DEM no-data value|None|None|0.0
+*ParameterBoolean|externalDEMApplyEGM|Apply Earth Gravitational MOdel to external DEM|False
 ParameterSelection|demResamplingMethod|DEM resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION;BISINC_5_POINT_INTERPOLATION;BISINC_11_POINT_INTERPOLATION;BISINC_21_POINT_INTERPOLATION;BICUBIC_INTERPOLATION;DELAUNAY_INTERPOLATION|1
 ParameterSelection|imgResamplingMethod|Image resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION;BISINC_5_POINT_INTERPOLATION;BISINC_11_POINT_INTERPOLATION;BISINC_21_POINT_INTERPOLATION;BICUBIC_INTERPOLATION;DELAUNAY_INTERPOLATION|1
 ParameterPixelSize|pixelSpacingInDegree|The pixel spacing in degrees|0.0|None|99999.9
@@ -20,11 +21,12 @@ ParameterPixelSize|pixelSpacingInMeter|The pixel spacing in meters|0.0|None|9999
 *ParameterBoolean|saveProjectedLocalIncidenceAngle|Save projected local incidence angle|False
 *ParameterBoolean|saveSelectedSourceBand|Save selected Source Band|True
 ParameterBoolean|applyRadiometricNormalization|Apply Radiometric Normalization|False
+*ParameterBoolean|outputComplex|Output complex data|False
 *ParameterBoolean|saveSigmaNought|Save Sigma Nought|False
 *ParameterBoolean|saveGammaNought|Save Gamma Nought|False
 *ParameterBoolean|saveBetaNought|Save Beta Nought|False
-ParameterSelection|incidenceAngleForSigma0|Incidence angle for Sigma 0|Use incidence angle from Ellipsoid;Use projected local incidence angle from DEM|1
-ParameterSelection|incidenceAngleForGamma0|Incidence angle for Gamma 0|Use incidence angle from Ellipsoid;Use projected local incidence angle from DEM|1
-ParameterSelection|auxFile|The auxiliary file|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|0
+ParameterSelection|incidenceAngleForSigma0|Incidence angle for Sigma 0|Use projected local incidence angle from DEM;Use local incidence angle from DEM;Use incidence angle from Ellipsoid|0
+ParameterSelection|incidenceAngleForGamma0|Incidence angle for Gamma 0|Use projected local incidence angle from DEM;Use local incidence angle from DEM;Use incidence angle from Ellipsoid|0
+ParameterSelection|auxFile|The auxiliary file (ASAR only)|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|0
 ParameterFile|externalAuxFile|The antenne elevation pattern gain auxiliary data file|False|True
 OutputRaster|-out|Output Image

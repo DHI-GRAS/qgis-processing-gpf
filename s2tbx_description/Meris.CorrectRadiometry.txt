@@ -1,5 +1,5 @@
 Meris.CorrectRadiometry
-beam_Meris.CorrectRadiometry
+s3tbx_Meris.CorrectRadiometry
 Radiometric correction
 Optical
 ParameterRaster|sourceProduct|MERIS L1b source product|False|False
