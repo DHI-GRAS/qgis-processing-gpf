@@ -49,6 +49,7 @@ class GPFUtils:
     GPF_MODELS_FOLDER = "GPF_MODELS_FOLDER"
     S1TBX_ACTIVATE = "S1TBX_ACTIVATE"
     S2TBX_ACTIVATE = "S2TBX_ACTIVATE"
+    S3TBX_ACTIVATE = "S3TBX_ACTIVATE"
     
     @staticmethod
     def beamKey():
@@ -61,6 +62,10 @@ class GPFUtils:
     @staticmethod
     def s2tbxKey():
         return "S2Tbx"
+    
+    @staticmethod
+    def s3tbxKey():
+        return "S3Tbx"
     
     @staticmethod
     def snapKey():
@@ -101,6 +106,8 @@ class GPFUtils:
             return os.path.join(os.path.dirname(__file__), "s1tbx_description")
         elif key == GPFUtils.s2tbxKey():
             return os.path.join(os.path.dirname(__file__), "s2tbx_description")
+        elif key == GPFUtils.s3tbxKey():
+            return os.path.join(os.path.dirname(__file__), "s3tbx_description")
         elif key == GPFUtils.snapKey():
             return os.path.join(os.path.dirname(__file__), "snap_generic_description")
         else:
@@ -114,6 +121,8 @@ class GPFUtils:
             return os.path.join(os.path.dirname(__file__), "s1tbx_doc")
         elif key == GPFUtils.s2tbxKey():
             return os.path.join(os.path.dirname(__file__), "s2tbx_doc")
+        elif key == GPFUtils.s3tbxKey():
+            return os.path.join(os.path.dirname(__file__), "s3tbx_doc")
         elif key == GPFUtils.snapKey():
             return os.path.join(os.path.dirname(__file__), "snap_generic_doc") 
         else:

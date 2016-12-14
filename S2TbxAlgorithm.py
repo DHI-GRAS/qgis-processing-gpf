@@ -33,11 +33,6 @@ from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
 
 # Sentinel-2 Toolbox specific algorithms
 class S2TbxAlgorithm(SNAPAlgorithm):
-    
-    def __init__(self, descriptionfile):
-        SNAPAlgorithm.__init__(self, descriptionfile)
-        #self.programKey = GPFUtils.s2tbxKey()
-        self.programKey = GPFUtils.snapKey()
                        
     def getIcon(self):
         return  QIcon(os.path.dirname(__file__) + "/images/s2Tbx.png")

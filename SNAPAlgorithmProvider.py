@@ -8,6 +8,7 @@ from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFModelerAlgorithm import GPFModelerAlgorithm
 from processing_gpf.S1TbxAlgorithm import S1TbxAlgorithm
 from processing_gpf.S2TbxAlgorithm import S2TbxAlgorithm
+from processing_gpf.S3TbxAlgorithm import S3TbxAlgorithm
 from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
 from processing_gpf.CreateNewGpfModelAction import CreateNewGpfModelAction
 from processing_gpf.EditGpfModelAction import EditGpfModelAction
@@ -30,6 +31,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.GPF_MODELS_FOLDER, "GPF models' directory", GPFUtils.modelsFolder()))
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_ACTIVATE, "Activate Sentinel-1 toolbox", False))
         ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S2TBX_ACTIVATE, "Activate Sentinel-2 toolbox", False))
+        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S3TBX_ACTIVATE, "Activate Sentinel-3 toolbox", False))
 
     def unload(self):
         AlgorithmProvider.unload(self)
@@ -38,6 +40,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
         ProcessingConfig.removeSetting(GPFUtils.GPF_MODELS_FOLDER)
         ProcessingConfig.removeSetting(GPFUtils.S1TBX_ACTIVATE)
         ProcessingConfig.removeSetting(GPFUtils.S2TBX_ACTIVATE)
+        ProcessingConfig.removeSetting(GPFUtils.S3TBX_ACTIVATE)
  
     def createAlgsList(self, key, gpfAlgorithm):
         self.preloadedAlgs = []
@@ -99,6 +102,10 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
                 self.algs.append(alg)
         if ProcessingConfig.getSetting(GPFUtils.S2TBX_ACTIVATE) == True:
             self.createAlgsList(GPFUtils.s2tbxKey(), S2TbxAlgorithm)
+            for alg in self.preloadedAlgs:
+                self.algs.append(alg)
+        if ProcessingConfig.getSetting(GPFUtils.S3TBX_ACTIVATE) == True:
+            self.createAlgsList(GPFUtils.s3tbxKey(), S3TbxAlgorithm)
             for alg in self.preloadedAlgs:
                 self.algs.append(alg)
         # Also load models
