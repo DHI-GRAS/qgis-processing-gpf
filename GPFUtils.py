@@ -397,5 +397,5 @@ class GPFUtils:
                         f = None
                     snapPath = path
                     hemisphere = "N" if proj[7]=='6' else "S"
-                    dataFormat = "SENTINEL-2-MSI-"+res.upper()+"-UTM"+proj[8:10]+ hemisphere
+                    dataFormat = "SENTINEL-2-MSI-MultiRes-UTM"+proj[8:10]+hemisphere
         return snapPath, dataFormat    
