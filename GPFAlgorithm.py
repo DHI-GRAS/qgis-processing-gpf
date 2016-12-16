@@ -160,7 +160,13 @@ class GPFAlgorithm(GeoAlgorithm):
                     # else assume its a reference to a previous node and add a "source" element
                     elif param.value:
                         source = ET.SubElement(sources, param.name, {"refid":param.value})
-
+                # This is to allow GPF graphs to save custom names of input rasters
+                elif operator.text == "Read":
+                    dataFormat = 'GeoTIFF'
+                    param.value = ""
+                    sourceNodeId = self.addReadNode(graph, param.value, dataFormat, self.nodeID)
+                    return graph
+                    
             # add parameters
             else:
                 # Set the name of the parameter
@@ -267,7 +273,7 @@ class GPFAlgorithm(GeoAlgorithm):
         if dataFormat:
             dataFormatParameter = ET.SubElement(parametersNode, "formatName")
             dataFormatParameter.text = dataFormat
-
+        
         return nodeID
 
     def addWriteNode(self, graph, output, key):

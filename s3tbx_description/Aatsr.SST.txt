@@ -1,6 +1,6 @@
 Aatsr.SST
-beam_Aatsr.SST
-Compute Sea Surface Temperature (SST)
+s3tbx_Aatsr.SST
+(A)ATSR Sea Surface Temperature (SST)
 Optical
 ParameterRaster|sourceProduct|AATSR source product|False|False
 ParameterBoolean|dual|Enable generation of the dual-view SST|True

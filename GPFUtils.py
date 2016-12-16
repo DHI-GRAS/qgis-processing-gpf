@@ -49,6 +49,7 @@ class GPFUtils:
     GPF_MODELS_FOLDER = "GPF_MODELS_FOLDER"
     S1TBX_ACTIVATE = "S1TBX_ACTIVATE"
     S2TBX_ACTIVATE = "S2TBX_ACTIVATE"
+    S3TBX_ACTIVATE = "S3TBX_ACTIVATE"
     
     @staticmethod
     def beamKey():
@@ -61,6 +62,10 @@ class GPFUtils:
     @staticmethod
     def s2tbxKey():
         return "S2Tbx"
+    
+    @staticmethod
+    def s3tbxKey():
+        return "S3Tbx"
     
     @staticmethod
     def snapKey():
@@ -101,6 +106,8 @@ class GPFUtils:
             return os.path.join(os.path.dirname(__file__), "s1tbx_description")
         elif key == GPFUtils.s2tbxKey():
             return os.path.join(os.path.dirname(__file__), "s2tbx_description")
+        elif key == GPFUtils.s3tbxKey():
+            return os.path.join(os.path.dirname(__file__), "s3tbx_description")
         elif key == GPFUtils.snapKey():
             return os.path.join(os.path.dirname(__file__), "snap_generic_description")
         else:
@@ -114,6 +121,8 @@ class GPFUtils:
             return os.path.join(os.path.dirname(__file__), "s1tbx_doc")
         elif key == GPFUtils.s2tbxKey():
             return os.path.join(os.path.dirname(__file__), "s2tbx_doc")
+        elif key == GPFUtils.s3tbxKey():
+            return os.path.join(os.path.dirname(__file__), "s3tbx_doc")
         elif key == GPFUtils.snapKey():
             return os.path.join(os.path.dirname(__file__), "snap_generic_doc") 
         else:
@@ -277,7 +286,7 @@ class GPFUtils:
         logging.disable(logging.NOTSET)
         return pixelSpacingDict
     
-    # Use sanppy to get a list of band names of a given raster
+    # Use snappy to get a list of band names of a given raster
     @staticmethod
     def getSnapBandNames(productPath, secondAttempt = False):
         bands = []
@@ -307,6 +316,36 @@ class GPFUtils:
         logging.disable(logging.NOTSET)
         return bands
     
+    # Use snappy to get a list of polarisations names of a given (S1) raster
+    @staticmethod
+    def getPolarisations(productPath, secondAttempt = False):
+        polarisations = []
+        
+        productPath, _ = GPFUtils.gdalPathToSnapPath(productPath)
+        
+        if productPath == "":
+            return polarisations
+        
+        snappy, jpy = GPFUtils.importSnappy()
+        if snappy is not None:
+            try:
+                product = snappy.ProductIO.readProduct(productPath)
+                metadata = jpy.get_type('org.esa.snap.engine_utilities.datamodel.AbstractMetadata').getAbstractedMetadata(product)
+                polarisations = \
+                    jpy.get_type('org.esa.s1tbx.insar.gpf.support.Sentinel1Utils').getProductPolarizations(metadata)
+            except Exception, e:
+                # Snappy sometimes throws an error on first try but returns band names 
+                # on second try
+                if not secondAttempt:
+                    polarisations = GPFUtils.getPolarisations(productPath, secondAttempt = True)
+                else:
+                    polarisations = ['Snappy exception', 'See Processing log for more details']
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Snappy exception: "+str(e))
+        else:
+            polarisations = ['Python module snappy is not installed in the user directory', 'Please run SNAP installer'] 
+        
+        logging.disable(logging.NOTSET)
+        return polarisations
     
     @staticmethod
     def indentXML(elem, level=0):
@@ -358,5 +397,5 @@ class GPFUtils:
                         f = None
                     snapPath = path
                     hemisphere = "N" if proj[7]=='6' else "S"
-                    dataFormat = "SENTINEL-2-MSI-"+res.upper()+"-UTM"+proj[8:10]+ hemisphere
+                    dataFormat = "SENTINEL-2-MSI-MultiRes-UTM"+proj[8:10]+hemisphere
         return snapPath, dataFormat    

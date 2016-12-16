@@ -1,5 +1,5 @@
 KMeansClusterAnalysis
-beam_KMeansClusterAnalysis
+SNAP_KMeansClusterAnalysis
 K Means Cluster Analysis
 Raster
 ParameterRaster|sourceProduct|The product to be classified|False|False

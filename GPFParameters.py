@@ -20,6 +20,15 @@ class ParameterBands(ParameterString):
         ParameterString.__init__(self, name, description, default, multiline=False, optional=optional)
         self.bandSourceRaster = bandSourceRaster
 
+# ParameterPolarisations is very similar to ParameterString except that it keeps the name
+# of the ParameterRaster (in bandSourceRaster) whos polarisations should be selected in
+# this parameter. It also has a different parameter panel (see GPFParametersPanel)
+class ParameterPolarisations(ParameterString):
+
+    def __init__(self, name='', description='', default='', bandSourceRaster = '', optional=True):
+        ParameterString.__init__(self, name, description, default, multiline=False, optional=optional)
+        self.bandSourceRaster = bandSourceRaster
+
 # ParameterPixelSize is exactly like parameter number except is has a
 # different name since it requires different parameter panel (see GPFParametersPanel)
 class ParameterPixelSize(ParameterNumber):

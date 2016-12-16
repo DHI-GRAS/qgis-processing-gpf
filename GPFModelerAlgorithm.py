@@ -22,7 +22,6 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
-import traceback
 from processing.core.GeoAlgorithm import GeoAlgorithm
 
 # NOTE
@@ -97,7 +96,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         graph = ET.Element("graph", {'id':"Graph"})
         version = ET.SubElement(graph, "version")
         version.text = "1.0"
-    
+        
         # If the XML is made to be saved then set parameters and outputs.
         # If it is made for execution then parameters and outputs are already set.
         if not forExecution:
@@ -113,33 +112,41 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         for alg in self.algs.values():
             self.prepareAlgorithm(alg)
             
-            # Only Write operators can save raster outputs
+            graph = alg.algorithm.addGPFNode(graph)
+            
+            # Save custom names of model outputs
             for out in alg.algorithm.outputs:
+                # Only Write operators can save raster outputs
                 if alg.algorithm.operator != "Write" and isinstance(out, OutputRaster):
                     if out.name in alg.outputs:
                         QMessageBox.warning(None, self.tr('Unable to save model'),
                                 self.tr('Output rasters can only be saved by Write operator. Remove the value of raster output in %s algorithm or add a Write operator' % (alg.algorithm.operator,) ))
                         return
-            
-            graph = alg.algorithm.addGPFNode(graph)
+                outTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+out.name)
+                if outTag is not None:
+                    safeOutName = self.getSafeNameForOutput(alg.name, out.name)
+                    for modelOutput in self.outputs:
+                        if modelOutput.name == safeOutName:
+                            outTag.attrib["qgisModelOutputName"] = str(modelOutput.description)
+                            break
+
             # Save also the position and settings of model inputs. 
             # They are saved as attributes of relevant parameter XML nodes.
             # This way they do not interfere with the model when it's opened
             # in SNAP.
-            if alg.algorithm.operator != "Read":
-                for param in alg.params.keys():
-                    paramValue = str(alg.params[param])
-                    if paramValue in self.inputs.keys():
-                        # Only Read operators can read raster inputs
-                        if param == "sourceProduct":
-                            QMessageBox.warning(None, self.tr('Unable to save model'),
-                                self.tr('Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm' % (alg.algorithm.operator,) ))
-                            return
-                        paramTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param)
-                        if paramTag is not None:
-                            pos = self.inputs[paramValue].pos
-                            paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
-                            paramTag.attrib["qgisModelInputVars"] = str(self.inputs[paramValue].param.todict())
+            for param in alg.params.keys():
+                paramValue = str(alg.params[param])
+                if paramValue in self.inputs.keys():
+                    # Only Read operators can read raster inputs
+                    if param == "sourceProduct" and alg.algorithm.operator != "Read":
+                        QMessageBox.warning(None, self.tr('Unable to save model'),
+                            self.tr('Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm' % (alg.algorithm.operator,) ))
+                        return
+                    paramTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param)
+                    if paramTag is not None:
+                        pos = self.inputs[paramValue].pos
+                        paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
+                        paramTag.attrib["qgisModelInputVars"] = str(self.inputs[paramValue].param.todict())
             
         # Save model layout
         presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation", "name":self.name, "group":self.group})
@@ -190,12 +197,13 @@ class GPFModelerAlgorithm (GeoAlgorithm):
             if root.tag == "graph" and "id" in root.attrib and root.attrib["id"] == "Graph":
                 model = GPFModelerAlgorithm(gpfAlgorithmProvider)
                 model.descriptionFile = filename
-                modelConnections = {}
+                modelConnections = []
                 inConnections = {}
                 outConnections = {}
                 # Process all graph nodes (algorithms)
                 for node in root.findall("node"):
-                    alg = gpfAlgorithmProvider.getAlgorithmFromOperator(node.find("operator").text)
+                    operator = node.find("operator").text
+                    alg = gpfAlgorithmProvider.getAlgorithmFromOperator(operator)
                     if alg is not None:
                         modelAlg = Algorithm(alg.commandLineName())
                         modelAlg.description = node.attrib["id"]
@@ -206,7 +214,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                             if paramNode is not None:
                                 modelAlg.params[param.name] = GPFModelerAlgorithm.parseParameterValue(param, paramNode.text)
                                 # Process model inputs which are saved as XML attributes
-                                # of a model parameters
+                                # of a algorithm parameters
                                 if "qgisModelInputPos" in paramNode.attrib and "qgisModelInputVars" in paramNode.attrib:
                                     modelInput = ModelerParameter()
                                     modelInput.param = copy.deepcopy(param)
@@ -215,41 +223,56 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                                     modelInput.pos = QPointF(float(pos[0]), float(pos[1]))
                                     model.addParameter(modelInput)
                                     modelAlg.params[param.name] = ValueFromInput(modelInput.param.name)
-                                    
-                                    
+                             
                             # Save the connections between nodes in the model
                             # Once all the nodes have been processed they will be processed
                             if node.find("sources/"+param.name) is not None:
                                 refid = node.find("sources/"+param.name).attrib["refid"]
-                                modelConnections[refid] = (modelAlg, param.name)
-                            
-                            # Special treatment for Read operator since it provides
-                            # the main raster input to the graph    
-                            if alg.operator == "Read":
-                                param = getParameterFromString("ParameterRaster|file|Source product")
-                                modelParameter = ModelerParameter(param, QPointF(0, 0))
-                                model.addParameter(modelParameter)
-                                modelAlg.params["file"] = ValueFromInput("file")
-                                inConnections[modelAlg] = modelParameter
-                            
-                            # Special treatment for Write operator since it provides
-                            # the main raster output from the graph    
-                            if alg.operator == "Write":
-                                modelOutput = ModelerOutput("Output file")
-                                modelOutput.pos = QPointF(0, 0)
-                                modelAlg.outputs["file"] = modelOutput
-                                outConnections[modelAlg] = modelOutput
-                                           
+                                modelConnections.append((refid, modelAlg, param.name))
+                        
+                        # Process model outputs which are saved as XML attributes
+                        # of a algorithm parameters        
+                        for output in alg.outputs:
+                            outputNode = node.find("parameters/"+output.name)
+                            if outputNode is not None:        
+                                if "qgisModelOutputName" in outputNode.attrib:
+                                    modelOutput = ModelerOutput(outputNode.attrib["qgisModelOutputName"])
+                                    modelOutput.pos = QPointF(0, 0)
+                                    modelAlg.outputs[output.name] = modelOutput
+                                    outConnections[modelAlg] = modelOutput    
+                                    
+
+                        # Special treatment for Read operator since it provides
+                        # the main raster input to the graph. This is used in case
+                        # the graph comes straight from SNAP and the Read operator
+                        # does not have a QGIS ParameterRaster.   
+                        if operator == "Read" and not modelAlg.params["file"]:
+                            param = getParameterFromString("ParameterRaster|file|Source product")
+                            modelParameter = ModelerParameter(param, QPointF(0, 0))
+                            model.addParameter(modelParameter)
+                            modelAlg.params["file"] = ValueFromInput("file")
+                            inConnections[modelAlg] = modelParameter
+                        
+                        # Special treatment for Write operator since it provides
+                        # the main raster output from the graph. This is used in case
+                        # the graph comes straight from SNAP and the Write operator
+                        # does not have a QGIS OutputRaster.    
+                        if operator == "Write" and not "file" in modelAlg.outputs.keys():
+                            modelOutput = ModelerOutput("Output file")
+                            modelOutput.pos = QPointF(0, 0)
+                            modelAlg.outputs["file"] = modelOutput
+                            outConnections[modelAlg] = modelOutput
+                                
                         model.addAlgorithm(modelAlg)
                     else:
-                        raise Exception("Unknown operator "+node.find("operator").text) 
-                
+                        raise Exception("Unknown operator "+operator) 
+               
                 # Set up connections between nodes of the graph
                 for connection in modelConnections:
                     for alg in model.algs.values():
-                        if alg.description == connection:
-                            modelAlg = modelConnections[connection][0]
-                            paramName = modelConnections[connection][1]
+                        if alg.description == connection[0]:
+                            modelAlg = connection[1]
+                            paramName = connection[2]
                             modelAlg.params[paramName] = ValueFromOutput(alg.name, "-out")
                             break
                 
