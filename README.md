@@ -1,7 +1,7 @@
 Processing GPF algorithm provider
 ==============
 
-QGIS Processing provider for GPF (Graph Processing Framework)-based algorithms. Currently supports selected algorithms from BEAM 5.0 (http://www.brockmann-consult.de/cms/web/beam/) and Sentinel Application Platform 2.0 (SNAP - http://step.esa.int).
+QGIS Processing provider for GPF (Graph Processing Framework)-based algorithms. Currently supports selected algorithms from BEAM 5.0 (http://www.brockmann-consult.de/cms/web/beam/) and Sentinel Application Platform 5.0 (SNAP - http://step.esa.int).
 
 The plugin requires BEAM and/or SNAP to be installed for it to be able to access their GPF algorithms. If SNAP algorithms are to be used then snappy (SNAP Python interface) should be installed together with SNAP. After the installation and activation of the plugin, the providers need to be also activated in the Processing options which are accessible from QGIS main menu (Processing > Options...). You can activate BEAM and SNAP providers separately and for SNAP you can also choose to activate algorithms from individual Sentinel Toolboxes. For each activated provider the path to the software installation needs to be specified.
 

@@ -10,19 +10,24 @@ name=Processing BEAM and SNAP algorithm Provider
 description= QGIS Processing provider for GPF-based algorithms (BEAM and SNAP). 
 
 about= 
-	QGIS Processing provider for GPF (Graph Processing Framework)-based algorithms. Currently supports selected algorithms from BEAM 5.0 (http://www.brockmann-consult.de/cms/web/beam/) and SNAP 2.0  (http://step.esa.int).
+	QGIS Processing provider for GPF (Graph Processing Framework)-based algorithms. Currently supports selected algorithms from BEAM 5.0 (http://www.brockmann-consult.de/cms/web/beam/) and SNAP 5.0  (http://step.esa.int).
 	
-	The plugin requires BEAM and/or SNAP to be installed for it to be able to access their GPF algorithms. See README in code repository for further instructions.
+	The plugin requires BEAM 5.0 and/or SNAP 5.0 to be installed for it to be able to access their GPF algorithms. See README in code repository for further instructions.
 	
 	This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
-version=1.3.1
+version=1.4.0
 qgisMinimumVersion=2.14
 
 # Optional items:
 
 
-Changelog=1.3.1
+Changelog=1.4.0
+    - Update algorithm descriptions to work with SNAP 5.0
+    - Add new BEAM and SNAP algorithms
+    - Add support for S3TBX
+    - Bug fixes and tune-ups, especially for GPF graphs
+    1.3.1
     - Fix compatibility with QGIS 2.16
     - Enable using S1 and S2 datasets loaded in QGIS with GDAL 2.1 as algorithm inputs
     - Update some algorithm descriptions to work with SNAP 3.0
@@ -44,9 +49,9 @@ Changelog=1.3.1
 
 # tags are comma separated with spaces allowed
 
-tags=processing, SAR, Envisat, Sentinel, BEAM, NEST, Sentinel Application Platform, SNAP
+tags=processing, SAR, Envisat, Sentinel, BEAM, Sentinel Application Platform, SNAP
 
-homepage=http://www.tiger-net.org
+homepage=https://github.com/DHI-GRAS/processing_gpf#processing-gpf-algorithm-provider
 tracker=https://github.com/DHI-GRAS/processing_gpf/issues
 repository=https://github.com/DHI-GRAS/processing_gpf
 
