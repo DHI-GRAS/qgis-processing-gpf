@@ -215,14 +215,17 @@ class GPFUtils:
         else:
             filename = str(filename)    # in case it's a QString
         if programKey == GPFUtils.beamKey():
-            command = "\""+os.path.dirname(__file__)+os.sep+"processing_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+bandDelim+" "+str(appendProductName)
-            proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
-            for line in iter(proc.readline, ""):
-                if bandDelim in line:
-                    line = line[len(bandDelim):].strip()
-                    #if appendFilename:
-                    #    line +="::"+os.path.basename(filename)
-                    bands.append(line)
+            if not os.path.exists(os.path.join(os.path.dirname(__file__), "processing_beam_java", "listBeamBands.class")):
+                bands = ['Missing Java class file', 'See '+os.path.join(os.path.dirname(__file__), "processing_beam_java", "README.txt")+' for more details']
+            else:
+                command = "\""+os.path.dirname(__file__)+os.sep+"processing_beam_java"+os.sep+"listBeamBands.bat\" "+"\""+GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename+"\" "+bandDelim+" "+str(appendProductName)
+                proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
+                for line in iter(proc.readline, ""):
+                    if bandDelim in line:
+                        line = line[len(bandDelim):].strip()
+                        #if appendFilename:
+                        #    line +="::"+os.path.basename(filename)
+                        bands.append(line)
         elif programKey == GPFUtils.snapKey():
             bands = GPFUtils.getSnapBandNames(filename)
         return bands
