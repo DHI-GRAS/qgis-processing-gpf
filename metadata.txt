@@ -16,13 +16,16 @@ about=
 	
 	This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
-version=1.4.0
+version=1.4.1
 qgisMinimumVersion=2.14
 
 # Optional items:
 
 
-Changelog=1.4.0
+Changelog=1.4.1
+    - Remove compiled Java file 
+      NOTE: The file is still required for full functionality of BEAM algorithm provider and can be downloaded from https://github.com/DHI-GRAS/processing_gpf/blob/GW-A_dev/processing_beam_java/listBeamBands.class
+    1.4.0
     - Update algorithm descriptions to work with SNAP 5.0
     - Add new BEAM and SNAP algorithms
     - Add support for S3TBX
