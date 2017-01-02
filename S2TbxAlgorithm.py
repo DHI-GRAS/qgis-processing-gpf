@@ -35,7 +35,7 @@ from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
 class S2TbxAlgorithm(SNAPAlgorithm):
                        
     def getIcon(self):
-        return  QIcon(os.path.dirname(__file__) + "/images/s2Tbx.png")
+        return  QIcon(os.path.dirname(__file__) + "/images/s2tbx.png")
     
     def getCopy(self):
         newone = S2TbxAlgorithm(self.descriptionFile)
