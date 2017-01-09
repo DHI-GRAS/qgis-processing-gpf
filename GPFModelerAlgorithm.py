@@ -104,9 +104,9 @@ class GPFModelerAlgorithm (GeoAlgorithm):
             
         # Set the connections between nodes
         for alg in self.algs.values():
-            for param in alg.params.values():
-                if isinstance(param, ValueFromOutput):
-                    alg.algorithm.getParameterFromName("sourceProduct").setValue(self.algs[param.alg].algorithm.nodeID)
+            for param in alg.params:
+                if isinstance(alg.params[param], ValueFromOutput):
+                    alg.algorithm.getParameterFromName(param).setValue(self.algs[alg.params[param].alg].algorithm.nodeID)
                 
         # Save model algorithms
         for alg in self.algs.values():
@@ -138,7 +138,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                 paramValue = str(alg.params[param])
                 if paramValue in self.inputs.keys():
                     # Only Read operators can read raster inputs
-                    if param == "sourceProduct" and alg.algorithm.operator != "Read":
+                    if re.match("sourceProduct\d*", param) and alg.algorithm.operator != "Read":
                         QMessageBox.warning(None, self.tr('Unable to save model'),
                             self.tr('Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm' % (alg.algorithm.operator,) ))
                         return
