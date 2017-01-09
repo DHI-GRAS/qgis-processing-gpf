@@ -2,11 +2,11 @@ CreateStack
 s1tbx_CreateStack
 Create Stack
 Radar
-ParameterRaster|1ProductSet-Reader>sourceProduct|Input product 1|False|False
-ParameterRaster|2ProductSet-Reader>sourceProduct|Input product 2|False|False
-*ParameterRaster|3ProductSet-Reader>sourceProduct|Input product 3|True|False
-*ParameterRaster|4ProductSet-Reader>sourceProduct|Input product 4|True|False
-ParameterBands|masterBands|The list of master source bands||1ProductSet-Reader>sourceProduct|True
+ParameterRaster|sourceProduct|Input product 1|False|False
+ParameterRaster|sourceProduct.1|Input product 2|False|False
+*ParameterRaster|sourceProduct.2|Input product 3|True|False
+*ParameterRaster|sourceProduct.3|Input product 4|True|False
+ParameterBands|masterBands|The list of master source bands||sourceProduct|True
 ParameterSelection|extent|The output image extents|Master;Minimum;Maximum|0
 ParameterSelection|resamplingType|Resampling type|NONE;NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION;BISINC_5_POINT_INTERPOLATION;BISINC_11_POINT_INTERPOLATION;BISINC_21_POINT_INTERPOLATION;BICUBIC_INTERPOLATION|0
 ParameterSelection|initialOffsetMethod|Initial offset method|Orbit;Product Geolocation|0
