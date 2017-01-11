@@ -154,9 +154,9 @@ class GPFAlgorithm(GeoAlgorithm):
                                 return graph
                             else:
                                 sourceNodeId = self.addReadNode(graph, param.value, dataFormat)
-                                if sources.find(paramName) == None:
-                                    source = ET.SubElement(sources, paramName)
-                                    source.set("refid",sourceNodeId)
+                        if sources.find(paramName) == None:
+                            source = ET.SubElement(sources, paramName)
+                            source.set("refid", sourceNodeId)
                     # else assume its a reference to a previous node and add a "source" element
                     elif param.value:
                         source = ET.SubElement(sources, param.name, {"refid":param.value})
