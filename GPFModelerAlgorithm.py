@@ -101,9 +101,11 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         # If it is made for execution then parameters and outputs are already set.
         if not forExecution:
             self.defineCharacteristics()
-            
-        # Set the connections between nodes
+        
+        # Set the connections between nodes    
         for alg in self.algs.values():
+            for output in alg.algorithm.outputs:
+                output.setValue(alg.algorithm.nodeID)
             for param in alg.params:
                 if isinstance(alg.params[param], ValueFromOutput):
                     alg.algorithm.getParameterFromName(param).setValue(self.algs[alg.params[param].alg].algorithm.nodeID)
