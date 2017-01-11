@@ -7,5 +7,5 @@ OutputRaster|-out|Output Image
 ParameterBands|!targetBands>!targetBand>expression|Expression||sourceProduct
 ParameterString|targetBands>targetBand>name|Name of output band|result
 ParameterString|targetBands>targetBand>type|Data type for out band|float32
-ParameterString|targetBands>targetBand>unit|Unit for out band|
+ParameterString|targetBands>targetBand>unit|Unit for out band||False|True
 ParameterString|targetBands>targetBand>noDataValue|No data value|NaN

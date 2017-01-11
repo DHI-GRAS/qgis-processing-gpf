@@ -7,7 +7,7 @@ ParameterExtent|geoRegionExtent|Spatial extent |
 ParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|1|None|1
 ParameterNumber|subSamplingY|The pixel sub-sampling step in Y (horizontal image direction)|1|None|1
 *ParameterBoolean|fullSwath|Forces the operator to extend the subset region to the full swath.|False
-ParameterString|tiePointGridNames|The comma-separated list of names of tie-point grids to be copied. If not given, all bands are copied.|
+ParameterString|tiePointGridNames|The comma-separated list of names of tie-point grids to be copied. If not given, all bands are copied.||False|True
 ParameterBands|bandNames|The comma-separated list of names of bands to be copied. If not given, all bands are copied.||sourceProduct
 *ParameterBoolean|copyMetadata|Whether to copy the metadata of the source product.|False
 OutputRaster|-out|Output Image
