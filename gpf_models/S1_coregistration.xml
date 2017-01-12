@@ -1,0 +1,98 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Warp_95">
+    <operator>Warp</operator>
+    <sources>
+      <sourceProduct refid="Cross-Correlation_100" />
+    </sources>
+    <parameters>
+      <rmsThreshold>0.05</rmsThreshold>
+      <warpPolynomialOrder>1</warpPolynomialOrder>
+      <interpolationMethod>Cubic convolution (6 points)</interpolationMethod>
+      <openResidualsFile>False</openResidualsFile>
+    </parameters>
+  </node>
+  <node id="CreateStack_101">
+    <operator>CreateStack</operator>
+    <sources>
+      <sourceProduct refid="Read_97" />
+      <sourceProduct.1 refid="Read_98" />
+    </sources>
+    <parameters>
+      <masterBands />
+      <extent>Master</extent>
+      <resamplingType>NONE</resamplingType>
+      <initialOffsetMethod>Orbit</initialOffsetMethod>
+    </parameters>
+  </node>
+  <node id="Read_97">
+    <operator>Read</operator>
+    <sources />
+    <parameters>
+      <file qgisModelInputPos="369.0,66.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'inputmasterproduct', 'showSublayersDialog': True, 'default': None, 'value': None, 'exported': None, 'hidden': False, 'optional': False, 'description': u'Input master product'}" />
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
+  <node id="Read_98">
+    <operator>Read</operator>
+    <sources />
+    <parameters>
+      <file qgisModelInputPos="658.0,66.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'inputslaveproduct1', 'showSublayersDialog': True, 'default': None, 'value': None, 'exported': None, 'hidden': False, 'optional': False, 'description': u'Input slave product'}" />
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
+  <node id="Cross-Correlation_100">
+    <operator>Cross-Correlation</operator>
+    <sources>
+      <sourceProduct refid="CreateStack_101" />
+    </sources>
+    <parameters>
+      <numGCPtoGenerate>2000</numGCPtoGenerate>
+      <coarseRegistrationWindowWidth>128</coarseRegistrationWindowWidth>
+      <coarseRegistrationWindowHeight>128</coarseRegistrationWindowHeight>
+      <rowInterpFactor>4</rowInterpFactor>
+      <columnInterpFactor>4</columnInterpFactor>
+      <maxIteration>10</maxIteration>
+      <gcpTolerance>0.25</gcpTolerance>
+      <applyFineRegistration>False</applyFineRegistration>
+      <fineRegistrationWindowWidth>32</fineRegistrationWindowWidth>
+      <fineRegistrationWindowHeight>32</fineRegistrationWindowHeight>
+      <coherenceWindowSize>3</coherenceWindowSize>
+      <coherenceThreshold>0.6</coherenceThreshold>
+      <useSlidingWindow>False</useSlidingWindow>
+      <computeOffset>False</computeOffset>
+      <onlyGCPsOnLand>False</onlyGCPsOnLand>
+    </parameters>
+  </node>
+  <node id="Write_94">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Warp_95" />
+    </sources>
+    <parameters>
+      <formatName>GeoTIFF-BigTIFF</formatName>
+      <file qgisModelOutputName="Output raster product">None</file>
+    </parameters>
+  </node>
+  <applicationData group="S1 Graphs" id="Presentation" name="S1 Coregistration">
+    <Description />
+    <node id="Warp_95">
+      <displayPosition x="510.0" y="493.0" />
+    </node>
+    <node id="CreateStack_101">
+      <displayPosition x="507.0" y="322.0" />
+    </node>
+    <node id="Read_97">
+      <displayPosition x="370.0" y="169.0" />
+    </node>
+    <node id="Read_98">
+      <displayPosition x="656.0" y="165.0" />
+    </node>
+    <node id="Cross-Correlation_100">
+      <displayPosition x="510.0" y="409.0" />
+    </node>
+    <node id="Write_94">
+      <displayPosition x="507.0" y="580.0" />
+    </node>
+  </applicationData>
+</graph>

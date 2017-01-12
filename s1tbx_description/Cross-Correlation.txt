@@ -1,0 +1,21 @@
+Cross-Correlation
+s1tbx_Cross-Correlation
+Cross Correlation
+Radar
+ParameterRaster|sourceProduct|Stack Image|False|False
+ParameterNumber|numGCPtoGenerate|Number of GCPs|1|None|2000
+ParameterSelection|coarseRegistrationWindowWidth|Coarse Window Width|32;64;128;256;512;1024;2048|2
+ParameterSelection|coarseRegistrationWindowHeight|Coarse Window Height|32;64;128;256;512;1024;2048|2
+ParameterSelection|rowInterpFactor|Row Interpolation Factor|2;4;8;16|0
+ParameterSelection|columnInterpFactor|Column Interpolation Factor|2;4;8;16|0
+ParameterNumber|maxIteration|Max Iterations|1|10|10
+ParameterNumber|gcpTolerance|GPC Tolerance|0|None|0.5
+*ParameterBoolean|applyFineRegistration|Apply Fine Registration for SLCs|False
+*ParameterSelection|fineRegistrationWindowWidth|Fine Registration Window Width|8;16;32;64;128;256;512|2
+*ParameterSelection|fineRegistrationWindowHeight|Fine Registration Window Height|8;16;32;64;128;256;512|2
+*ParameterNumber|coherenceWindowSize|Coherence Window Size|1|16|3
+*ParameterNumber|coherenceThreshold|Coherence Threshold|0|None|0.6
+*ParameterBoolean|useSlidingWindow|Use coherence sliding window|False
+*ParameterBoolean|computeOffset|Estimate Coarse Offset|False
+*ParameterBoolean|onlyGCPsOnLand|Test GCPs are on land|False
+OutputRaster|-out|Output Image
