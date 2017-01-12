@@ -212,7 +212,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                         for param in alg.parameters:
                             modelAlg.params[param.name] = None
                             # Set algorithm parameter values
-                            paramNode = node.find("parameters/"+param.name)
+                            paramNode = node.find("parameters/"+param.name.replace('!', '').replace('>','/'))
                             if paramNode is not None:
                                 modelAlg.params[param.name] = GPFModelerAlgorithm.parseParameterValue(param, paramNode.text)
                                 # Process model inputs which are saved as XML attributes
