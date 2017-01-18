@@ -169,12 +169,9 @@ class GPFUtils:
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin", os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads)])
         elif key == GPFUtils.snapKey():
             # check if running on windows or other OS
-            if platform.system() == "Windows":
-                batchFile = os.path.join("bin", "gpt.exe")
-            else:
-                batchFile = os.path.join("bin", "gpt.sh")
+            batchFile = os.path.join("bin", "gpt")
             try:
-                threads = int(float(ProcessingConfig.getSetting(GPFUtils.S1TBX_THREADS)))
+                threads = int(float(ProcessingConfig.getSetting(GPFUtils.SNAP_THREADS)))
             except:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ",str(threads)])      
