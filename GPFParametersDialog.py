@@ -58,10 +58,13 @@ class GPFParametersDialog(AlgorithmDialog):
         QgsMapLayerRegistry.instance().layersWillBeRemoved.connect(self.mainWidget.layersWillBeRemoved)
         
     def getRasterParamPath(self, paramName):
-        param = self.mainWidget.valueItems[paramName]
-        obj = param.getValue()
-        if isinstance(obj, QgsRasterLayer):
-            value = unicode(obj.dataProvider().dataSourceUri())
+        if paramName is not None:
+            param = self.mainWidget.valueItems[paramName]
+            obj = param.getValue()
+            if isinstance(obj, QgsRasterLayer):
+                value = unicode(obj.dataProvider().dataSourceUri())
+            else:
+                value = param.getValue()
         else:
-            value = param.getValue()
+            value = ""
         return value
