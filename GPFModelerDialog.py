@@ -1,13 +1,45 @@
+"""
+***************************************************************************
+    GPFModelerDialog.py
+-------------------------------------
+    Copyright (C) 2017 Radoslaw Guzinski
+
+***************************************************************************
+* This plugin is part of the Water Observation Information System (WOIS)  *
+* developed under the TIGER-NET project funded by the European Space      *
+* Agency as part of the long-term TIGER initiative aiming at promoting    *
+* the use of Earth Observation (EO) for improved Integrated Water         *
+* Resources Management (IWRM) in Africa.                                  *
+*                                                                         *
+* WOIS is a free software i.e. you can redistribute it and/or modify      *
+* it under the terms of the GNU General Public License as published       *
+* by the Free Software Foundation, either version 3 of the License,       *
+* or (at your option) any later version.                                  *
+*                                                                         *
+* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY * 
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
+* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
+* for more details.                                                       *
+*                                                                         *
+* You should have received a copy of the GNU General Public License along *
+* with this program.  If not, see <http://www.gnu.org/licenses/>.         *
+***************************************************************************
+"""
+
+import sys
 import codecs
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QMessageBox, QTreeWidget, QTreeWidgetItem, QFileDialog
+from PyQt4.QtCore import Qt, QPoint, QPointF, QRectF
+from PyQt4.QtGui import QMessageBox, QTreeWidgetItem, QFileDialog
 from processing.modeler.ModelerDialog import ModelerDialog, TreeAlgorithmItem
 from processing.gui.HelpEditionDialog import HelpEditionDialog
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.core.ProcessingLog import ProcessingLog
 from processing.modeler.WrongModelException import WrongModelException
+from processing.modeler.ModelerAlgorithm import ModelerParameter
 from processing_gpf.GPFModelerAlgorithm import GPFModelerAlgorithm
 from processing_gpf.GPFUtils import GPFUtils
+from processing_gpf.GPFModelerParameterDefinitionDialog import GPFModelerParameterDefinitionDialog
+from processing_gpf.GPFModelerScene import GPFModelerScene
 
 class GPFModelerDialog(ModelerDialog):
     
@@ -89,6 +121,22 @@ class GPFModelerDialog(ModelerDialog):
                     groupItem.setExpanded(True)
 
         self.algorithmTree.sortItems(0, Qt.AscendingOrder)
+    
+    # This is a copy of implementation from ModelerDialog except that 
+    # it uses GPFModelerParameterDefinitionDialog
+    def addInputOfType(self, paramType, pos=None):
+        if paramType in GPFModelerParameterDefinitionDialog.paramTypes:
+            dlg = GPFModelerParameterDefinitionDialog(self.alg, paramType)
+            dlg.exec_()
+            if dlg.param is not None:
+                if pos is None:
+                    pos = self.getPositionForParameterItem()
+                if isinstance(pos, QPoint):
+                    pos = QPointF(pos)
+                self.alg.addParameter(ModelerParameter(dlg.param, pos))
+                self.repaintModel()
+                #self.view.ensureVisible(self.scene.getLastParameterItem())
+                self.hasChanged = True
         
     def openModel(self):
         filename = unicode(QFileDialog.getOpenFileName(self,
@@ -118,8 +166,6 @@ class GPFModelerDialog(ModelerDialog):
                 QMessageBox.critical(self, self.tr('Could not open model'),
                     self.tr('The selected model could not be loaded.\n'
                             'See the log for more information.'))
-            
-                
             
     def saveModel(self, saveAs):
         if unicode(self.textGroup.text()).strip() == '' \
@@ -165,3 +211,13 @@ class GPFModelerDialog(ModelerDialog):
                                     self.tr('Model was correctly saved.'))
 
             self.hasChanged = False
+    
+    # Function repaintModel is exactly the same as in ModelerDialog class from
+    # QGIS 2.18.3 except that ModelerScene is replaced by GPFModelerScene 
+    # and ModelerAlgorithm is replaced by GPFModelerAlgorithm        
+    def repaintModel(self):
+        self.scene = GPFModelerScene()
+        self.scene.setSceneRect(QRectF(0, 0, GPFModelerAlgorithm.CANVAS_SIZE,
+                                       GPFModelerAlgorithm.CANVAS_SIZE))
+        self.scene.paintModel(self.alg)
+        self.view.setScene(self.scene)
