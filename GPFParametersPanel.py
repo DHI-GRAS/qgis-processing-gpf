@@ -37,11 +37,11 @@ from PyQt4 import QtGui, QtCore
 class GPFParametersPanel(ParametersPanel):
     
     def getWidgetFromParameter(self, param):
-        if isinstance(param, ParameterBands):
-            item = GPFBandsSelectorPanel(param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
-        elif isinstance(param, ParameterPolarisations):
+        if isinstance(param, ParameterPolarisations):
             item = GPFPolarisationsSelectorPanel(param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
-        # Sspecial treatment for S1 Toolbox Terrain-Correction to get pixel sizes from SAR image
+        elif isinstance(param, ParameterBands):
+            item = GPFBandsSelectorPanel(param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
+        # Special treatment for S1 Toolbox Terrain-Correction to get pixel sizes from SAR image
         elif isinstance(param, ParameterPixelSize):
             item = S1TbxPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
         else:
