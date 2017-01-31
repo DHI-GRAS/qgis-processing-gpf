@@ -16,13 +16,18 @@ about=
 	
 	This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
-version=1.4.1
+version=1.4.2
 qgisMinimumVersion=2.14
 
 # Optional items:
 
 
-Changelog=1.4.1
+Changelog=1.4.2
+    - Add support for using Bands parameter in GPF graphs
+    - Add new S1TBX algorithms and graphs (contribution by Pedro Venancio)
+    - Fix calls to SNAP 5 GPT on Linux
+    - Bug fixes in GPF graphs functionality 
+    1.4.1
     - Remove compiled Java file 
       NOTE: The file is still required for full functionality of BEAM algorithm provider and can be downloaded from https://github.com/DHI-GRAS/processing_gpf/blob/GW-A_dev/processing_beam_java/listBeamBands.class
     1.4.0
