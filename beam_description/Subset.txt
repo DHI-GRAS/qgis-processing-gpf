@@ -3,7 +3,7 @@ beam_Subset
 Subset image
 I/O
 ParameterRaster|sourceProduct|The product which will be subseted|False|False
-ParameterExtent|geoRegionExtent|Spatial extent |
+ParameterExtent|geoRegionExtent|Spatial extent ||True
 ParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|1|None|1
 ParameterNumber|subSamplingY|The pixel sub-sampling step in Y (horizontal image direction)|1|None|1
 *ParameterBoolean|fullSwath|Forces the operator to extend the subset region to the full swath.|False
