@@ -1,0 +1,354 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Apply-Orbit-File_844">
+    <operator>Apply-Orbit-File</operator>
+    <sources>
+      <sourceProduct refid="Read_859" />
+    </sources>
+    <parameters>
+      <orbitType>Sentinel Precise (Auto Download)</orbitType>
+      <polyDegree>3</polyDegree>
+      <continueOnFail>True</continueOnFail>
+    </parameters>
+  </node>
+  <node id="Warp_845">
+    <operator>Warp</operator>
+    <sources>
+      <sourceProduct refid="Cross-Correlation_853" />
+    </sources>
+    <parameters>
+      <rmsThreshold>0.5</rmsThreshold>
+      <warpPolynomialOrder>1</warpPolynomialOrder>
+      <interpolationMethod>Bilinear interpolation</interpolationMethod>
+      <openResidualsFile>False</openResidualsFile>
+    </parameters>
+  </node>
+  <node id="CreateStack_846">
+    <operator>CreateStack</operator>
+    <sources>
+      <sourceProduct refid="Subset_855" />
+      <sourceProduct.1 refid="Subset_854" />
+    </sources>
+    <parameters>
+      <masterBands />
+      <extent>Master</extent>
+      <resamplingType>NONE</resamplingType>
+      <initialOffsetMethod>Orbit</initialOffsetMethod>
+    </parameters>
+  </node>
+  <node id="CreateStack_847">
+    <operator>CreateStack</operator>
+    <sources>
+      <sourceProduct refid="BandMaths_856" />
+      <sourceProduct.1 refid="BandMaths_857" />
+      <sourceProduct.2 refid="BandMaths_858" />
+    </sources>
+    <parameters>
+      <masterBands />
+      <extent>Master</extent>
+      <resamplingType>NONE</resamplingType>
+      <initialOffsetMethod>Orbit</initialOffsetMethod>
+    </parameters>
+  </node>
+  <node id="Speckle-Filter_848">
+    <operator>Speckle-Filter</operator>
+    <sources>
+      <sourceProduct refid="CreateStack_847" />
+    </sources>
+    <parameters>
+      <sourceBands />
+      <filter>Lee</filter>
+      <filterSizeX>3</filterSizeX>
+      <filterSizeY>3</filterSizeY>
+      <dampingFactor>2</dampingFactor>
+      <windowSize>7x7</windowSize>
+      <targetWindowSizeStr>3x3</targetWindowSizeStr>
+      <sigmaStr>0.9</sigmaStr>
+      <anSize>50</anSize>
+      <estimateENL>False</estimateENL>
+      <numLooksStr>1</numLooksStr>
+      <enl>1</enl>
+    </parameters>
+  </node>
+  <node id="Write_843">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="KMeansClusterAnalysis_860" />
+    </sources>
+    <parameters>
+      <formatName>GeoTIFF-BigTIFF</formatName>
+      <file qgisModelOutputName="Classified Flood Raster Layer">None</file>
+    </parameters>
+  </node>
+  <node id="Terrain-Correction_849">
+    <operator>Terrain-Correction</operator>
+    <sources>
+      <sourceProduct refid="Warp_845" />
+    </sources>
+    <parameters>
+      <sourceBands />
+      <demName>SRTM 3Sec</demName>
+      <externalDEMFile />
+      <externalDEMNoDataValue>0</externalDEMNoDataValue>
+      <externalDEMApplyEGM>False</externalDEMApplyEGM>
+      <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
+      <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>
+      <pixelSpacingInDegree>8.9831528412e-05</pixelSpacingInDegree>
+      <pixelSpacingInMeter>10</pixelSpacingInMeter>
+      <nodataValueAtSea>True</nodataValueAtSea>
+      <saveDEM>False</saveDEM>
+      <saveLatLon>False</saveLatLon>
+      <saveLocalIncidenceAngle>False</saveLocalIncidenceAngle>
+      <saveIncidenceAngleFromEllipsoid>False</saveIncidenceAngleFromEllipsoid>
+      <saveProjectedLocalIncidenceAngle>False</saveProjectedLocalIncidenceAngle>
+      <saveSelectedSourceBand>True</saveSelectedSourceBand>
+      <applyRadiometricNormalization>False</applyRadiometricNormalization>
+      <outputComplex>False</outputComplex>
+      <saveSigmaNought>False</saveSigmaNought>
+      <saveGammaNought>False</saveGammaNought>
+      <saveBetaNought>False</saveBetaNought>
+      <incidenceAngleForSigma0>Use projected local incidence angle from DEM</incidenceAngleForSigma0>
+      <incidenceAngleForGamma0>Use projected local incidence angle from DEM</incidenceAngleForGamma0>
+      <auxFile>Latest Auxiliary File</auxFile>
+      <externalAuxFile />
+    </parameters>
+  </node>
+  <node id="Calibration_850">
+    <operator>Calibration</operator>
+    <sources>
+      <sourceProduct refid="Apply-Orbit-File_861" />
+    </sources>
+    <parameters>
+      <selectedPolarisations>VV</selectedPolarisations>
+      <sourceBands />
+      <auxFile>Latest Auxiliary File</auxFile>
+      <externalAuxFile />
+      <outputImageInComplex>False</outputImageInComplex>
+      <outputImageScaleInDb>False</outputImageScaleInDb>
+      <outputGammaBand>False</outputGammaBand>
+      <createGammaBand>False</createGammaBand>
+      <outputBetaBand>False</outputBetaBand>
+      <createBetaBand>False</createBetaBand>
+      <outputSigmaBand>True</outputSigmaBand>
+    </parameters>
+  </node>
+  <node id="Calibration_851">
+    <operator>Calibration</operator>
+    <sources>
+      <sourceProduct refid="Apply-Orbit-File_844" />
+    </sources>
+    <parameters>
+      <selectedPolarisations>VV</selectedPolarisations>
+      <sourceBands />
+      <auxFile>Latest Auxiliary File</auxFile>
+      <externalAuxFile />
+      <outputImageInComplex>False</outputImageInComplex>
+      <outputImageScaleInDb>False</outputImageScaleInDb>
+      <outputGammaBand>False</outputGammaBand>
+      <createGammaBand>False</createGammaBand>
+      <outputBetaBand>False</outputBetaBand>
+      <createBetaBand>False</createBetaBand>
+      <outputSigmaBand>True</outputSigmaBand>
+    </parameters>
+  </node>
+  <node id="Read_852">
+    <operator>Read</operator>
+    <sources />
+    <parameters>
+      <file qgisModelInputPos="418.0,82.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'bfloodsentinel1layer', 'showSublayersDialog': True, 'default': None, 'value': None, 'exported': None, 'hidden': False, 'optional': False, 'description': u'Flood Sentinel-1 Layer (Select a Sentinel-1 image taken AFTER the flood)'}" />
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
+  <node id="Cross-Correlation_853">
+    <operator>Cross-Correlation</operator>
+    <sources>
+      <sourceProduct refid="CreateStack_846" />
+    </sources>
+    <parameters>
+      <numGCPtoGenerate>2000</numGCPtoGenerate>
+      <coarseRegistrationWindowWidth>128</coarseRegistrationWindowWidth>
+      <coarseRegistrationWindowHeight>128</coarseRegistrationWindowHeight>
+      <rowInterpFactor>2</rowInterpFactor>
+      <columnInterpFactor>2</columnInterpFactor>
+      <maxIteration>10</maxIteration>
+      <gcpTolerance>0.5</gcpTolerance>
+      <applyFineRegistration>True</applyFineRegistration>
+      <fineRegistrationWindowWidth>32</fineRegistrationWindowWidth>
+      <fineRegistrationWindowHeight>32</fineRegistrationWindowHeight>
+      <coherenceWindowSize>3</coherenceWindowSize>
+      <coherenceThreshold>0.6</coherenceThreshold>
+      <useSlidingWindow>False</useSlidingWindow>
+      <computeOffset>False</computeOffset>
+      <onlyGCPsOnLand>True</onlyGCPsOnLand>
+    </parameters>
+  </node>
+  <node id="Subset_854">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct refid="Calibration_851" />
+    </sources>
+    <parameters>
+      <geoRegion qgisModelInputPos="284.0,453.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'extent', 'default': None, 'hidden': False, 'optional': False, 'value': None, 'description': u'Extent in EPSG:4326 Reference System'}" />
+      <subSamplingX>1</subSamplingX>
+      <subSamplingY>1</subSamplingY>
+      <sourceBands>Sigma0_VV</sourceBands>
+      <copyMetadata>True</copyMetadata>
+    </parameters>
+  </node>
+  <node id="Subset_855">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct refid="Calibration_850" />
+    </sources>
+    <parameters>
+      <geoRegion qgisModelInputPos="284.0,453.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'extent', 'default': None, 'hidden': False, 'optional': False, 'value': None, 'description': u'Extent in EPSG:4326 Reference System'}" />
+      <subSamplingX>1</subSamplingX>
+      <subSamplingY>1</subSamplingY>
+      <sourceBands>Sigma0_VV</sourceBands>
+      <copyMetadata>True</copyMetadata>
+    </parameters>
+  </node>
+  <node id="BandMaths_856">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Terrain-Correction_849" />
+    </sources>
+    <parameters>
+      <targetBands>
+        <targetBand>
+          <expression qgisModelInputPos="119.410625728,1087.40206564" qgisModelInputVars="{'isAdvanced': False, 'name': u'aformuladifference', 'default': u'log(abs(Sigma0_VV_mst_ddMMMYYYY - Sigma0_VV_slv1_ddMMMYYYY))', 'value': u'log(abs(Sigma0_VV_mst_ddMMMYYYY - Sigma0_VV_slv1_ddMMMYYYY))', '_bandSourceRaster': u'areferencesentinel1layer', 'multiline': False, 'evaluateExpressions': False, 'hidden': False, 'optional': False, 'description': u'Formula Difference (Change ddMMMYYYY by DayMonthYear of the AFTER (mst) and BEFORE (slv1) flood images. For instance: 14Jan2016 or 09Dec2015)'}">log(abs(Sigma0_VV_mst_ddMMMYYYY - Sigma0_VV_slv1_ddMMMYYYY))</expression>
+          <name>Difference</name>
+          <type>float32</type>
+          <unit />
+          <noDataValue>0.0</noDataValue>
+        </targetBand>
+      </targetBands>
+    </parameters>
+  </node>
+  <node id="BandMaths_857">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Terrain-Correction_849" />
+    </sources>
+    <parameters>
+      <targetBands>
+        <targetBand>
+          <expression qgisModelInputPos="333.2177082,1087.59400203" qgisModelInputVars="{'isAdvanced': False, 'name': u'bformularatio', 'default': u'log(abs(Sigma0_VV_mst_ddMMMYYYY / Sigma0_VV_slv1_ddMMMYYYY))', 'value': u'log(abs(Sigma0_VV_mst_ddMMMYYYY / Sigma0_VV_slv1_ddMMMYYYY))', '_bandSourceRaster': u'areferencesentinel1layer', 'multiline': False, 'evaluateExpressions': False, 'hidden': False, 'optional': False, 'description': u'Formula Ratio (Change ddMMMYYYY by DayMonthYear of the AFTER (mst) and BEFORE (slv1) flood images. For instance: 14Jan2016 or 09Dec2015)'}">log(abs(Sigma0_VV_mst_ddMMMYYYY / Sigma0_VV_slv1_ddMMMYYYY))</expression>
+          <name>Ratio</name>
+          <type>float32</type>
+          <unit />
+          <noDataValue>0.0</noDataValue>
+        </targetBand>
+      </targetBands>
+    </parameters>
+  </node>
+  <node id="BandMaths_858">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Terrain-Correction_849" />
+    </sources>
+    <parameters>
+      <targetBands>
+        <targetBand>
+          <expression qgisModelInputPos="550.991711412,1088.43072088" qgisModelInputVars="{'isAdvanced': False, 'name': u'cformulaflood', 'default': u'Sigma0_VV_mst_ddMMMYYYY', 'value': u'Sigma0_VV_mst_ddMMMYYYY', '_bandSourceRaster': u'areferencesentinel1layer', 'multiline': False, 'evaluateExpressions': False, 'hidden': False, 'optional': False, 'description': u'Formula Flood (Change ddMMMYYYY by DayMonthYear of the AFTER (mst) flood image. For instance: 14Jan2016)'}">Sigma0_VV_mst_ddMMMYYYY</expression>
+          <name>Flood</name>
+          <type>float32</type>
+          <unit />
+          <noDataValue>0.0</noDataValue>
+        </targetBand>
+      </targetBands>
+    </parameters>
+  </node>
+  <node id="Read_859">
+    <operator>Read</operator>
+    <sources />
+    <parameters>
+      <file qgisModelInputPos="142.0,79.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'areferencesentinel1layer', 'showSublayersDialog': True, 'default': None, 'value': None, 'exported': None, 'hidden': False, 'optional': False, 'description': u'Reference Sentinel-1 Layer (Select a Sentinel-1 image taken BEFORE the flood)'}" />
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
+  <node id="KMeansClusterAnalysis_860">
+    <operator>KMeansClusterAnalysis</operator>
+    <sources>
+      <sourceProduct refid="Speckle-Filter_848" />
+    </sources>
+    <parameters>
+      <clusterCount>5</clusterCount>
+      <iterationCount>30</iterationCount>
+      <randomSeed>31415</randomSeed>
+      <sourceBandNames />
+      <roiMaskName />
+    </parameters>
+  </node>
+  <node id="Apply-Orbit-File_861">
+    <operator>Apply-Orbit-File</operator>
+    <sources>
+      <sourceProduct refid="Read_852" />
+    </sources>
+    <parameters>
+      <orbitType>Sentinel Precise (Auto Download)</orbitType>
+      <polyDegree>3</polyDegree>
+      <continueOnFail>True</continueOnFail>
+    </parameters>
+  </node>
+  <applicationData group="S1 Graphs" id="Presentation" name="S1 Flood Analysis">
+    <Description />
+    <node id="Apply-Orbit-File_844">
+      <displayPosition x="147.0" y="293.0" />
+    </node>
+    <node id="Warp_845">
+      <displayPosition x="339.0" y="868.0" />
+    </node>
+    <node id="CreateStack_846">
+      <displayPosition x="339.0" y="700.0" />
+    </node>
+    <node id="CreateStack_847">
+      <displayPosition x="337.0" y="1281.0" />
+    </node>
+    <node id="Speckle-Filter_848">
+      <displayPosition x="339.0" y="1360.0" />
+    </node>
+    <node id="Write_843">
+      <displayPosition x="347.0" y="1519.0" />
+    </node>
+    <node id="Terrain-Correction_849">
+      <displayPosition x="339.0" y="951.0" />
+    </node>
+    <node id="Calibration_850">
+      <displayPosition x="414.0" y="381.0" />
+    </node>
+    <node id="Calibration_851">
+      <displayPosition x="150.0" y="384.0" />
+    </node>
+    <node id="Read_852">
+      <displayPosition x="408.0" y="189.0" />
+    </node>
+    <node id="Cross-Correlation_853">
+      <displayPosition x="338.0" y="780.0" />
+    </node>
+    <node id="Subset_854">
+      <displayPosition x="212.35" y="573.95" />
+    </node>
+    <node id="Subset_855">
+      <displayPosition x="434.8791125" y="573.0" />
+    </node>
+    <node id="BandMaths_856">
+      <displayPosition x="124.0" y="1170.0" />
+    </node>
+    <node id="BandMaths_857">
+      <displayPosition x="334.0" y="1169.0" />
+    </node>
+    <node id="BandMaths_858">
+      <displayPosition x="549.0" y="1171.0" />
+    </node>
+    <node id="Read_859">
+      <displayPosition x="141.0" y="192.0" />
+    </node>
+    <node id="KMeansClusterAnalysis_860">
+      <displayPosition x="343.0" y="1443.0" />
+    </node>
+    <node id="Apply-Orbit-File_861">
+      <displayPosition x="415.0" y="289.0" />
+    </node>
+  </applicationData>
+</graph>
