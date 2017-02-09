@@ -1,0 +1,47 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Write_693">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Resample_695" />
+    </sources>
+    <parameters>
+      <formatName>GeoTIFF-BigTIFF</formatName>
+      <file qgisModelOutputName="Output image">None</file>
+    </parameters>
+  </node>
+  <node id="Read_694">
+    <operator>Read</operator>
+    <sources />
+    <parameters>
+      <file qgisModelInputPos="120.0,60.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'input', 'showSublayersDialog': True, 'default': None, 'value': None, 'exported': None, 'hidden': False, 'optional': False, 'description': u'Input'}" />
+      <formatName>GeoTIFF</formatName>
+    </parameters>
+  </node>
+  <node id="Resample_695">
+    <operator>Resample</operator>
+    <sources>
+      <sourceProduct refid="Read_694" />
+    </sources>
+    <parameters>
+      <referenceBand />
+      <targetResolution qgisModelInputPos="340.0,60.0" qgisModelInputVars="{'isAdvanced': False, 'description': u'Pixel resolution', 'min': 10, 'default': 10, 'max': 90, 'value': 10, 'hidden': False, 'isInteger': True, 'optional': False, 'name': u'pixelresolution'}">10</targetResolution>
+      <upsampling>Nearest</upsampling>
+      <downsampling>First</downsampling>
+      <flagDownsampling>First</flagDownsampling>
+      <resampleOnPyramidLevels>True</resampleOnPyramidLevels>
+    </parameters>
+  </node>
+  <applicationData group="S2 Graphs" id="Presentation" name="S2_Resample">
+    <Description />
+    <node id="Write_693">
+      <displayPosition x="560.0" y="360.0" />
+    </node>
+    <node id="Read_694">
+      <displayPosition x="120.0" y="160.0" />
+    </node>
+    <node id="Resample_695">
+      <displayPosition x="340.0" y="260.0" />
+    </node>
+  </applicationData>
+</graph>
