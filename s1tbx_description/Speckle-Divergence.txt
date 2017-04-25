@@ -1,0 +1,8 @@
+Speckle-Divergence
+s1tbx_Speckle-Divergence
+Speckle Divergence
+Radar
+ParameterRaster|sourceProduct|Input image|False|False
+ParameterBands|sourceBands|The list of source bands||sourceProduct|True
+ParameterSelection|windowSizeStr|Window Size|3x3;5x5;7x7;9x9;11x11;13x13;15x15;17x17|6
+OutputRaster|-out|Output Image
