@@ -16,13 +16,17 @@ about=
 	
 	This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
-version=1.4.2
+version=1.4.3
 qgisMinimumVersion=2.14
 
 # Optional items:
 
 
-Changelog=1.4.2
+Changelog=1.4.3
+    - Addition of new SAR operators: Speckle Divergence and Grey Level Co-occurrence Matrix (contribution by Pedro Venancio)
+    - Addition of NDVI operator (contribution by ewamiti)
+    - Make spatial extent optional in BEAM subset operator
+    1.4.2
     - Add support for using Bands parameter in GPF graphs
     - Add new S1TBX algorithms and graphs (contribution by Pedro Venancio)
     - Fix calls to SNAP 5 GPT on Linux
