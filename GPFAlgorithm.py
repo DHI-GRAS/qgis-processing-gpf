@@ -26,13 +26,14 @@
 ***************************************************************************
 """
 
+import importlib
 import os
 import re
-import GPFRasterOutput
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
+
 from processing.core.GeoAlgorithm import GeoAlgorithm
 from processing.core.parameters import ParameterFile
 from processing.core.parameters import ParameterRaster
@@ -43,9 +44,12 @@ from processing.core.parameters import getParameterFromString
 from processing.core.outputs import getOutputFromString
 from processing.core.ProcessingLog import ProcessingLog
 from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
+
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFParametersDialog import GPFParametersDialog
 from processing_gpf import GPFParameters
+from processing_gpf import GPFRasterOutput
+
 
 class GPFAlgorithm(GeoAlgorithm):
 
@@ -55,7 +59,7 @@ class GPFAlgorithm(GeoAlgorithm):
     NOVALUEDOUBLE = 99999.9
 
     # static nodeIDNum, increased everytime an algorithm is created
-    nodeIDNum = 0;
+    nodeIDNum = 0
 
     def __init__(self, descriptionfile):
         GeoAlgorithm.__init__(self)
@@ -63,13 +67,13 @@ class GPFAlgorithm(GeoAlgorithm):
         self.descriptionFile = descriptionfile
         self.defineCharacteristicsFromFile()
         self.nodeID = ""+self.operator+"_"+str(GPFAlgorithm.nodeIDNum)
-        GPFAlgorithm.nodeIDNum +=1
+        GPFAlgorithm.nodeIDNum += 1
         self.previousAlgInGraph = None
 
     def helpFile(self, key):
         folder = GPFUtils.gpfDocPath(key)
         if str(folder).strip() != "":
-            helpfile = os.path.join( str(folder), self.operator + ".html" )
+            helpfile = os.path.join(str(folder), self.operator + ".html")
             return helpfile
         return None
 
@@ -112,17 +116,19 @@ class GPFAlgorithm(GeoAlgorithm):
                     self.addOutput(getOutputFromString(line))
                 line = lines.readline().strip("\n").strip()
             except Exception,e:
-                ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open GPF algorithm: " + self.descriptionFile + "\n" + line)
+                ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open GPF algorithm: " +
+                                       self.descriptionFile + "\n" + line)
                 raise e
         lines.close()
 
     def addGPFNode(self, graph):
-        # if there are previous nodes that should be added to the graph, recursively go backwards and add them
-        if self.previousAlgInGraph != None:
+        # If there are previous nodes that should be added to the graph, recursively go backwards
+        # and add them
+        if self.previousAlgInGraph is not None:
             self.previousAlgInGraph.addGPFNode(graph)
 
         # now create and add the current node
-        node = ET.Element("node", {"id":self.nodeID})
+        node = ET.Element("node", {"id": self.nodeID})
         operator = ET.SubElement(node, "operator")
         operator.text = self.operator
 
@@ -143,30 +149,31 @@ class GPFAlgorithm(GeoAlgorithm):
                     if os.path.isfile(param.value):
                         # check if the file should be added individually or through the
                         # ProductSet-Reader used sometimes by S1 Toolbox
-                        match = re.match("^\d*ProductSet-Reader>(.*)",param.name)
+                        match = re.match("^\d*ProductSet-Reader>(.*)", param.name)
                         if match:
                             paramName = match.group(1)
                             sourceNodeId = self.addProductSetReaderNode(graph, param.value)
                         else:
                             paramName = param.name
                             if operator.text == "Read":
-                                sourceNodeId = self.addReadNode(graph, param.value, dataFormat, self.nodeID)
+                                sourceNodeId = self.addReadNode(graph, param.value, dataFormat,
+                                                                self.nodeID)
                                 return graph
                             else:
                                 sourceNodeId = self.addReadNode(graph, param.value, dataFormat)
-                        if sources.find(paramName) == None:
+                        if sources.find(paramName) is None:
                             source = ET.SubElement(sources, paramName)
                             source.set("refid", sourceNodeId)
                     # else assume its a reference to a previous node and add a "source" element
                     elif param.value:
-                        source = ET.SubElement(sources, param.name, {"refid":param.value})
+                        source = ET.SubElement(sources, param.name, {"refid": param.value})
                 # This is to allow GPF graphs to save custom names of input rasters
                 elif operator.text == "Read":
                     dataFormat = 'GeoTIFF'
                     param.value = ""
                     sourceNodeId = self.addReadNode(graph, param.value, dataFormat, self.nodeID)
                     return graph
-                    
+
             # add parameters
             else:
                 # Set the name of the parameter
@@ -175,7 +182,8 @@ class GPFAlgorithm(GeoAlgorithm):
                 parentElement = parametersNode
                 parameter = None
                 for tag in tagList:
-                    # if this is the last tag or there are no nested tags create the parameter element
+                    # if this is the last tag or there are no nested tags create the parameter
+                    # element
                     if tag == tagList[-1]:
                         # special treatment for geoRegionExtent parameter in Subset operator
                         if tag == "geoRegionExtent":
@@ -185,11 +193,12 @@ class GPFAlgorithm(GeoAlgorithm):
                             parameter = parentElement.findall(tag)[0]
                         else:
                             parameter = ET.SubElement(parentElement, tag)
-                    # "!" means that a new element in the graph should be created as child of the parent element and set as a parent
+                    # "!" means that a new element in the graph should be created as child of the
+                    # parent element and set as a parent
                     elif tag.startswith("!"):
                         parentElement = ET.SubElement(parentElement, tag[1:])
-                    # otherwise just find the last element with required name and set it as parent of the parameter element
-                    # or create a new one if it can't be found
+                    # otherwise just find the last element with required name and set it as parent
+                    # of the parameter element or create a new one if it can't be found
                     else:
                         if len(parentElement.findall(tag)) > 0:
                             parentElement = (parentElement.findall(tag))[-1]
@@ -197,7 +206,8 @@ class GPFAlgorithm(GeoAlgorithm):
                             parentElement = ET.SubElement(parentElement, tag)
 
                 # Set the value of the parameter
-                if param.value == None or param.value == GPFAlgorithm.NOVALUEINT or param.value == GPFAlgorithm.NOVALUEDOUBLE:
+                if param.value is None or param.value == GPFAlgorithm.NOVALUEINT or\
+                   param.value == GPFAlgorithm.NOVALUEDOUBLE:
                     pass
                 elif isinstance(param, ParameterBoolean):
                     if param.value:
@@ -212,11 +222,11 @@ class GPFAlgorithm(GeoAlgorithm):
                     values = param.value.split(",")
                     if len(values) == 4:
                         parameter.text = "POLYGON(("
-                        parameter.text += values[0] + ' ' + values[2] +", "
-                        parameter.text += values[0] + ' ' + values[3] +", "
-                        parameter.text += values[1] + ' ' + values[3] +", "
-                        parameter.text += values[1] + ' ' + values[2] +", "
-                        parameter.text += values[0] + ' ' + values[2] +"))"
+                        parameter.text += values[0] + ' ' + values[2] + ", "
+                        parameter.text += values[0] + ' ' + values[3] + ", "
+                        parameter.text += values[1] + ' ' + values[3] + ", "
+                        parameter.text += values[1] + ' ' + values[2] + ", "
+                        parameter.text += values[0] + ' ' + values[2] + "))"
                 elif isinstance(param, ParameterFile):
                     if param.value is None or param.value == "None":
                         parameter.text = ""
@@ -230,7 +240,6 @@ class GPFAlgorithm(GeoAlgorithm):
             fileParameter = ET.SubElement(parametersNode, "file")
             fileParameter.text = str((self.outputs[0]).value)
 
-
         graph.append(node)
         return graph
 
@@ -239,27 +248,27 @@ class GPFAlgorithm(GeoAlgorithm):
         node = graph.find(".//*[@id='"+nodeID+"']")
 
         # add ProductSet-Reader node if it doesn't exist yet
-        if node == None:
-            node = ET.SubElement(graph, "node", {"id":nodeID})
+        if node is None:
+            node = ET.SubElement(graph, "node", {"id": nodeID})
             ET.SubElement(node, "sources")
             operator = ET.SubElement(node, "operator")
             operator.text = "ProductSet-Reader"
             # add the file list
             parametersNode = ET.SubElement(node, "parameters")
             parameter = ET.SubElement(parametersNode, "fileList")
-            parameter.text=filename
+            parameter.text = filename
         # otherwise append filename to the node's fileList
         else:
             parameter = node.find(".//fileList")
-            parameter.text +=","+filename
+            parameter.text += ","+filename
         return nodeID
 
-    def addReadNode(self, graph, filename, dataFormat = "", nodeID = ""):
+    def addReadNode(self, graph, filename, dataFormat="", nodeID=""):
         # Add read node
         if not nodeID:
             nodeID = self.nodeID+"_read_"+str(GPFAlgorithm.nodeIDNum)
-        GPFAlgorithm.nodeIDNum +=1
-        node = ET.SubElement(graph, "node", {"id":nodeID})
+        GPFAlgorithm.nodeIDNum += 1
+        node = ET.SubElement(graph, "node", {"id": nodeID})
         operator = ET.SubElement(node, "operator")
         operator.text = "Read"
 
@@ -273,21 +282,21 @@ class GPFAlgorithm(GeoAlgorithm):
         if dataFormat:
             dataFormatParameter = ET.SubElement(parametersNode, "formatName")
             dataFormatParameter.text = dataFormat
-        
+
         return nodeID
 
     def addWriteNode(self, graph, output, key):
 
         # add write node
         nodeID = self.nodeID+"_write_"+str(GPFAlgorithm.nodeIDNum)
-        GPFAlgorithm.nodeIDNum +=1
-        node = ET.SubElement(graph, "node", {"id":nodeID})
+        GPFAlgorithm.nodeIDNum += 1
+        node = ET.SubElement(graph, "node", {"id": nodeID})
         operator = ET.SubElement(node, "operator")
         operator.text = "Write"
 
         # add source
         sources = ET.SubElement(node, "sources")
-        ET.SubElement(sources, "sourceProduct", {"refid":self.nodeID})
+        ET.SubElement(sources, "sourceProduct", {"refid": self.nodeID})
 
         # add some options
         parametersNode = ET.SubElement(node, "parameters")
@@ -307,7 +316,7 @@ class GPFAlgorithm(GeoAlgorithm):
 
     def processAlgorithm(self, key, progress):
         # Create a GFP for execution with SNAP's GPT
-        graph = ET.Element("graph", {'id':self.operator+'_gpf'})
+        graph = ET.Element("graph", {'id': self.operator+'_gpf'})
         version = ET.SubElement(graph, "version")
         version.text = "1.0"
 
@@ -331,7 +340,8 @@ class GPFAlgorithm(GeoAlgorithm):
         GPFUtils.executeGpf(key, ET.tostring(graph), progress)
 
     def commandLineName(self):
-        return self.provider.getName().lower().replace(" ", "") + ":" + self.operator.lower().replace("-","")
+        return (self.provider.getName().lower().replace(" ", "") + ":" +
+                self.operator.lower().replace("-", ""))
 
     ##############################################################################
     # Below are GeoAlgorithm functions which need to be overwritten to support
@@ -350,6 +360,7 @@ class GPFAlgorithm(GeoAlgorithm):
         msg = GeoAlgorithm._checkParameterValuesBeforeExecuting(self)
         # .safe, .zip, .dim and .xml file formats can be opened with Sentinel Toolbox
         # even though they can't be opened by GDAL.
-        if msg and (msg.endswith(".safe") or msg.endswith(".zip") or msg.endswith(".dim") or msg.endswith(".xml") or msg.endswith(".N1")):
+        if msg and (msg.endswith(".safe") or msg.endswith(".zip") or msg.endswith(".dim") or
+                    msg.endswith(".xml") or msg.endswith(".N1")):
             msg = None
         return msg
