@@ -15,6 +15,7 @@ from processing_gpf.CreateNewGpfModelAction import CreateNewGpfModelAction
 from processing_gpf.EditGpfModelAction import EditGpfModelAction
 from processing_gpf.DeleteGpfModelAction import DeleteGpfModelAction
 
+
 class SNAPAlgorithmProvider(AlgorithmProvider):
 
     def __init__(self):
@@ -22,17 +23,35 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
         self.actions = [CreateNewGpfModelAction(self)]
         self.contextMenuActions = [EditGpfModelAction(), DeleteGpfModelAction()]
         self.activate = False
-        
-        #self.createAlgsList() #preloading algorithms to speed up
+
+        # self.createAlgsList() #preloading algorithms to speed up
 
     def initializeSettings(self):
         AlgorithmProvider.initializeSettings(self)
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.SNAP_FOLDER, "SNAP install directory", GPFUtils.programPath(GPFUtils.snapKey())))
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.SNAP_THREADS, "Maximum number of parallel (native) threads", 4))
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.GPF_MODELS_FOLDER, "GPF models' directory", GPFUtils.modelsFolder()))
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S1TBX_ACTIVATE, "Activate Sentinel-1 toolbox", False))
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S2TBX_ACTIVATE, "Activate Sentinel-2 toolbox", False))
-        ProcessingConfig.addSetting(Setting(self.getDescription(), GPFUtils.S3TBX_ACTIVATE, "Activate Sentinel-3 toolbox", False))
+        ProcessingConfig.addSetting(Setting(self.getDescription(),
+                                            GPFUtils.SNAP_FOLDER,
+                                            "SNAP install directory",
+                                            GPFUtils.programPath(GPFUtils.snapKey())))
+        ProcessingConfig.addSetting(Setting(self.getDescription(),
+                                            GPFUtils.SNAP_THREADS,
+                                            "Maximum number of parallel (native) threads",
+                                            4))
+        ProcessingConfig.addSetting(Setting(self.getDescription(),
+                                            GPFUtils.GPF_MODELS_FOLDER,
+                                            "GPF models' directory",
+                                            GPFUtils.modelsFolder()))
+        ProcessingConfig.addSetting(Setting(self.getDescription(),
+                                            GPFUtils.S1TBX_ACTIVATE,
+                                            "Activate Sentinel-1 toolbox",
+                                            False))
+        ProcessingConfig.addSetting(Setting(self.getDescription(),
+                                            GPFUtils.S2TBX_ACTIVATE,
+                                            "Activate Sentinel-2 toolbox",
+                                            False))
+        ProcessingConfig.addSetting(Setting(self.getDescription(),
+                                            GPFUtils.S3TBX_ACTIVATE,
+                                            "Activate Sentinel-3 toolbox",
+                                            False))
 
     def unload(self):
         AlgorithmProvider.unload(self)
@@ -42,7 +61,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
         ProcessingConfig.removeSetting(GPFUtils.S1TBX_ACTIVATE)
         ProcessingConfig.removeSetting(GPFUtils.S2TBX_ACTIVATE)
         ProcessingConfig.removeSetting(GPFUtils.S3TBX_ACTIVATE)
- 
+
     def createAlgsList(self, key, gpfAlgorithm):
         self.preloadedAlgs = []
         folder = GPFUtils.gpfDescriptionPath(key)
@@ -54,11 +73,13 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
                         alg.provider = self
                         self.preloadedAlgs.append(alg)
                     else:
-                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open " + key + " SNAP generic algorithm: " + descriptionFile)
+                        ProcessingLog.addToLog(
+                            ProcessingLog.LOG_ERROR, "Could not open " + key + " SNAP generic algorithm: " + descriptionFile)
                 except Exception as e:
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, str(e))
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open " + key + " generic algorithm: " + descriptionFile)
-    
+                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open " +
+                                           key + " generic algorithm: " + descriptionFile)
+
     def loadGpfModels(self, folder):
         if not os.path.exists(folder):
             return
@@ -74,11 +95,11 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
                             self.algs.append(alg)
                         else:
                             ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
-                                self.tr('Could not load model %s', 'ModelerAlgorithmProvider') % descriptionFile)
+                                                   self.tr('Could not load model %s', 'ModelerAlgorithmProvider') % descriptionFile)
                     except WrongModelException as e:
                         ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
-                            self.tr('Could not load model %s\n%s', 'ModelerAlgorithmProvider') % (descriptionFile, e.msg))
-                    
+                                               self.tr('Could not load model %s\n%s', 'ModelerAlgorithmProvider') % (descriptionFile, e.msg))
+
     def getDescription(self):
         return GPFUtils.providerDescription()
 
@@ -87,7 +108,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
 
     def getIcon(self):
         return QIcon(os.path.dirname(__file__) + "/images/snap.png")
-    
+
     def getAlgorithmFromOperator(self, operatorName):
         for alg in self.algs:
             if alg.operator == operatorName:
@@ -111,7 +132,6 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
                 self.algs.append(alg)
         # Also load models
         self.loadGpfModels(GPFUtils.modelsFolder())
-
 
     def getSupportedOutputRasterLayerExtensions(self):
         return ["tif", "dim", "hdr"]

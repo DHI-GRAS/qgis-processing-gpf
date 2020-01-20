@@ -34,29 +34,34 @@ from processing_gpf.GPFParameters import ParameterBands, ParameterPolarisations,
 from qgis.PyQt import QtGui, QtCore
 
 # GPF parameters panel is the same as normal parameters panel except
-# it can also handle ParameterBands, ParameterPolarisations and 
+# it can also handle ParameterBands, ParameterPolarisations and
 # ParameterPixelSize with special UI
+
+
 class GPFParametersPanel(ParametersPanel):
-    
+
     def getWidgetFromParameter(self, param):
         if isinstance(param, ParameterPolarisations):
-            item = GPFPolarisationsSelectorPanel(param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
+            item = GPFPolarisationsSelectorPanel(
+                param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
         elif isinstance(param, ParameterBands):
-            item = GPFBandsSelectorPanel(param.default, self.parent, self.alg.programKey, param.bandSourceRaster, False)
+            item = GPFBandsSelectorPanel(param.default, self.parent,
+                                         self.alg.programKey, param.bandSourceRaster, False)
         # Special treatment for S1 Toolbox Terrain-Correction to get pixel sizes from SAR image
         elif isinstance(param, ParameterPixelSize):
-            item = S1TbxPixelSizeInputPanel(param.default, param.isInteger, self.parent, self.alg.programKey)
+            item = S1TbxPixelSizeInputPanel(
+                param.default, param.isInteger, self.parent, self.alg.programKey)
         else:
             item = ParametersPanel.getWidgetFromParameter(self, param)
         return item
-    
-    
+
+
 # Special functionality for S1 Toolbox terrain-correction
 # S1 Toolbox pixel size input panel is the same as normal number
 # input panel except that it has a button next to it
-# to show selected products pixel size.     
+# to show selected products pixel size.
 class S1TbxPixelSizeInputPanel(QtGui.QWidget):
-    
+
     def __init__(self, default, isInteger, parent, programKey):
         QtGui.QWidget.__init__(self)
         self.parent = parent
@@ -78,22 +83,24 @@ class S1TbxPixelSizeInputPanel(QtGui.QWidget):
         pixelSizes = GPFUtils.getS1TbxPixelSize(sourceProduct, self.programKey)
         dlg = S1TbxPixelSizeInputDialog(pixelSizes, sourceProduct, self.parent)
         dlg.show()
-        
+
     def getValue(self):
         return self.numberPanel.text()
-    
+
     def text(self):
         return self.getValue()
-        
-# Simple dialog displaying SAR image pixel sizes           
-class S1TbxPixelSizeInputDialog(QtGui.QDialog): 
+
+# Simple dialog displaying SAR image pixel sizes
+
+
+class S1TbxPixelSizeInputDialog(QtGui.QDialog):
     def __init__(self, pixelSizes, filename, parent):
         self.pixelSizes = pixelSizes
         self.filename = filename
         QtGui.QDialog.__init__(self, parent)
         self.setWindowModality(0)
         self.setupUi()
-      
+
     def setupUi(self):
         self.resize(500, 180)
         self.setWindowTitle("Pixel Sizes: "+str(self.filename))
@@ -103,7 +110,7 @@ class S1TbxPixelSizeInputDialog(QtGui.QDialog):
         self.horizontalLayout.setMargin(0)
         self.table = QtGui.QTableWidget()
         self.table.setColumnCount(1)
-        self.table.setColumnWidth(0,270)
+        self.table.setColumnWidth(0, 270)
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setVisible(False)
         self.table.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
@@ -111,22 +118,24 @@ class S1TbxPixelSizeInputDialog(QtGui.QDialog):
         self.horizontalLayout.addWidget(self.table)
         self.setLayout(self.horizontalLayout)
         self.verticalLayout.addLayout(self.horizontalLayout)
-       
+
     def setTableContent(self):
         self.table.setRowCount(len(self.pixelSizes))
-        i=0
-        for k,v in list(self.pixelSizes.items()):
+        i = 0
+        for k, v in list(self.pixelSizes.items()):
             item = QtGui.QLineEdit()
             item.setReadOnly(True)
             text = str(k).strip() + ":\t\t" + str(v).strip()
             item.setText(text)
-            self.table.setCellWidget(i,0, item)
-            i += 1     
-             
+            self.table.setCellWidget(i, 0, item)
+            i += 1
+
 # GPF bands selector panel is the same as normal text panel
-# except that it has a button next to it to show band names 
+# except that it has a button next to it to show band names
+
+
 class GPFBandsSelectorPanel(QtGui.QWidget):
-    
+
     def __init__(self, default, parent, programKey, bandSourceRaster, appendProductName):
         QtGui.QWidget.__init__(self)
         self.parent = parent
@@ -144,26 +153,29 @@ class GPFBandsSelectorPanel(QtGui.QWidget):
         self.horizontalLayout.setMargin(0)
         self.horizontalLayout.addWidget(self.bandsPanel)
         self.horizontalLayout.addWidget(self.bandsButton)
-    
+
     def setBandsPanel(self, bands):
         self.bandsPanel.setText(bands)
-       
+
     def showBandsDialog(self):
-        bands = GPFUtils.getBeamBandNames(self.getFilePath(), self.programKey, self.appendProductName)
+        bands = GPFUtils.getBeamBandNames(
+            self.getFilePath(), self.programKey, self.appendProductName)
         dlg = GPFBandsListDialog(bands, self.getFilePath(), self)
         dlg.show()
-        
+
     def getFilePath(self):
         value = self.parent.getRasterParamPath(self.bandSourceRaster)
         return value
-    
+
     def getValue(self):
         return self.bandsPanel.text()
-    
+
     def text(self):
         return self.getValue()
-        
-# Simple dialog displaying a list of bands            
+
+# Simple dialog displaying a list of bands
+
+
 class GPFBandsListDialog(QtGui.QDialog):
     def __init__(self, bands, filename, parent):
         self.bands = bands
@@ -195,7 +207,7 @@ class GPFBandsListDialog(QtGui.QDialog):
         self.buttonBox.addButton(self.setButton, QtGui.QDialogButtonBox.ActionRole)
         self.table = QtGui.QTableWidget()
         self.table.setColumnCount(1)
-        self.table.setColumnWidth(0,270)
+        self.table.setColumnWidth(0, 270)
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setVisible(False)
         self.table.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
@@ -213,28 +225,27 @@ class GPFBandsListDialog(QtGui.QDialog):
         QtCore.QObject.connect(self.copyButton, QtCore.SIGNAL("clicked()"), self.copyBands)
         QtCore.QObject.connect(self.setButton, QtCore.SIGNAL("clicked()"), self.setBands)
         QtCore.QMetaObject.connectSlotsByName(self)
-        
+
     def setTableContent(self):
         self.table.setRowCount(len(self.bands))
         for i in range(len(self.bands)):
             item = QtGui.QCheckBox()
             item.setText(self.bands[i])
-            self.table.setCellWidget(i,0, item)
+            self.table.setCellWidget(i, 0, item)
             QtCore.QObject.connect(item, QtCore.SIGNAL("stateChanged(int)"), self.updateBandList)
-    
-    
+
     def updateBandList(self):
         selectedBands = ""
         for i in range(len(self.bands)):
             widget = self.table.cellWidget(i, 0)
-            if widget.isChecked(): 
-                selectedBands+=widget.text()
-                selectedBands+=","
+            if widget.isChecked():
+                selectedBands += widget.text()
+                selectedBands += ","
         if selectedBands:
             if selectedBands[-1] == ",":
                 selectedBands = selectedBands[:-1]
         self.bandList.setText(selectedBands)
-            
+
     def selectAll(self):
         checked = False
         for i in range(len(self.bands)):
@@ -245,33 +256,35 @@ class GPFBandsListDialog(QtGui.QDialog):
         for i in range(len(self.bands)):
             widget = self.table.cellWidget(i, 0)
             widget.setChecked(checked)
-            
+
     def copyBands(self):
         clipboard = QtGui.QApplication.clipboard()
         clipboard.setText(self.bandList.text())
-    
+
     def setBands(self):
         self.parent.setBandsPanel(self.bandList.text())
         QtGui.QDialog.close(self)
-        
+
     def close(self):
         QtGui.QDialog.close(self)
-        
+
+
 class GPFPolarisationsSelectorPanel(GPFBandsSelectorPanel):
     def __init__(self, default, parent, programKey, bandSourceRaster, appendProductName):
-        super(GPFPolarisationsSelectorPanel, self).__init__(default, parent, programKey, bandSourceRaster, appendProductName)
+        super(GPFPolarisationsSelectorPanel, self).__init__(
+            default, parent, programKey, bandSourceRaster, appendProductName)
         self.bandsButton.setText("Polarisations")
-        
+
     def showBandsDialog(self):
         polarisations = GPFUtils.getPolarisations(self.getFilePath())
         dlg = GPFPolarisationsListDialog(polarisations, self.getFilePath(), self)
         dlg.show()
-        
-class GPFPolarisationsListDialog(GPFBandsListDialog): 
+
+
+class GPFPolarisationsListDialog(GPFBandsListDialog):
     def setupUi(self):
         super(GPFPolarisationsListDialog, self).setupUi()
         self.setWindowTitle("Polarisations: "+str(self.filename))
         self.copyButton.setText("Copy polarisations")
         self.setButton.setText("Set polarisations")
         self.label.setText("Selected polarisations:")
-        

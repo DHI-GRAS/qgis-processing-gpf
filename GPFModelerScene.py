@@ -32,10 +32,11 @@ from processing.modeler.ModelerArrowItem import ModelerArrowItem
 from processing.modeler.ModelerScene import ModelerScene
 from processing_gpf.GPFModelerGraphicItem import GPFModelerGraphicItem
 
+
 class GPFModelerScene(ModelerScene):
-    
+
     # Function paintModel is exactly the same as in ModelerScene class from
-    # QGIS 2.18.3 except that ModelerGraphicItem is replaced by 
+    # QGIS 2.18.3 except that ModelerGraphicItem is replaced by
     # GPFModelerGraphicItem
     def paintModel(self, model):
         self.model = model
@@ -68,7 +69,8 @@ class GPFModelerScene(ModelerScene):
                         value = None
                     sourceItems = self.getItemsFromParamValue(value)
                     for sourceItem, sourceIdx in sourceItems:
-                        arrow = ModelerArrowItem(sourceItem, sourceIdx, self.algItems[alg.name], idx)
+                        arrow = ModelerArrowItem(sourceItem, sourceIdx,
+                                                 self.algItems[alg.name], idx)
                         sourceItem.addArrow(arrow)
                         self.algItems[alg.name].addArrow(arrow)
                         arrow.updatePath()

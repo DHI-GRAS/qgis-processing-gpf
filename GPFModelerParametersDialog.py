@@ -31,6 +31,7 @@ from qgis.PyQt.QtWidgets import QComboBox
 from processing.modeler.ModelerParametersDialog import ModelerParametersDialog
 from processing_gpf.GPFParameters import ParameterBands
 
+
 class GPFModelerParametersDialog(ModelerParametersDialog):
 
     def getWidgetFromParameter(self, param):
@@ -44,5 +45,5 @@ class GPFModelerParametersDialog(ModelerParametersDialog):
             item.setEditText(str(param.default or ""))
         else:
             item = ModelerParametersDialog.getWidgetFromParameter(self, param)
-            
+
         return item

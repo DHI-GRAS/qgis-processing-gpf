@@ -33,24 +33,25 @@ from processing.modeler.ModelerParameterDefinitionDialog import ModelerParameter
 from processing.core.parameters import Parameter, ParameterRaster
 from processing_gpf.GPFParameters import ParameterBands
 
+
 class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
-    
+
     PARAMETER_BANDS = "Raster bands"
-    
+
     paramTypes = ModelerParameterDefinitionDialog.paramTypes
     if PARAMETER_BANDS not in paramTypes:
         paramTypes.extend([PARAMETER_BANDS])
-    
+
     def setupUi(self):
         if self.paramType == GPFModelerParameterDefinitionDialog.PARAMETER_BANDS or \
            isinstance(self.param, ParameterBands):
-        
+
             self.setWindowTitle(self.tr('Parameter definition'))
 
             self.verticalLayout = QVBoxLayout(self)
             self.verticalLayout.setSpacing(40)
             self.verticalLayout.setMargin(20)
-        
+
             self.horizontalLayoutName = QHBoxLayout(self)
             self.horizontalLayoutName.setSpacing(2)
             self.horizontalLayoutName.setMargin(0)
@@ -59,7 +60,7 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
             self.nameTextBox = QLineEdit()
             self.horizontalLayoutName.addWidget(self.nameTextBox)
             self.verticalLayout.addLayout(self.horizontalLayoutName)
-        
+
             self.horizontalLayoutRequired = QHBoxLayout(self)
             self.horizontalLayoutRequired.setSpacing(2)
             self.horizontalLayoutRequired.setMargin(0)
@@ -72,11 +73,10 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
             self.horizontalLayoutDatatype = QHBoxLayout(self)
             self.horizontalLayoutDatatype.setSpacing(2)
             self.horizontalLayoutDatatype.setMargin(0)
-        
+
             if isinstance(self.param, Parameter):
                 self.nameTextBox.setText(self.param.description)
-                
-            
+
             self.horizontalLayoutDefault.addWidget(QLabel(self.tr('Default band')))
             self.defaultTextBox = QLineEdit()
             if self.param is not None:
@@ -95,8 +95,7 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
                     idx += 1
             self.horizontalLayoutDefault.addWidget(self.parentCombo)
             self.verticalLayout.addLayout(self.horizontalLayoutDefault)
-            
-            
+
             self.horizontalLayoutRequired.addWidget(QLabel(self.tr('Required')))
             self.yesNoCombo = QComboBox()
             self.yesNoCombo.addItem(self.tr('Yes'))
@@ -106,7 +105,7 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
                 self.yesNoCombo.setCurrentIndex(
                     1 if self.param.optional else 0)
             self.verticalLayout.addLayout(self.horizontalLayoutRequired)
-        
+
             self.buttonBox = QDialogButtonBox(self)
             self.buttonBox.setOrientation(Qt.Horizontal)
             self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel
@@ -114,15 +113,14 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
             self.buttonBox.setObjectName('buttonBox')
             self.buttonBox.accepted.connect(self.okPressed)
             self.buttonBox.rejected.connect(self.cancelPressed)
-        
+
             self.verticalLayout.addWidget(self.buttonBox)
-        
+
             self.setLayout(self.verticalLayout)
-        
+
         else:
             ModelerParameterDefinitionDialog.setupUi(self)
-            
-    
+
     def okPressed(self):
         if self.paramType == GPFModelerParameterDefinitionDialog.PARAMETER_BANDS or \
            isinstance(self.param, ParameterBands):
@@ -141,19 +139,18 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
                     name = safeName.lower() + str(i)
             else:
                 name = self.param.name
-                
-                
+
             if self.parentCombo.currentIndex() < 0:
                 QMessageBox.warning(self, self.tr('Unable to define parameter'),
                                     self.tr('Wrong or missing parameter values'))
                 return
-            
+
             raster = self.parentCombo.itemData(self.parentCombo.currentIndex())
             default = str(self.defaultTextBox.text())
             self.param = ParameterBands(name, description, default, raster, optional=False)
 
             self.param.optional = self.yesNoCombo.currentIndex() == 1
             self.close()
-            
+
         else:
             ModelerParameterDefinitionDialog.okPressed(self)

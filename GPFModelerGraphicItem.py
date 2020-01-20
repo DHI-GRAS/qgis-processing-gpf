@@ -31,16 +31,17 @@ from processing.modeler.ModelerAlgorithm import ModelerParameter, Algorithm
 from processing_gpf.GPFModelerParameterDefinitionDialog import GPFModelerParameterDefinitionDialog
 from processing_gpf.GPFModelerParametersDialog import GPFModelerParametersDialog
 
+
 class GPFModelerGraphicItem(ModelerGraphicItem):
-    
+
     # Function editElement is exactly the same as in ModelerGraphicItem class from
-    # QGIS 2.18.3 except that ModelerParameterDefinitionDialog is replaced by 
+    # QGIS 2.18.3 except that ModelerParameterDefinitionDialog is replaced by
     # GPFModelerParameterDefinitionDialog and ModelerParametersDialog is replaced
-    # by GPFModelerParametersDialog 
+    # by GPFModelerParametersDialog
     def editElement(self):
         if isinstance(self.element, ModelerParameter):
             dlg = GPFModelerParameterDefinitionDialog(self.model,
-                                                   param=self.element.param)
+                                                      param=self.element.param)
             dlg.exec_()
             if dlg.param is not None:
                 self.model.updateParameter(dlg.param)
@@ -48,9 +49,12 @@ class GPFModelerGraphicItem(ModelerGraphicItem):
                 self.text = dlg.param.description
                 self.update()
         elif isinstance(self.element, Algorithm):
-            dlg = self.element.algorithm.getCustomModelerParametersDialog(self.model, self.element.name)
+            dlg = self.element.algorithm.getCustomModelerParametersDialog(self.model,
+                                                                          self.element.name)
             if not dlg:
-                dlg = GPFModelerParametersDialog(self.element.algorithm, self.model, self.element.name)
+                dlg = GPFModelerParametersDialog(self.element.algorithm,
+                                                 self.model,
+                                                 self.element.name)
             dlg.exec_()
             if dlg.alg is not None:
                 dlg.alg.name = self.element.name

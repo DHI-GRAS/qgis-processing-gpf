@@ -32,6 +32,8 @@ import sys
 from processing.core.parameters import ParameterNumber, ParameterString
 
 # Copied from processing.core.parameters
+
+
 def getParameterFromString(s):
     barsub = '<barsub>'
     s = s.replace('\\|', barsub)
@@ -44,10 +46,13 @@ def getParameterFromString(s):
 # ParameterBands is very similar to ParameterString except that it keeps the name
 # of the ParameterRaster (in bandSourceRaster) whos bands should be selected in
 # this parameter. It also has a different parameter panel (see GPFParametersPanel)
+
+
 class ParameterBands(ParameterString):
 
-    def __init__(self, name='', description='', default='', bandSourceRaster = '', optional=True):
-        ParameterString.__init__(self, name, description, default, multiline=False, optional=optional)
+    def __init__(self, name='', description='', default='', bandSourceRaster='', optional=True):
+        ParameterString.__init__(self, name, description, default,
+                                 multiline=False, optional=optional)
         self._bandSourceRaster = bandSourceRaster
 
     # Band source raster is a property rather then variable because in GPF modeler it is possible
@@ -58,21 +63,24 @@ class ParameterBands(ParameterString):
             return self._bandSourceRaster
         except AttributeError:
             return None
+
     @bandSourceRaster.setter
     def bandSourceRaster(self, value):
         self._bandSourceRaster = value
-            
+
 
 # ParameterPolarisations is very similar to ParameterString except that it keeps the name
 # of the ParameterRaster (in bandSourceRaster) whos polarisations should be selected in
 # this parameter. It also has a different parameter panel (see GPFParametersPanel)
 class ParameterPolarisations(ParameterBands):
 
-    def __init__(self, name='', description='', default='', bandSourceRaster = '', optional=True):
+    def __init__(self, name='', description='', default='', bandSourceRaster='', optional=True):
         ParameterBands.__init__(self, name, description, default, bandSourceRaster, optional)
 
 # ParameterPixelSize is exactly like parameter number except is has a
 # different name since it requires different parameter panel (see GPFParametersPanel)
+
+
 class ParameterPixelSize(ParameterNumber):
 
     def __init__(self, name='', description='', minValue=None, maxValue=None,

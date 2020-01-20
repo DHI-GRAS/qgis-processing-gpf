@@ -31,11 +31,13 @@ from qgis.PyQt.QtGui import QIcon
 from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
 
 # Sentinel-3 Toolbox specific algorithms
+
+
 class S3TbxAlgorithm(SNAPAlgorithm):
-                       
+
     def getIcon(self):
-        return  QIcon(os.path.dirname(__file__) + "/images/s3tbx.png")
-    
+        return QIcon(os.path.dirname(__file__) + "/images/s3tbx.png")
+
     def getCopy(self):
         newone = S3TbxAlgorithm(self.descriptionFile)
         newone.provider = self.provider

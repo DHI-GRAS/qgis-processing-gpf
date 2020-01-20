@@ -36,15 +36,17 @@ from processing_gpf.GPFAlgorithm import GPFAlgorithm
 from processing.core.parameters import ParameterRaster
 
 # General SNAP algorithms (e.g. from Raster or Input-Output menus)
+
+
 class SNAPAlgorithm(GPFAlgorithm):
-    
+
     def __init__(self, descriptionfile):
         GPFAlgorithm.__init__(self, descriptionfile)
         self.programKey = GPFUtils.snapKey()
-        
+
     def processAlgorithm(self, progress):
         GPFAlgorithm.processAlgorithm(self, GPFUtils.snapKey(), progress)
-        
+
     def addGPFNode(self, graph):
         graph = GPFAlgorithm.addGPFNode(self, graph)
         # split band element with multiple bands into multiple elements
@@ -65,29 +67,26 @@ class SNAPAlgorithm(GPFAlgorithm):
                     element.text = str(wkt)
                 except:
                     parent.remove(element)
-                
-        
+
         return graph
-        
+
     def defineCharacteristicsFromFile(self):
         GPFAlgorithm.defineCharacteristicsFromFile(self)
         # check if there are multiple raster inputs
         inputsCount = 0
         for param in self.parameters:
             if isinstance(param, ParameterRaster):
-                inputsCount+=1
+                inputsCount += 1
         if inputsCount > 1:
-            self.multipleRasterInput = True                    
-        
+            self.multipleRasterInput = True
+
     def helpFile(self):
         GPFAlgorithm.helpFile(self, GPFUtils.snapKey())
-        
+
     def getIcon(self):
-        return  QIcon(os.path.dirname(__file__) + "/images/snap.png")
-    
+        return QIcon(os.path.dirname(__file__) + "/images/snap.png")
+
     def getCopy(self):
         newone = SNAPAlgorithm(self.descriptionFile)
         newone.provider = self.provider
         return newone
-                
-        

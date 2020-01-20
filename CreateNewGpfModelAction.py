@@ -3,16 +3,17 @@ from processing_gpf.GPFModelerDialog import GPFModelerDialog
 from qgis.PyQt.QtGui import QIcon
 import os
 
+
 class CreateNewGpfModelAction(CreateNewModelAction):
-    
+
     def __init__(self, gpfAlgorithmProvider):
         CreateNewModelAction.__init__(self)
         self.name = self.tr('GPF Graph Builder', 'CreateNewGpfModelAction')
         self.gpfAlgorithmProvider = gpfAlgorithmProvider
-    
+
     def getIcon(self):
         return QIcon(os.path.dirname(__file__) + '/images/snap_graph.png')
-    
+
     def execute(self):
         dlg = GPFModelerDialog(self.gpfAlgorithmProvider)
         dlg.exec_()

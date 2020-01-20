@@ -31,14 +31,14 @@ from qgis.PyQt.QtGui import QIcon
 from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
 
 # Sentinel-1 Toolbox specific algorithms
+
+
 class S1TbxAlgorithm(SNAPAlgorithm):
-                       
+
     def getIcon(self):
-        return  QIcon(os.path.dirname(__file__) + "/images/s1tbx.png")
-    
+        return QIcon(os.path.dirname(__file__) + "/images/s1tbx.png")
+
     def getCopy(self):
         newone = S1TbxAlgorithm(self.descriptionFile)
         newone.provider = self.provider
         return newone
-                
-        
