@@ -27,15 +27,12 @@
 """
 
 import os
-from PyQt4.QtGui import *
-from qgis.core import *
-from xml.etree.ElementTree import Element, SubElement
+from PyQt4.QtGui import QIcon
+from qgis.core import QgsCoordinateReferenceSystem
+from xml.etree.ElementTree import SubElement
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFAlgorithm import GPFAlgorithm
-try:
-    from processing.parameters.ParameterRaster import ParameterRaster
-except:
-    from processing.core.parameters import ParameterRaster
+from processing.core.parameters import ParameterRaster
 
 # General SNAP algorithms (e.g. from Raster or Input-Output menus)
 class SNAPAlgorithm(GPFAlgorithm):

@@ -26,7 +26,7 @@
 ***************************************************************************
 """
 
-from PyQt4.QtGui import  QPushButton, QWidget, QVBoxLayout
+from PyQt4.QtGui import QPushButton, QWidget, QVBoxLayout
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.AlgorithmDialogBase import AlgorithmDialogBase
 from processing_gpf.GPFParametersPanel import GPFParametersPanel

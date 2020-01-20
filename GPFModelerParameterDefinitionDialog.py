@@ -30,7 +30,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, QMessageBox
 from processing.modeler.ModelerParameterDefinitionDialog import ModelerParameterDefinitionDialog
 from processing.core.parameters import Parameter, ParameterRaster
-from processing_gpf.GPFParameters import ParameterBands 
+from processing_gpf.GPFParameters import ParameterBands
 
 class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
     

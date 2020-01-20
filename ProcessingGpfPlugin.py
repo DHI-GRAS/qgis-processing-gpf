@@ -26,11 +26,11 @@
 ***************************************************************************
 """
 
-from qgis.core import *
-import os, sys
+import os
+import sys
 import inspect
 from processing.core.Processing import Processing
-from processing_gpf.BEAMAlgorithmProvider import BEAMAlgorithmProvider 
+from processing_gpf.BEAMAlgorithmProvider import BEAMAlgorithmProvider
 from processing_gpf.SNAPAlgorithmProvider import SNAPAlgorithmProvider
 
 cmd_folder = os.path.split(inspect.getfile( inspect.currentframe() ))[0]

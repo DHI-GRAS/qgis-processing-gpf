@@ -1,5 +1,5 @@
 import os
-from PyQt4.QtGui import *
+from PyQt4.QtGui import QIcon
 from processing.core.ProcessingConfig import ProcessingConfig, Setting
 from processing.core.AlgorithmProvider import AlgorithmProvider
 from processing.core.ProcessingLog import ProcessingLog

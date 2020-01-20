@@ -27,8 +27,7 @@
 """
 
 import os
-from PyQt4.QtGui import *
-from processing_gpf.GPFUtils import GPFUtils
+from PyQt4.QtGui import QIcon
 from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
 
 # Sentinel-1 Toolbox specific algorithms

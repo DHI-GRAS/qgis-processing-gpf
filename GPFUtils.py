@@ -34,7 +34,7 @@ import subprocess
 import sys
 import logging
 from osgeo import gdal
-from decimal import Decimal 
+from decimal import Decimal
 from processing.tools.system import userFolder, mkdir
 from processing.core.ProcessingConfig import ProcessingConfig
 from processing.core.ProcessingLog import ProcessingLog
