@@ -26,7 +26,8 @@
 ***************************************************************************
 """
 
-from PyQt4.QtGui import QPushButton, QWidget, QVBoxLayout
+from builtins import str
+from qgis.PyQt.QtWidgets import QPushButton, QWidget, QVBoxLayout
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.AlgorithmDialogBase import AlgorithmDialogBase
 from processing_gpf.GPFParametersPanel import GPFParametersPanel
@@ -62,7 +63,7 @@ class GPFParametersDialog(AlgorithmDialog):
             param = self.mainWidget.valueItems[paramName]
             obj = param.getValue()
             if isinstance(obj, QgsRasterLayer):
-                value = unicode(obj.dataProvider().dataSourceUri())
+                value = str(obj.dataProvider().dataSourceUri())
             else:
                 value = param.getValue()
         else:

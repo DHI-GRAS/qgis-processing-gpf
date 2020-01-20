@@ -1,6 +1,6 @@
 from processing.modeler.CreateNewModelAction import CreateNewModelAction
 from processing_gpf.GPFModelerDialog import GPFModelerDialog
-from PyQt4.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 import os
 
 class CreateNewGpfModelAction(CreateNewModelAction):

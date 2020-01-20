@@ -27,7 +27,7 @@
 """
 
 import os
-from PyQt4.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 from processing.core.ProcessingConfig import ProcessingConfig, Setting
 from processing.core.AlgorithmProvider import AlgorithmProvider
 from processing.core.ProcessingLog import ProcessingLog
@@ -62,7 +62,7 @@ class BEAMAlgorithmProvider(AlgorithmProvider):
                         self.preloadedAlgs.append(alg)
                     else:
                         ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
-                except Exception,e:
+                except Exception as e:
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open BEAM algorithm: " + descriptionFile)
         # leave out for now as the functionality is not fully developed
         #self.preloadedAlgs.append(MultinodeGPFCreator())  

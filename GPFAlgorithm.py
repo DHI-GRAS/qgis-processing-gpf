@@ -26,6 +26,7 @@
 ***************************************************************************
 """
 
+from builtins import str
 import importlib
 import os
 import re
@@ -115,7 +116,7 @@ class GPFAlgorithm(GeoAlgorithm):
                 else:
                     self.addOutput(getOutputFromString(line))
                 line = lines.readline().strip("\n").strip()
-            except Exception,e:
+            except Exception as e:
                 ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open GPF algorithm: " +
                                        self.descriptionFile + "\n" + line)
                 raise e

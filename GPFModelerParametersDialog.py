@@ -26,7 +26,8 @@
 ***************************************************************************
 """
 
-from PyQt4.QtGui import QComboBox
+from builtins import str
+from qgis.PyQt.QtWidgets import QComboBox
 from processing.modeler.ModelerParametersDialog import ModelerParametersDialog
 from processing_gpf.GPFParameters import ParameterBands
 
@@ -40,7 +41,7 @@ class GPFModelerParametersDialog(ModelerParametersDialog):
             item.setEditable(True)
             for desc, val in options:
                 item.addItem(desc, val)
-            item.setEditText(unicode(param.default or ""))
+            item.setEditText(str(param.default or ""))
         else:
             item = ModelerParametersDialog.getWidgetFromParameter(self, param)
             

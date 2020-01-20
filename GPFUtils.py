@@ -26,6 +26,8 @@
 ***************************************************************************
 """
 
+from builtins import str
+from builtins import object
 import os
 import platform
 import re
@@ -40,7 +42,7 @@ from processing.core.ProcessingConfig import ProcessingConfig
 from processing.core.ProcessingLog import ProcessingLog
 from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 
-class GPFUtils:
+class GPFUtils(object):
     
     BEAM_FOLDER = "BEAM_FOLDER"
     BEAM_THREADS = "BEAM_THREADS"
@@ -132,8 +134,8 @@ class GPFUtils:
     def modelsFolder():
         folder = ProcessingConfig.getSetting(GPFUtils.GPF_MODELS_FOLDER)
         if folder is None:
-            folder = unicode(os.path.join(userFolder(), 'models'))
-        folder = unicode(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'gpf_models'))
+            folder = str(os.path.join(userFolder(), 'models'))
+        folder = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'gpf_models'))
         mkdir(folder)
         return os.path.abspath(folder)       
     
@@ -302,7 +304,7 @@ class GPFUtils:
                 product = snappy.ProductIO.readProduct(productPath)
                 for band in product.getBands():
                     bands.append(band.getName())
-            except Exception, e:
+            except Exception as e:
                 # Snappy sometimes throws an error on first try but returns band names 
                 # on second try
                 if not secondAttempt:
@@ -333,7 +335,7 @@ class GPFUtils:
                 metadata = jpy.get_type('org.esa.snap.engine_utilities.datamodel.AbstractMetadata').getAbstractedMetadata(product)
                 polarisations = \
                     jpy.get_type('org.esa.s1tbx.insar.gpf.support.Sentinel1Utils').getProductPolarizations(metadata)
-            except Exception, e:
+            except Exception as e:
                 # Snappy sometimes throws an error on first try but returns band names 
                 # on second try
                 if not secondAttempt:

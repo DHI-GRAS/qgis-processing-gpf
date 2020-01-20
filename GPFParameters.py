@@ -27,6 +27,7 @@
 """
 
 
+from builtins import str
 import sys
 from processing.core.parameters import ParameterNumber, ParameterString
 
@@ -36,7 +37,7 @@ def getParameterFromString(s):
     s = s.replace('\\|', barsub)
     tokens = s.split("|")
     tokens = [t.replace(barsub, '|') for t in tokens]
-    params = [t if unicode(t) != "None" else None for t in tokens[1:]]
+    params = [t if str(t) != "None" else None for t in tokens[1:]]
     clazz = getattr(sys.modules[__name__], tokens[0])
     return clazz(*params)
 

@@ -26,8 +26,8 @@
 ***************************************************************************
 """
 
-from PyQt4.QtGui import QGraphicsItem
-from PyQt4.QtCore import QPointF
+from qgis.PyQt.QtWidgets import QGraphicsItem
+from qgis.PyQt.QtCore import QPointF
 from processing.modeler.ModelerArrowItem import ModelerArrowItem
 from processing.modeler.ModelerScene import ModelerScene
 from processing_gpf.GPFModelerGraphicItem import GPFModelerGraphicItem
@@ -40,7 +40,7 @@ class GPFModelerScene(ModelerScene):
     def paintModel(self, model):
         self.model = model
         # Inputs
-        for inp in model.inputs.values():
+        for inp in list(model.inputs.values()):
             item = GPFModelerGraphicItem(inp, model)
             item.setFlag(QGraphicsItem.ItemIsMovable, True)
             item.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -49,7 +49,7 @@ class GPFModelerScene(ModelerScene):
             self.paramItems[inp.param.name] = item
 
         # We add the algs
-        for alg in model.algs.values():
+        for alg in list(model.algs.values()):
             item = GPFModelerGraphicItem(alg, model)
             item.setFlag(QGraphicsItem.ItemIsMovable, True)
             item.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -58,7 +58,7 @@ class GPFModelerScene(ModelerScene):
             self.algItems[alg.name] = item
 
         # And then the arrows
-        for alg in model.algs.values():
+        for alg in list(model.algs.values()):
             idx = 0
             for parameter in alg.algorithm.parameters:
                 if not parameter.hidden:
@@ -83,7 +83,7 @@ class GPFModelerScene(ModelerScene):
                 self.addItem(arrow)
 
         # And finally the outputs
-        for alg in model.algs.values():
+        for alg in list(model.algs.values()):
             outputs = alg.outputs
             outputItems = {}
             idx = 0

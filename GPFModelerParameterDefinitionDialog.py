@@ -26,8 +26,9 @@
 ***************************************************************************
 """
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, QMessageBox
+from builtins import str
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, QMessageBox
 from processing.modeler.ModelerParameterDefinitionDialog import ModelerParameterDefinitionDialog
 from processing.core.parameters import Parameter, ParameterRaster
 from processing_gpf.GPFParameters import ParameterBands
@@ -85,7 +86,7 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
             self.horizontalLayoutDefault.addWidget(QLabel(self.tr('Raster layer')))
             self.parentCombo = QComboBox()
             idx = 0
-            for param in self.alg.inputs.values():
+            for param in list(self.alg.inputs.values()):
                 if isinstance(param.param, (ParameterRaster)):
                     self.parentCombo.addItem(param.param.description, param.param.name)
                     if self.param is not None:
@@ -125,7 +126,7 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
     def okPressed(self):
         if self.paramType == GPFModelerParameterDefinitionDialog.PARAMETER_BANDS or \
            isinstance(self.param, ParameterBands):
-            description = unicode(self.nameTextBox.text())
+            description = str(self.nameTextBox.text())
             if description.strip() == '':
                 QMessageBox.warning(self, self.tr('Unable to define parameter'),
                                     self.tr('Invalid parameter name'))
@@ -148,7 +149,7 @@ class GPFModelerParameterDefinitionDialog(ModelerParameterDefinitionDialog):
                 return
             
             raster = self.parentCombo.itemData(self.parentCombo.currentIndex())
-            default = unicode(self.defaultTextBox.text())
+            default = str(self.defaultTextBox.text())
             self.param = ParameterBands(name, description, default, raster, optional=False)
 
             self.param.optional = self.yesNoCombo.currentIndex() == 1

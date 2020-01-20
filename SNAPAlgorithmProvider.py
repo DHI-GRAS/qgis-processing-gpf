@@ -1,5 +1,6 @@
+from builtins import str
 import os
-from PyQt4.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 from processing.core.ProcessingConfig import ProcessingConfig, Setting
 from processing.core.AlgorithmProvider import AlgorithmProvider
 from processing.core.ProcessingLog import ProcessingLog
@@ -54,7 +55,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
                         self.preloadedAlgs.append(alg)
                     else:
                         ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open " + key + " SNAP generic algorithm: " + descriptionFile)
-                except Exception,e:
+                except Exception as e:
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, str(e))
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open " + key + " generic algorithm: " + descriptionFile)
     
@@ -74,7 +75,7 @@ class SNAPAlgorithmProvider(AlgorithmProvider):
                         else:
                             ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
                                 self.tr('Could not load model %s', 'ModelerAlgorithmProvider') % descriptionFile)
-                    except WrongModelException, e:
+                    except WrongModelException as e:
                         ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
                             self.tr('Could not load model %s\n%s', 'ModelerAlgorithmProvider') % (descriptionFile, e.msg))
                     

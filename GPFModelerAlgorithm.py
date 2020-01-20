@@ -26,6 +26,7 @@
 ***************************************************************************
 """
 
+from builtins import str
 import os
 import copy
 import ast
@@ -43,8 +44,9 @@ from processing.modeler.WrongModelException import WrongModelException
 from processing.gui.Help2Html import getHtmlFromDescriptionsDict
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFParametersDialog import GPFParametersDialog
-from PyQt4.QtCore import QPointF
-from PyQt4.QtGui import QIcon, QMessageBox
+from qgis.PyQt.QtCore import QPointF
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMessageBox
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -94,7 +96,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
     def getCopy(self):
         newone = GPFModelerAlgorithm(self.provider)
         newone.algs = {}
-        for algname, alg in self.algs.iteritems():
+        for algname, alg in self.algs.items():
             newone.algs[algname] = Algorithm()
             newone.algs[algname].__dict__.update(copy.deepcopy(alg.todict()))
         newone.inputs = copy.deepcopy(self.inputs)
@@ -131,7 +133,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
             self.defineCharacteristics()
         
         # Set the connections between nodes    
-        for alg in self.algs.values():
+        for alg in list(self.algs.values()):
             for output in alg.algorithm.outputs:
                 output.setValue(alg.algorithm.nodeID)
             for param in alg.params:
@@ -139,7 +141,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                     alg.algorithm.getParameterFromName(param).setValue(self.algs[alg.params[param].alg].algorithm.nodeID)
                 
         # Save model algorithms
-        for alg in self.algs.values():
+        for alg in list(self.algs.values()):
             self.prepareAlgorithm(alg)
             
             graph = alg.algorithm.addGPFNode(graph)
@@ -164,9 +166,9 @@ class GPFModelerAlgorithm (GeoAlgorithm):
             # They are saved as attributes of relevant parameter XML nodes.
             # This way they do not interfere with the model when it's opened
             # in SNAP.
-            for param in alg.params.keys():
+            for param in list(alg.params.keys()):
                 paramValue = str(alg.params[param])
-                if paramValue in self.inputs.keys():
+                if paramValue in list(self.inputs.keys()):
                     # Only Read operators can read raster inputs
                     if re.match("sourceProduct\d*", param) and alg.algorithm.operator != "Read":
                         QMessageBox.warning(None, self.tr('Unable to save model'),
@@ -181,7 +183,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         # Save model layout
         presentation = ET.SubElement(graph, "applicationData", {"id":"Presentation", "name":self.name, "group":self.group})
         ET.SubElement(presentation, "Description")
-        for alg in self.algs.values():
+        for alg in list(self.algs.values()):
             node = ET.SubElement(presentation, "node", {"id":alg.algorithm.nodeID})
             ET.SubElement(node, "displayPosition", {"x":str(alg.pos.x()), "y":str(alg.pos.y())})     
         
@@ -287,7 +289,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                         # the main raster output from the graph. This is used in case
                         # the graph comes straight from SNAP and the Write operator
                         # does not have a QGIS OutputRaster.    
-                        if operator == "Write" and not "file" in modelAlg.outputs.keys():
+                        if operator == "Write" and not "file" in list(modelAlg.outputs.keys()):
                             modelOutput = ModelerOutput("Output file")
                             modelOutput.pos = QPointF(0, 0)
                             modelAlg.outputs["file"] = modelOutput
@@ -299,7 +301,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                
                 # Set up connections between nodes of the graph
                 for connection in modelConnections:
-                    for alg in model.algs.values():
+                    for alg in list(model.algs.values()):
                         if alg.description == connection[0]:
                             modelAlg = connection[1]
                             paramName = connection[2]
@@ -308,10 +310,10 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                 
                 presentation = root.find('applicationData[@id="Presentation"]')
                 # Set the model name and group
-                model.name = presentation.attrib["name"] if "name" in presentation.attrib.keys() else os.path.splitext(os.path.basename(filename))[0]
-                model.group = presentation.attrib["group"] if "group" in presentation.attrib.keys() else "Uncategorized"
+                model.name = presentation.attrib["name"] if "name" in list(presentation.attrib.keys()) else os.path.splitext(os.path.basename(filename))[0]
+                model.group = presentation.attrib["group"] if "group" in list(presentation.attrib.keys()) else "Uncategorized"
                 # Place the nodes on the graph canvas
-                for alg in model.algs.values():
+                for alg in list(model.algs.values()):
                     position = presentation.find('node[@id="'+alg.description+'"]/displayPosition')
                     if position is not None:
                         alg.pos = QPointF(float(position.attrib["x"]), float(position.attrib["y"])) 
@@ -322,7 +324,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                         if alg in outConnections:
                             outConnections[alg].pos = QPointF(alg.pos.x()+50, alg.pos.y()+50)     
                 return model
-        except Exception, e:
+        except Exception as e:
             raise WrongModelException("Error reading GPF XML file: "+str(e))
         
         
@@ -336,14 +338,14 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                    ParameterBoolean, ParameterString, ParameterNumber]
         self.parameters = []
         for c in classes:
-            for inp in self.inputs.values():
+            for inp in list(self.inputs.values()):
                 if isinstance(inp.param, c):
                     self.parameters.append(inp.param)
-        for inp in self.inputs.values():
+        for inp in list(self.inputs.values()):
             if inp.param not in self.parameters:
                 self.parameters.append(inp.param)
         self.outputs = []
-        for alg in self.algs.values():
+        for alg in list(self.algs.values()):
             if alg.active:
                 for out in alg.outputs:
                     modelOutput = copy.deepcopy(alg.algorithm.getOutputFromName(out))
@@ -364,7 +366,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
     
     def getNameForAlgorithm(self, alg):
         i = 1
-        while alg.consoleName.upper().replace(":", "") + "_" + str(i) in self.algs.keys():
+        while alg.consoleName.upper().replace(":", "") + "_" + str(i) in list(self.algs.keys()):
             i += 1
         return alg.consoleName.upper().replace(":", "") + "_" + str(i)
     
@@ -403,8 +405,8 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         """This method returns True if some other element depends on
         the passed one.
         """
-        for alg in self.algs.values():
-            for value in alg.params.values():
+        for alg in list(self.algs.values()):
+            for value in list(alg.params.values()):
                 if value is None:
                     continue
                 if isinstance(value, list):
@@ -431,7 +433,7 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         alg = self.algs[name]
         algs = set()
         algs.update(set(alg.dependencies))
-        for value in alg.params.values():
+        for value in list(alg.params.values()):
             if value is None:
                 continue
             if isinstance(value, list):
@@ -452,8 +454,8 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         """
         algs = set()
         algs.add(name)
-        for alg in self.algs.values():
-            for value in alg.params.values():
+        for alg in list(self.algs.values()):
+            for value in list(alg.params.values()):
                 if value is None:
                     continue
                 if isinstance(value, list):
@@ -466,12 +468,12 @@ class GPFModelerAlgorithm (GeoAlgorithm):
         return algs
 
     def setPositions(self, paramPos, algPos, outputsPos):
-        for param, pos in paramPos.iteritems():
+        for param, pos in paramPos.items():
             self.inputs[param].pos = pos
-        for alg, pos in algPos.iteritems():
+        for alg, pos in algPos.items():
             self.algs[alg].pos = pos
-        for alg, positions in outputsPos.iteritems():
-            for output, pos in positions.iteritems():
+        for alg, positions in outputsPos.items():
+            for output, pos in positions.items():
                 self.algs[alg].outputs[output].pos = pos
                 
     def prepareAlgorithm(self, alg):

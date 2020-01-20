@@ -1,9 +1,11 @@
+from builtins import str
+from builtins import range
 import sys
 from processing.core.outputs import OutputRaster
 
 def getOutputFromString(s):
     tokens = s.split("|")
-    params = [t if unicode(t) != "None" else None for t in tokens[1:]]
+    params = [t if str(t) != "None" else None for t in tokens[1:]]
     clazz = getattr(sys.modules[__name__], tokens[0])
     return clazz(*params)
 

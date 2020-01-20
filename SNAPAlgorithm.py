@@ -26,8 +26,9 @@
 ***************************************************************************
 """
 
+from builtins import str
 import os
-from PyQt4.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsCoordinateReferenceSystem
 from xml.etree.ElementTree import SubElement
 from processing_gpf.GPFUtils import GPFUtils

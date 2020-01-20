@@ -26,10 +26,11 @@
 ***************************************************************************
 """
 
+from builtins import str
 import sys
 import codecs
-from PyQt4.QtCore import Qt, QPoint, QPointF, QRectF
-from PyQt4.QtGui import QMessageBox, QTreeWidgetItem, QFileDialog
+from qgis.PyQt.QtCore import Qt, QPoint, QPointF, QRectF
+from qgis.PyQt.QtWidgets import QMessageBox, QTreeWidgetItem, QFileDialog
 from processing.modeler.ModelerDialog import ModelerDialog, TreeAlgorithmItem
 from processing.gui.HelpEditionDialog import HelpEditionDialog
 from processing.gui.AlgorithmDialog import AlgorithmDialog
@@ -80,13 +81,13 @@ class GPFModelerDialog(ModelerDialog):
 
         self.algorithmTree.sortItems(0, Qt.AscendingOrder)
 
-        text = unicode(self.searchBox.text())
+        text = str(self.searchBox.text())
         if text != '':
             self.algorithmTree.expandAll()
             
     def fillAlgorithmTreeUsingProviders(self):
         self.algorithmTree.clear()
-        text = unicode(self.searchBox.text())
+        text = str(self.searchBox.text())
         groups = {}
         
         # Add only GPF algorithms
@@ -112,11 +113,11 @@ class GPFModelerDialog(ModelerDialog):
                     self.gpfAlgorithmProvider.getDescription())
             providerItem.setIcon(0,
                     self.gpfAlgorithmProvider.getIcon())
-            for groupItem in groups.values():
+            for groupItem in list(groups.values()):
                 providerItem.addChild(groupItem)
             self.algorithmTree.addTopLevelItem(providerItem)
             providerItem.setExpanded(text != '')
-            for groupItem in groups.values():
+            for groupItem in list(groups.values()):
                 if text != '':
                     groupItem.setExpanded(True)
 
@@ -139,7 +140,7 @@ class GPFModelerDialog(ModelerDialog):
                 self.hasChanged = True
         
     def openModel(self):
-        filename = unicode(QFileDialog.getOpenFileName(self,
+        filename, __ = str(QFileDialog.getOpenFileName(self,
                            self.tr('Open GPF Model'), GPFUtils.modelsFolder(),
                            self.tr('GPF models (*.xml *.XML)')))
         if filename:
@@ -154,13 +155,13 @@ class GPFModelerDialog(ModelerDialog):
                 self.view.centerOn(0, 0)
                 self.hasChanged = False
                 
-            except WrongModelException, e:
+            except WrongModelException as e:
                 ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
                     self.tr('Could not load model %s\n%s') % (filename, e.msg))
                 QMessageBox.critical(self, self.tr('Could not open model'),
                         self.tr('The selected model could not be loaded.\n'
                                 'See the log for more information.'))
-            except Exception, e:
+            except Exception as e:
                 ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
                     self.tr('Could not load model %s\n%s') % (filename, e.args[0]))
                 QMessageBox.critical(self, self.tr('Could not open model'),
@@ -168,18 +169,18 @@ class GPFModelerDialog(ModelerDialog):
                             'See the log for more information.'))
             
     def saveModel(self, saveAs):
-        if unicode(self.textGroup.text()).strip() == '' \
-                or unicode(self.textName.text()).strip() == '':
+        if str(self.textGroup.text()).strip() == '' \
+                or str(self.textName.text()).strip() == '':
             QMessageBox.warning(
                 self, self.tr('Warning'), self.tr('Please enter group and model names before saving')
             )
             return
-        self.alg.name = unicode(self.textName.text())
-        self.alg.group = unicode(self.textGroup.text())
+        self.alg.name = str(self.textName.text())
+        self.alg.group = str(self.textGroup.text())
         if self.alg.descriptionFile is not None and not saveAs:
             filename = self.alg.descriptionFile
         else:
-            filename = unicode(QFileDialog.getSaveFileName(self,
+            filename, __ = str(QFileDialog.getSaveFileName(self,
                                self.tr('Save GPF Model'),
                                GPFUtils.modelsFolder(),
                                self.tr('GPF models (*.xml)')))
@@ -196,7 +197,7 @@ class GPFModelerDialog(ModelerDialog):
             except:
                 if saveAs:
                     QMessageBox.warning(self, self.tr('I/O error'),
-                            self.tr('Unable to save edits. Reason:\n %s') % unicode(sys.exc_info()[1]))
+                            self.tr('Unable to save edits. Reason:\n %s') % str(sys.exc_info()[1]))
                 else:
                     QMessageBox.warning(self, self.tr("Can't save model"),
                             self.tr("This model can't be saved in its "

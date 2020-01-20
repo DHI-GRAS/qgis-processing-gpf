@@ -26,10 +26,12 @@
 ***************************************************************************
 """
 
+from builtins import str
+from builtins import range
 from processing.gui.ParametersPanel import ParametersPanel
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFParameters import ParameterBands, ParameterPolarisations, ParameterPixelSize
-from PyQt4 import QtGui, QtCore
+from qgis.PyQt import QtGui, QtCore
 
 # GPF parameters panel is the same as normal parameters panel except
 # it can also handle ParameterBands, ParameterPolarisations and 
@@ -113,7 +115,7 @@ class S1TbxPixelSizeInputDialog(QtGui.QDialog):
     def setTableContent(self):
         self.table.setRowCount(len(self.pixelSizes))
         i=0
-        for k,v in self.pixelSizes.items():
+        for k,v in list(self.pixelSizes.items()):
             item = QtGui.QLineEdit()
             item.setReadOnly(True)
             text = str(k).strip() + ":\t\t" + str(v).strip()

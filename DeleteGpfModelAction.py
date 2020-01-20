@@ -1,5 +1,5 @@
 import os
-from PyQt4.QtGui import QMessageBox
+from qgis.PyQt.QtWidgets import QMessageBox
 from processing.gui.ContextAction import ContextAction
 from processing_gpf.GPFModelerAlgorithm import GPFModelerAlgorithm
 
