@@ -27,66 +27,101 @@
 """
 
 import os
+
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtGui import QIcon
+from qgis.core import Qgis, QgsProcessingProvider, QgsMessageLog
 from processing.core.ProcessingConfig import ProcessingConfig, Setting
-from processing.core.AlgorithmProvider import AlgorithmProvider
-from processing.core.ProcessingLog import ProcessingLog
+
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.BEAMAlgorithm import BEAMAlgorithm
 
 
-class BEAMAlgorithmProvider(AlgorithmProvider):
+class BEAMAlgorithmProvider(QgsProcessingProvider):
 
+    activateSetting = "ACTIVATE_BEAM"
+    
     def __init__(self):
-        AlgorithmProvider.__init__(self)
+        QgsProcessingProvider.__init__(self)
         self.activate = False
-        self.createAlgsList()  # preloading algorithms to speed up
+        self.algs = []
 
-    def initializeSettings(self):
-        AlgorithmProvider.initializeSettings(self)
-        ProcessingConfig.addSetting(Setting(self.getDescription(),
+    def load(self):
+        ProcessingConfig.settingIcons[self.name()] = self.icon()
+        ProcessingConfig.addSetting(Setting(self.name(), self.activateSetting,
+                                            self.tr('Activate'), True))
+        ProcessingConfig.addSetting(Setting(self.name(),
                                             GPFUtils.BEAM_FOLDER,
-                                            "BEAM install directory",
+                                            self.tr("BEAM install directory"),
                                             GPFUtils.programPath(GPFUtils.beamKey())))
-        ProcessingConfig.addSetting(Setting(self.getDescription(),
+        ProcessingConfig.addSetting(Setting(self.name(),
                                             GPFUtils.BEAM_THREADS,
-                                            "Maximum number of parallel (native) threads",
+                                            self.tr("Maximum number of parallel (native) threads"),
                                             4))
+        ProcessingConfig.readSettings()
+        self.refreshAlgorithms()
+        return True
 
     def unload(self):
-        AlgorithmProvider.unload(self)
+        ProcessingConfig.removeSetting(self.activateSetting)
         ProcessingConfig.removeSetting(GPFUtils.BEAM_FOLDER)
         ProcessingConfig.removeSetting(GPFUtils.BEAM_THREADS)
 
+    def isActive(self):
+        return ProcessingConfig.getSetting(self.activateSetting)
+
+    def setActive(self, active):
+        ProcessingConfig.setSettingValue(self.activateSetting, active)
+
     def createAlgsList(self):
-        self.preloadedAlgs = []
+        algs = []
         folder = GPFUtils.gpfDescriptionPath(GPFUtils.beamKey())
         for descriptionFile in os.listdir(folder):
             if descriptionFile.endswith("txt"):
                 try:
                     alg = BEAMAlgorithm(os.path.join(folder, descriptionFile))
-                    if alg.name.strip() != "":
-                        self.preloadedAlgs.append(alg)
+                    if alg.name().strip() != "":
+                        algs.append(alg)
                     else:
-                        ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
-                                               "Could not open BEAM algorithm: " + descriptionFile)
+                        QgsMessageLog.logMessage(
+                                self.tr("Could not open BEAM algorithm: " + descriptionFile),
+                                self.tr("Processing"),
+                                Qgis.Critical)
                 except Exception as e:
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
-                                           "Could not open BEAM algorithm: " + descriptionFile)
-        # leave out for now as the functionality is not fully developed
-        # self.preloadedAlgs.append(MultinodeGPFCreator())
+                    QgsMessageLog.logMessage(self.tr(str(e)), self.tr("Processing"), Qgis.Critical)
+                    QgsMessageLog.logMessage(
+                                self.tr("Could not open BEAM algorithm: " + descriptionFile),
+                                self.tr("Processing"),
+                                Qgis.Critical)
+        return algs
 
-    def getDescription(self):
+    def longName(self):
         return "BEAM (Envisat image analysis)"
 
-    def getName(self):
+    def name(self):
+        return "BEAM"
+
+    def id(self):
         return "beam"
 
-    def getIcon(self):
+    def helpId(self):
+        return "beam"
+
+    def icon(self):
         return QIcon(os.path.dirname(__file__) + "/images/beam.png")
 
-    def _loadAlgorithms(self):
-        self.algs = self.preloadedAlgs
+    def loadAlgorithms(self):
+        self.algs = self.createAlgsList()
+        for a in self.algs:
+            self.addAlgorithm(a)
 
-    def getSupportedOutputRasterLayerExtensions(self):
+    def supportedOutputRasterLayerExtensions(self):
         return ["tif", "dim"]
+
+    def supportsNonFileBasedOutput(self):
+        return False
+
+    def tr(self, string, context=''):
+        if context == '':
+            context = 'Grass7AlgorithmProvider'
+        return QCoreApplication.translate(context, string)
