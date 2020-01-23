@@ -120,7 +120,7 @@ class SNAPAlgorithmProvider(QgsProcessingProvider):
                                 Qgis.Critical)
 
     def longName(self):
-        return GPFUtils.providerDescription()
+        return "SNAP Toolbox (Sentinel Application Platform)"
 
     def name(self):
         return "SNAP"

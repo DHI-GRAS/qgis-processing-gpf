@@ -16,7 +16,7 @@
 * by the Free Software Foundation, either version 3 of the License,       *
 * or (at your option) any later version.                                  *
 *                                                                         *
-* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY * 
+* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY *
 * WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
 * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
 * for more details.                                                       *
@@ -37,10 +37,11 @@ import sys
 import logging
 from osgeo import gdal
 from decimal import Decimal
+
+from qgis.core import Qgis, QgsMessageLog, QgsProcessingException
+from qgis.PyQt.QtCore import QCoreApplication
 from processing.tools.system import userFolder, mkdir
 from processing.core.ProcessingConfig import ProcessingConfig
-from processing.core.ProcessingLog import ProcessingLog
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 
 
 class GPFUtils(object):
@@ -75,17 +76,13 @@ class GPFUtils(object):
         return "SNAP"
 
     @staticmethod
-    def providerDescription():
-        return "SNAP Toolbox (Sentinel Application Platform)"
-
-    @staticmethod
     def getKeyFromProviderName(providerName):
         if providerName == "beam":
             return GPFUtils.beamKey()
         elif providerName == "snap":
             return GPFUtils.snapKey()
         else:
-            raise GeoAlgorithmExecutionException("Invalid GPF provider name!")
+            raise QgsProcessingException("Invalid GPF provider name!")
 
     @staticmethod
     def programPath(key):
@@ -96,7 +93,7 @@ class GPFUtils(object):
         else:
             folder = None
 
-        if folder == None:
+        if folder is None:
             folder = ""
         return folder
 
@@ -147,14 +144,15 @@ class GPFUtils(object):
         elif key == GPFUtils.snapKey():
             loglines.append("SNAP execution console output")
         else:
-            ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Unknown GPF algorithm provider")
+            QgsMessageLog.logMessage(GPFUtils.tr("Unknown GPF algorithm provider"),
+                                     GPFUtils.tr("Processing"),
+                                     Qgis.Critical)
             return
 
         # save gpf to temporary file
-        gpfFile = open(tempfile.gettempdir() + os.sep + "gpf.xml", 'w')
-        gpfFile.write(gpf)
-        gpfPath = gpfFile.name
-        gpfFile.close()
+        with open(tempfile.gettempdir() + os.sep + "gpf.xml", 'w') as gpfFile:
+            gpfFile.write(gpf)
+            gpfPath = gpfFile.name
 
         # execute the gpf
         if key == GPFUtils.beamKey():
@@ -165,7 +163,7 @@ class GPFUtils(object):
                 batchFile = "gpt.sh"
             try:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.BEAM_THREADS)))
-            except:
+            except ValueError:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, "bin",
                                os.sep, batchFile, "\" \"", gpfPath, "\" -e", " -q ", str(threads)])
@@ -174,55 +172,52 @@ class GPFUtils(object):
             batchFile = os.path.join("bin", "gpt")
             try:
                 threads = int(float(ProcessingConfig.getSetting(GPFUtils.SNAP_THREADS)))
-            except:
+            except ValueError:
                 threads = 4
             command = ''.join(["\"", GPFUtils.programPath(key), os.sep, batchFile,
                                "\" \"", gpfPath, "\" -e", " -q ", str(threads)])
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
-                                stdin=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True).stdout
+                                stdin=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                universal_newlines=True).stdout
+        progress.pushCommandInfo(command)
         line = ""
         for char in iter((lambda: proc.read(1)), ''):
             line += char
             if "\n" in line:
                 loglines.append(line)
-                progress.setConsoleInfo(line)
-                # force refresh of the execution dialog
-                try:
-                    progress.repaint()
-                except:
-                    pass
+                if re.search("Error: ", line):
+                    progress.reportError(line)
+                else:
+                    progress.pushConsoleInfo(line)
                 line = ""
-            # show progress during S1 Toolbox executions
-            m = re.search("\.(\d{2,3})\%$", line)
+            # show progress during SNAP executions
+            m = re.search("(\d{2,3})\%$", line)
             if m:
-                progress.setPercentage(int(m.group(1)))
-                # force refresh of the execution dialog
-                try:
-                    progress.repaint()
-                except:
-                    pass
+                progress.setProgress(int(m.group(1)))
+                line = ""
 
-        progress.setPercentage(100)
-        ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
+        progress.setProgress(100)
+        QgsMessageLog.logMessage("".join(loglines), GPFUtils.tr("Processing"), Qgis.Info)
 
     # Get the bands names by calling a java program that uses BEAM functionality
     @staticmethod
     def getBeamBandNames(filename, programKey, appendProductName=False):
         bands = []
         bandDelim = "__band:"
-        if filename == None:
+        if filename is None:
             filename = ""
         else:
             filename = str(filename)    # in case it's a QString
         if programKey == GPFUtils.beamKey():
-            if not os.path.exists(os.path.join(os.path.dirname(__file__), "processing_beam_java", "listBeamBands.class")):
+            if not os.path.exists(os.path.join(os.path.dirname(__file__), "processing_beam_java",
+                                               "listBeamBands.class")):
                 bands = ['Missing Java class file', 'See '+os.path.join(os.path.dirname(
                     __file__), "processing_beam_java", "README.txt")+' for more details']
             else:
-                command = "\""+os.path.dirname(__file__)+os.sep+"processing_beam_java"+os.sep+"listBeamBands.bat\" "+"\"" + \
-                          GPFUtils.programPath(programKey)+os.sep+"\" "+"\""+filename + \
-                          "\" "+bandDelim+" "+str(appendProductName)
+                command = "\""+os.path.dirname(__file__)+os.sep+"processing_beam_java"+os.sep+\
+                          "listBeamBands.bat\" "+"\"" + GPFUtils.programPath(programKey)+os.sep+\
+                          "\" "+"\""+filename+"\" "+bandDelim+" "+str(appendProductName)
                 proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                         stdin=subprocess.PIPE, stderr=subprocess.STDOUT,
                                         universal_newlines=True).stdout
@@ -240,7 +235,7 @@ class GPFUtils(object):
     @staticmethod
     def importSnappy():
         snappyPath = os.path.join(os.path.expanduser("~"), ".snap", "snap-python")
-        if not snappyPath in sys.path:
+        if snappyPath not in sys.path:
             sys.path.append(snappyPath)
 
         try:
@@ -251,15 +246,18 @@ class GPFUtils(object):
             import snappy
             import jpy
             return snappy, jpy
-        except:
-            ProcessingLog.addToLog(
-                ProcessingLog.LOG_ERROR, 'Python module snappy is not installed in the user directory. Please run SNAP installer')
+        except Exception:
+            QgsMessageLog.logMessage(
+                GPFUtils.tr("Python module snappy is not installed in the user directory." +
+                            " Please run SNAP installer"),
+                GPFUtils.tr("Processing"),
+                Qgis.Critical)
             return None, None
 
     # Special functionality for S1 Toolbox terrain-correction
     # Get the SAR image pixel sizes by using snappy functionality
     @staticmethod
-    def getS1TbxPixelSize(filename, programKey):
+    def getS1TbxPixelSize(filename):
 
         # The value which S1 Toolbox uses to convert resolution from meters to degrees
         # As far as I can see it's independent of the geographical location and is used for
@@ -268,7 +266,7 @@ class GPFUtils(object):
 
         pixelSpacingDict = {}
 
-        if filename == None:
+        if filename is None:
             return pixelSpacingDict
 
         snappy, jpy = GPFUtils.importSnappy()
@@ -326,7 +324,9 @@ class GPFUtils(object):
                     bands = GPFUtils.getSnapBandNames(productPath, secondAttempt=True)
                 else:
                     bands = ['Snappy exception', 'See Processing log for more details']
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Snappy exception: "+str(e))
+                    QgsMessageLog.logMessage(GPFUtils.tr("Snappy exception: ")+str(e),
+                                             GPFUtils.tr("Processing"),
+                                             Qgis.Critical)
         else:
             bands = ['Python module snappy is not installed in the user directory',
                      'Please run SNAP installer']
@@ -362,8 +362,8 @@ class GPFUtils(object):
                     polarisations = ['Snappy exception', 'See Processing log for more details']
                     ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Snappy exception: "+str(e))
         else:
-            polarisations = [
-                'Python module snappy is not installed in the user directory', 'Please run SNAP installer']
+            polarisations = ['Python module snappy is not installed in the user directory',
+                             'Please run SNAP installer']
 
         logging.disable(logging.NOTSET)
         return polarisations
@@ -384,9 +384,7 @@ class GPFUtils(object):
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
 
-    # GDAL has ability to open S1 and S2 data since version 2.1. However, GDAL has
-    # different opening options than SNAP (e.g. SNAP can open S1 manifest.safe files and
-    # zipped S1 files, while GDAL can open manifest.safe and .SAFE directory), and sometimes
+    # GDAL has ability to open S1 and S2 data since version 2.1. However, GDAL sometimes
     # prepends or postpends text to the file path (especially in case of S2 images with
     # sub-datasets). Those discrepancies have to be resolved before the path can be used in
     # a SNAP GPF graph.
@@ -394,31 +392,26 @@ class GPFUtils(object):
     def gdalPathToSnapPath(gdalPath):
         snapPath = gdalPath
         dataFormat = ""
-
-        # Sentinel-1 data
-        # SNAP can't open .SAFE directories
-        if gdalPath.endswith(".SAFE") and not gdalPath.endswith("manifest.safe") and os.path.exists(gdalPath):
-            snapPath = os.path.join(gdalPath, "manifest.safe")
         # Sentinel-2 data
         # The path to S2 XML file and data format has to be extracted from GDAL path string.
-        else:
-            match = re.match(
-                "SENTINEL2_L[123][ABC](_TILE)?:(/vsizip/)?(.[:]?[^:]+):([^:]*):?(.*)", gdalPath)
-            if match:
-                isZipped = match.group(2)
-                path = match.group(3)
-                res = match.group(4)
-                proj = match.group(5)
-                if isZipped:
-                    snapPath = "Error: SNAP cannot process zipped Sentinel-2 datasets. Please extract the archive before processing."
-                else:
-                    if not proj:
-                        f = gdal.Open(gdalPath, gdal.GA_ReadOnly)
-                        proj = f.GetProjection()
-                        proj = "EPSG_" + \
-                            re.search('AUTHORITY\[\"EPSG\",\"([0-9]{5})\"\]\]$', proj).group(1)
-                        f = None
-                    snapPath = path
-                    hemisphere = "N" if proj[7] == '6' else "S"
-                    dataFormat = "SENTINEL-2-MSI-MultiRes-UTM"+proj[8:10]+hemisphere
+        match = re.match(
+            "SENTINEL2_L[123][ABC](_TILE)?:(/vsizip/)?(.[:]?[^:]+):([^:]*):?(.*)", gdalPath)
+        if match:
+            path = match.group(3)
+            proj = match.group(5)
+            if not proj:
+                f = gdal.Open(gdalPath, gdal.GA_ReadOnly)
+                proj = f.GetProjection()
+                proj = "EPSG_" + \
+                    re.search('AUTHORITY\[\"EPSG\",\"([0-9]{5})\"\]\]$', proj).group(1)
+                f = None
+            snapPath = path
+            hemisphere = "N" if proj[7] == '6' else "S"
+            dataFormat = "SENTINEL-2-MSI-MultiRes-UTM"+proj[8:10]+hemisphere
         return snapPath, dataFormat
+
+    @staticmethod
+    def tr(string, context=''):
+        if context == '':
+            context = 'Grass7Utils'
+        return QCoreApplication.translate(context, string)
