@@ -38,13 +38,10 @@ class BEAMAlgorithm(GPFAlgorithm):
         GPFAlgorithm.__init__(self, descriptionfile)
         self.programKey = GPFUtils.beamKey()
 
-    def processAlgorithm(self, progress):
-        GPFAlgorithm.processAlgorithm(self, GPFUtils.beamKey(), progress)
+    def helpUrl(self):
+        GPFAlgorithm.helpUrl(self, GPFUtils.beamKey())
 
-    def helpFile(self):
-        GPFAlgorithm.helpFile(self, GPFUtils.beamKey())
-
-    def getIcon(self):
+    def icon(self):
         return QIcon(os.path.dirname(__file__) + "/images/beam.png")
 
     def getCopy(self):

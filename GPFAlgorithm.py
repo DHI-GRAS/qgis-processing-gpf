@@ -27,7 +27,6 @@
 """
 
 from builtins import str
-import importlib
 import os
 import re
 try:
@@ -35,24 +34,21 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
-from processing.core.GeoAlgorithm import GeoAlgorithm
-from processing.core.parameters import ParameterFile
-from processing.core.parameters import ParameterRaster
-from processing.core.parameters import ParameterBoolean
-from processing.core.parameters import ParameterSelection
-from processing.core.parameters import ParameterExtent
+from qgis.PyQt.QtCore import QCoreApplication, QUrl
+from qgis.core import (Qgis,
+                       QgsProcessingAlgorithm,
+                       QgsProcessingParameterRasterLayer,
+                       QgsProcessingParameterEnum,
+                       QgsProcessingParameterExtent,
+                       QgsMessageLog,
+                       QgsProcessingException)
 from processing.core.parameters import getParameterFromString
-from processing.core.outputs import getOutputFromString
-from processing.core.ProcessingLog import ProcessingLog
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
 
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.GPFParametersDialog import GPFParametersDialog
 from processing_gpf import GPFParameters
-from processing_gpf import GPFRasterOutput
 
 
-class GPFAlgorithm(GeoAlgorithm):
+class GPFAlgorithm(QgsProcessingAlgorithm):
 
     OUTPUT_EXTENT = "OUTPUT_EXTENT"
 
@@ -63,66 +59,86 @@ class GPFAlgorithm(GeoAlgorithm):
     nodeIDNum = 0
 
     def __init__(self, descriptionfile):
-        GeoAlgorithm.__init__(self)
-        self.multipleRasterInput = False
+        QgsProcessingAlgorithm.__init__(self)
+        self._name = ''
+        self._display_name = ''
+        self._short_description = ''
+        self._group = ''
+        self._groupId = ''
+        self.groupIdRegex = re.compile(r'^[^\s\(]+')
         self.descriptionFile = descriptionfile
         self.defineCharacteristicsFromFile()
         self.nodeID = ""+self.operator+"_"+str(GPFAlgorithm.nodeIDNum)
         GPFAlgorithm.nodeIDNum += 1
         self.previousAlgInGraph = None
+        self.programKey = GPFUtils.snapKey()
+        
 
-    def helpFile(self, key):
+    def createInstance(self):
+        return self.__class__(self.descriptionFile)
+
+    def name(self):
+        return self._name
+
+    def displayName(self):
+        return self._display_name
+
+    def shortDescription(self):
+        return self._short_description
+
+    def group(self):
+        return self._group
+
+    def groupId(self):
+        return self._groupId
+
+    def flags(self):
+        # TODO - maybe it's safe to background thread this?
+        return super().flags() | QgsProcessingAlgorithm.FlagNoThreading | QgsProcessingAlgorithm.FlagDisplayNameIsLiteral
+
+    def helpUrl(self, key):
         folder = GPFUtils.gpfDocPath(key)
         if str(folder).strip() != "":
             helpfile = os.path.join(str(folder), self.operator + ".html")
-            return helpfile
+            return QUrl.fromLocalFile(helpfile).toString
         return None
 
-    # GPF parameters dialog is the same as normal parameters dialog except
-    # it can handle special GPF parameters.
-    def getCustomParametersDialog(self):
-        return GPFParametersDialog(self)
+    def initAlgorithm(self, config=None):
+        pass
 
     def defineCharacteristicsFromFile(self):
-        lines = open(self.descriptionFile)
-        line = lines.readline().strip("\n").strip()
-        self.operator = line
-        line = lines.readline().strip("\n").strip()
-        self.description = line
-        line = lines.readline().strip("\n").strip()
-        self.name = line
-        line = lines.readline().strip("\n").strip()
-        self.group = line
-        line = lines.readline().strip("\n").strip()
-        while line != "":
-            try:
-                if line.startswith("Parameter"):
-                    try:
-                        # Initialize GPF specific parameters ...
-                        param = GPFParameters.getParameterFromString(line)
-                    except AttributeError:
+        with open(self.descriptionFile) as lines:
+            line = lines.readline().strip("\n").strip()
+            self.operator = line
+            self._display_name = self.tr(line)
+            line = lines.readline().strip("\n").strip()
+            self._name = self.tr(line)
+            line = lines.readline().strip("\n").strip()
+            self._short_description = self.tr(line)
+            line = lines.readline().strip("\n").strip()
+            self._group = self.tr(line)
+            self._groupId = self.groupIdRegex.search(line).group(0).lower()
+            line = lines.readline().strip("\n").strip()
+            while line != "":
+                try:
+                    # Initialize GPF specific parameters ...
+                    param = GPFParameters.getParameterFromString(line)
+                    if param is None:
                         # ... and generic Processing parameters
-                        param = getParameterFromString(line)
-                    self.addParameter(param)
-                elif line.startswith("*Parameter"):
-                    try:
-                        param = GPFParameters.getParameterFromString(line[1:])
-                    except AttributeError:
-                        param = getParameterFromString(line[1:])
-                    param.isAdvanced = True
-                    self.addParameter(param)
-                elif line.startswith("OutputRaster"):
-                    self.addOutput(GPFRasterOutput.getOutputFromString(line))
-                else:
-                    self.addOutput(getOutputFromString(line))
-                line = lines.readline().strip("\n").strip()
-            except Exception as e:
-                ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Could not open GPF algorithm: " +
-                                       self.descriptionFile + "\n" + line)
-                raise e
-        lines.close()
+                        param = getParameterFromString(line, "SnapAlgorithm")
+                    if param is not None:
+                        # We use createOutput argument for automatic output creation
+                        self.addParameter(param, True)
+                    line = lines.readline().strip("\n").strip()
+                except Exception as e:
+                    QgsMessageLog.logMessage(
+                            self.tr("Could not open GPF algorithm: " + self.descriptionFile +
+                                    "\n" + line),
+                            self.tr("Processing"),
+                            Qgis.Critical)
+                    raise e
 
-    def addGPFNode(self, graph):
+    def addGPFNode(self, parameters, graph, context):
         # If there are previous nodes that should be added to the graph, recursively go backwards
         # and add them
         if self.previousAlgInGraph is not None:
@@ -138,48 +154,51 @@ class GPFAlgorithm(GeoAlgorithm):
 
         parametersNode = ET.SubElement(node, "parameters")
 
-        for param in self.parameters:
+        noOutputs = [o for o in self.parameterDefinitions() if o not in
+                     self.destinationParameterDefinitions()]
+        for param in noOutputs:
 
             # add a source product
-            if isinstance(param, ParameterRaster):
-                if param.value:
-                    param.value, dataFormat = GPFUtils.gdalPathToSnapPath(param.value)
-                    if param.value.startswith("Error:"):
-                        raise GeoAlgorithmExecutionException(param.value)
+            if isinstance(param, QgsProcessingParameterRasterLayer):
+                value = self.parameterAsRasterLayer(parameters, param.name(), context).source()
+                if value:
+                    value, dataFormat = GPFUtils.gdalPathToSnapPath(value)
+                    if value.startswith("Error:"):
+                        raise QgsProcessingException(value)
                     # if the source is a file, then add an external "source product" file
-                    if os.path.isfile(param.value):
+                    if os.path.isfile(value):
                         # check if the file should be added individually or through the
                         # ProductSet-Reader used sometimes by S1 Toolbox
-                        match = re.match("^\d*ProductSet-Reader>(.*)", param.name)
+                        match = re.match("^\d*ProductSet-Reader>(.*)", param.name())
                         if match:
                             paramName = match.group(1)
-                            sourceNodeId = self.addProductSetReaderNode(graph, param.value)
+                            sourceNodeId = self.addProductSetReaderNode(graph, value)
                         else:
-                            paramName = param.name
+                            paramName = param.name()
                             if operator.text == "Read":
-                                sourceNodeId = self.addReadNode(graph, param.value, dataFormat,
+                                sourceNodeId = self.addReadNode(graph, value, dataFormat,
                                                                 self.nodeID)
                                 return graph
                             else:
-                                sourceNodeId = self.addReadNode(graph, param.value, dataFormat)
+                                sourceNodeId = self.addReadNode(graph, value, dataFormat)
                         if sources.find(paramName) is None:
                             source = ET.SubElement(sources, paramName)
                             source.set("refid", sourceNodeId)
                     # else assume its a reference to a previous node and add a "source" element
-                    elif param.value:
-                        source = ET.SubElement(sources, param.name, {"refid": param.value})
+                    elif value is not None:
+                        source = ET.SubElement(sources, param.name(), {"refid": value})
                 # This is to allow GPF graphs to save custom names of input rasters
                 elif operator.text == "Read":
                     dataFormat = 'GeoTIFF'
-                    param.value = ""
-                    sourceNodeId = self.addReadNode(graph, param.value, dataFormat, self.nodeID)
+                    value = ""
+                    sourceNodeId = self.addReadNode(graph, value, dataFormat, self.nodeID)
                     return graph
 
             # add parameters
             else:
                 # Set the name of the parameter
                 # First check if there are nested tags
-                tagList = param.name.split(">")
+                tagList = param.name().split(">")
                 parentElement = parametersNode
                 parameter = None
                 for tag in tagList:
@@ -207,20 +226,17 @@ class GPFAlgorithm(GeoAlgorithm):
                             parentElement = ET.SubElement(parentElement, tag)
 
                 # Set the value of the parameter
-                if param.value is None or param.value == GPFAlgorithm.NOVALUEINT or\
-                   param.value == GPFAlgorithm.NOVALUEDOUBLE:
+                value = self.parameterAsDouble(parameters, param.name(), context)
+                if value is None or value == GPFAlgorithm.NOVALUEINT or\
+                   value == GPFAlgorithm.NOVALUEDOUBLE:
                     pass
-                elif isinstance(param, ParameterBoolean):
-                    if param.value:
-                        parameter.text = "True"
-                    else:
-                        parameter.text = "False"
-                elif isinstance(param, ParameterSelection):
-                    idx = int(param.value)
-                    parameter.text = str(param.options[idx])
+                elif isinstance(param, QgsProcessingParameterEnum):
+                    idx = self.parameterAsEnums(parameters, param.name(), context)[0]
+                    parameter.text = str(param.options()[idx])
                 # create at WKT polygon from the extent values, used in Subset Operator
-                elif isinstance(param, ParameterExtent):
-                    values = param.value.split(",")
+                elif isinstance(param, QgsProcessingParameterExtent):
+                    values = self.parameterAsString(parameters, param.name(), context)
+                    values = values.split(",")
                     if len(values) == 4:
                         parameter.text = "POLYGON(("
                         parameter.text += values[0] + ' ' + values[2] + ", "
@@ -228,18 +244,14 @@ class GPFAlgorithm(GeoAlgorithm):
                         parameter.text += values[1] + ' ' + values[3] + ", "
                         parameter.text += values[1] + ' ' + values[2] + ", "
                         parameter.text += values[0] + ' ' + values[2] + "))"
-                elif isinstance(param, ParameterFile):
-                    if param.value is None or param.value == "None":
-                        parameter.text = ""
-                    else:
-                        parameter.text = str(param.value)
                 else:
-                    parameter.text = str(param.value)
+                    parameter.text = self.parameterAsString(parameters, param.name(), context)
 
         # For "Write" operator also save the output raster as a parameter
         if self.operator == "Write":
             fileParameter = ET.SubElement(parametersNode, "file")
-            fileParameter.text = str((self.outputs[0]).value)
+            paramName = self.destinationParameterDefinitions()[0].name()
+            fileParameter.text = self.parameterAsString(parameters, paramName, context)
 
         graph.append(node)
         return graph
@@ -286,7 +298,7 @@ class GPFAlgorithm(GeoAlgorithm):
 
         return nodeID
 
-    def addWriteNode(self, graph, output, key):
+    def addWriteNode(self, parameters, graph, output, key, context):
 
         # add write node
         nodeID = self.nodeID+"_write_"+str(GPFAlgorithm.nodeIDNum)
@@ -294,6 +306,7 @@ class GPFAlgorithm(GeoAlgorithm):
         node = ET.SubElement(graph, "node", {"id": nodeID})
         operator = ET.SubElement(node, "operator")
         operator.text = "Write"
+        value = self.parameterAsOutputLayer(parameters, output.name(), context)
 
         # add source
         sources = ET.SubElement(node, "sources")
@@ -302,11 +315,11 @@ class GPFAlgorithm(GeoAlgorithm):
         # add some options
         parametersNode = ET.SubElement(node, "parameters")
         parameter = ET.SubElement(parametersNode, "file")
-        parameter.text = str(output.value)
+        parameter.text = value
         parameter = ET.SubElement(parametersNode, "formatName")
-        if output.value.lower().endswith(".dim"):
+        if value.lower().endswith(".dim"):
             parameter.text = "BEAM-DIMAP"
-        elif output.value.lower().endswith(".hdr"):
+        elif value.lower().endswith(".hdr"):
             parameter.text = "ENVI"
         else:
             if key == GPFUtils.beamKey():
@@ -315,53 +328,48 @@ class GPFAlgorithm(GeoAlgorithm):
                 parameter.text = "GeoTIFF-BigTIFF"
         return graph
 
-    def processAlgorithm(self, key, progress):
+    def processAlgorithm(self, parameters, context, progress):
+        key = self.programKey
+        results = {}
+        
         # Create a GFP for execution with SNAP's GPT
         graph = ET.Element("graph", {'id': self.operator+'_gpf'})
         version = ET.SubElement(graph, "version")
         version.text = "1.0"
 
         # Add node with this algorithm's operator
-        graph = self.addGPFNode(graph)
+        graph = self.addGPFNode(parameters, graph, context)
 
         # Add outputs as write nodes (except for Write operator)
-        if self.operator != "Write" and len(self.outputs) >= 1:
-            for output in self.outputs:
-                graph = self.addWriteNode(graph, output, key)
+        if self.operator != "Write" and len(self.destinationParameterDefinitions()) >= 1:
+            for output in self.destinationParameterDefinitions():
+                graph = self.addWriteNode(parameters, graph, output, key, context)
 
         # Log the GPF
         loglines = []
         loglines.append("GPF Graph")
         GPFUtils.indentXML(graph)
-        for line in ET.tostring(graph).splitlines():
+        for line in ET.tostring(graph, encoding="unicode").splitlines():
             loglines.append(line)
-        ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
+        QgsMessageLog.logMessage("".join(loglines), self.tr("Processing"), Qgis.Info)
 
         # Execute the GPF
-        GPFUtils.executeGpf(key, ET.tostring(graph), progress)
+        GPFUtils.executeGpf(key, ET.tostring(graph, encoding="unicode"), progress)
 
-    def commandLineName(self):
-        return (self.provider.getName().lower().replace(" ", "") + ":" +
-                self.operator.lower().replace("-", ""))
+        for output in self.destinationParameterDefinitions():
+            results[output.name()] = self.parameterAsOutputLayer(parameters,
+                                                                 output.name(),
+                                                                 context)
+        return results
+
+    def tr(self, string, context=''):
+        if context == '':
+            context = self.__class__.__name__
+        return QCoreApplication.translate(context, string)
 
     ##############################################################################
-    # Below are GeoAlgorithm functions which need to be overwritten to support
+    # Below are QgsProcessingAlgorithm functions which need to be overwritten to support
     # non-GDAL inputs (.safe, .zip, .dim) and outputs (.dim) in Processing toolbox.
 
-    def convertUnsupportedFormats(self, progress):
-        pass
-
-    def checkOutputFileExtensions(self):
-        pass
-
-    def checkInputCRS(self):
+    def validateInputCRS(self):
         return True
-
-    def _checkParameterValuesBeforeExecuting(self):
-        msg = GeoAlgorithm._checkParameterValuesBeforeExecuting(self)
-        # .safe, .zip, .dim and .xml file formats can be opened with Sentinel Toolbox
-        # even though they can't be opened by GDAL.
-        if msg and (msg.endswith(".safe") or msg.endswith(".zip") or msg.endswith(".dim") or
-                    msg.endswith(".xml") or msg.endswith(".N1")):
-            msg = None
-        return msg

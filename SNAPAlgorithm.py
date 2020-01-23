@@ -33,7 +33,6 @@ from qgis.core import QgsCoordinateReferenceSystem
 from xml.etree.ElementTree import SubElement
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFAlgorithm import GPFAlgorithm
-from processing.core.parameters import ParameterRaster
 
 # General SNAP algorithms (e.g. from Raster or Input-Output menus)
 
@@ -44,11 +43,8 @@ class SNAPAlgorithm(GPFAlgorithm):
         GPFAlgorithm.__init__(self, descriptionfile)
         self.programKey = GPFUtils.snapKey()
 
-    def processAlgorithm(self, progress):
-        GPFAlgorithm.processAlgorithm(self, GPFUtils.snapKey(), progress)
-
-    def addGPFNode(self, graph):
-        graph = GPFAlgorithm.addGPFNode(self, graph)
+    def addGPFNode(self, parameters, graph, context):
+        graph = GPFAlgorithm.addGPFNode(self, parameters, graph, context)
         # split band element with multiple bands into multiple elements
         for parent in graph.findall(".//band/.."):
             for element in parent.findall("band"):
@@ -65,25 +61,15 @@ class SNAPAlgorithm(GPFAlgorithm):
                     projection = QgsCoordinateReferenceSystem(int(crs), 2)
                     wkt = projection.toWkt()
                     element.text = str(wkt)
-                except:
+                except Exception:
                     parent.remove(element)
 
         return graph
 
-    def defineCharacteristicsFromFile(self):
-        GPFAlgorithm.defineCharacteristicsFromFile(self)
-        # check if there are multiple raster inputs
-        inputsCount = 0
-        for param in self.parameters:
-            if isinstance(param, ParameterRaster):
-                inputsCount += 1
-        if inputsCount > 1:
-            self.multipleRasterInput = True
+    def helpUrl(self):
+        GPFAlgorithm.helpUrl(self, GPFUtils.snapKey())
 
-    def helpFile(self):
-        GPFAlgorithm.helpFile(self, GPFUtils.snapKey())
-
-    def getIcon(self):
+    def icon(self):
         return QIcon(os.path.dirname(__file__) + "/images/snap.png")
 
     def getCopy(self):
