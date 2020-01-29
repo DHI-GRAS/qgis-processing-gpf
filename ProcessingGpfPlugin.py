@@ -16,7 +16,7 @@
 * by the Free Software Foundation, either version 3 of the License,       *
 * or (at your option) any later version.                                  *
 *                                                                         *
-* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY * 
+* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY *
 * WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
 * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
 * for more details.                                                       *
@@ -30,6 +30,9 @@ from builtins import object
 import os
 import sys
 import inspect
+from qgis.PyQt.QtCore import (QTranslator,
+                              QCoreApplication)
+from qgis.core import QgsApplication
 from processing.core.Processing import Processing
 from processing_gpf.BEAMAlgorithmProvider import BEAMAlgorithmProvider
 from processing_gpf.SNAPAlgorithmProvider import SNAPAlgorithmProvider
@@ -47,11 +50,23 @@ class ProcessingGpfPlugin(object):
 
         self.iface = iface
 
+        # initialize locale
+        plugin_dir = os.path.dirname(__file__)
+        locale = QgsApplication.locale()
+        locale_path = os.path.join(
+            plugin_dir,
+            'i18n',
+            '{}.qm'.format(locale))
+
+        if os.path.exists(locale_path):
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+            QCoreApplication.installTranslator(self.translator)
+
     def initGui(self):
-        Processing.addProvider(self.BeamProvider, True)
-        Processing.addProvider(self.SNAPProvider, True)
-        #Processing.addProvider(self.S1tbx, True)
+        QgsApplication.processingRegistry().addProvider(self.BeamProvider)
+        QgsApplication.processingRegistry().addProvider(self.SNAPProvider)
 
     def unload(self):
-        Processing.removeProvider(self.BeamProvider)
-        Processing.removeProvider(self.SNAPProvider)
+        QgsApplication.processingRegistry().removeProvider(self.BeamProvider)
+        QgsApplication.processingRegistry().removeProvider(self.SNAPProvider)
