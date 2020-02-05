@@ -1,8 +1,3 @@
-# This file contains metadata for your plugin. Beginning
-# with version 1.8 this is the preferred way to supply information about a
-# plugin. The current method of embedding metadata in __init__.py will
-# be supported until version 2.0
-
 # This file should be included when you package your plugin.
 
 [general]
@@ -12,17 +7,19 @@ description= QGIS Processing provider for GPF-based algorithms (BEAM and SNAP).
 about= 
 	QGIS Processing provider for GPF (Graph Processing Framework)-based algorithms. Currently supports selected algorithms from BEAM 5.0 (http://www.brockmann-consult.de/cms/web/beam/) and SNAP 5.0  (http://step.esa.int).
 	
-	The plugin requires BEAM 5.0 and/or SNAP 5.0 to be installed for it to be able to access their GPF algorithms. See README in code repository for further instructions.
+	The plugin requires BEAM 5.0 and/or SNAP 7.0 to be installed for it to be able to access their GPF algorithms. See README in code repository for further instructions.
 	
 	This plugin is part of the Water Observation Information System (WOIS) developed under the TIGER-NET project funded by the European Space Agency as part of the long-term TIGER initiative aiming at promoting the use of Earth Observation (EO) for improved Integrated Water Resources Management (IWRM) in Africa. Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
-version=1.4.3
-qgisMinimumVersion=2.14
+version=2.0.0
+qgisMinimumVersion=3.10
 
 # Optional items:
 
 
-Changelog=1.4.3
+Changelog=2.0.0
+    - Made compatible with QGIS 3.10
+    1.4.3
     - Addition of new SAR operators: Speckle Divergence and Grey Level Co-occurrence Matrix (contribution by Pedro Venancio)
     - Addition of NDVI operator (contribution by ewamiti)
     - Make spatial extent optional in BEAM subset operator
