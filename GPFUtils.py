@@ -254,53 +254,6 @@ class GPFUtils(object):
                 Qgis.Critical)
             return None, None
 
-    # Special functionality for S1 Toolbox terrain-correction
-    # Get the SAR image pixel sizes by using snappy functionality
-    @staticmethod
-    def getS1TbxPixelSize(filename):
-
-        # The value which S1 Toolbox uses to convert resolution from meters to degrees
-        # As far as I can see it's independent of the geographical location and is used for
-        # both latitude and longitude
-        METERSPERDEGREE = Decimal(111319.4907932735600086975208)
-
-        pixelSpacingDict = {}
-
-        if filename is None:
-            return pixelSpacingDict
-
-        snappy, jpy = GPFUtils.importSnappy()
-        if snappy is not None:
-
-            def setSpacing(spacingName, spacingUnit, spacingData, spacingDict):
-                spacingDict[spacingName+" ("+spacingUnit+")"] = spacingData
-                if spacingUnit == "m":
-                    spacingDict[spacingName+" (deg)"] = str(Decimal(spacingData)/METERSPERDEGREE)
-                elif spacingUnit == "deg":
-                    spacingDict[spacingName+" (m)"] = str(Decimal(spacingData)*METERSPERDEGREE)
-                return spacingDict
-
-            product = snappy.ProductIO.readProduct(filename)
-            metadata = jpy.get_type(
-                'org.esa.snap.engine_utilities.datamodel.AbstractMetadata').getAbstractedMetadata(product)
-            range_spacing = metadata.getAttribute("range_spacing")
-            azimuth_spacing = metadata.getAttribute("azimuth_spacing")
-            if range_spacing and azimuth_spacing:
-                pixelSpacingDict = setSpacing("Range spacing",
-                                              range_spacing.getUnit(),
-                                              range_spacing.getData().getElemDouble(),
-                                              pixelSpacingDict)
-                pixelSpacingDict = setSpacing("Azimuth spacing",
-                                              azimuth_spacing.getUnit(),
-                                              azimuth_spacing.getData().getElemDouble(),
-                                              pixelSpacingDict)
-
-        else:
-            pixelSpacingDict['!'] = 'Python module snappy is not installed in the user directory. Please run SNAP installer'
-
-        logging.disable(logging.NOTSET)
-        return pixelSpacingDict
-
     # Use snappy to get a list of band names of a given raster
     @staticmethod
     def getSnapBandNames(productPath, secondAttempt=False):

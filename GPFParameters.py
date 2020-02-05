@@ -57,20 +57,6 @@ def getParameterFromString(s, context=''):
                 params[4] = True if params[4].lower() == 'true' else False
             if len(params) > 5:
                 params[5] = True if params[5].lower() == 'true' else False
-        elif clazz == ParameterPixelSize:
-            if len(params) > 2:
-                try:
-                    params[2] = int(params[2])
-                except Exception:
-                    params[2] = getattr(QgsProcessingParameterNumber, params[2].split(".")[1])
-            if len(params) > 3:
-                params[3] = float(params[3].strip()) if params[3] is not None else None
-            if len(params) > 4:
-                params[4] = True if params[4].lower() == 'true' else False
-            if len(params) > 5:
-                params[5] = float(params[5].strip()) if params[5] is not None else -sys.float_info.max + 1
-            if len(params) > 6:
-                params[6] = float(params[6].strip()) if params[6] is not None else sys.float_info.max - 1
         else:
             return None
 
@@ -87,10 +73,6 @@ def getParameterFromString(s, context=''):
             param.setMetadata(
                     {'widget_wrapper': {
                             'class': 'processing_gpf.GPFParameterWidgets.GPFPolarisationsWidgetWrapper'}})
-        elif clazz == ParameterPixelSize:
-            param.setMetadata(
-                    {'widget_wrapper': {
-                            'class': 'processing_gpf.GPFParameterWidgets.GPFPixelSizeWidgetWrapper'}})
 
         param.setDescription(QCoreApplication.translate(context, param.description()))
 
@@ -134,22 +116,3 @@ class ParameterPolarisations(QgsProcessingParameterBand):
     @staticmethod
     def parameterType():
         return "GpfParameterPolarisations"
-
-
-# ParameterPixelSize is exacly the same as ParameterNumber except that it has a different
-# parameter widget (see GPFParametersPanel)
-class ParameterPixelSize(QgsProcessingParameterNumber):
-
-    def __init__(self, name='', description='', type=QgsProcessingParameterNumber.Double,
-                 defaultValue=10.0, optional=False, minValue=0.0, maxValue=99999.9,
-                 parentLayerParameterName=''):
-        QgsProcessingParameterNumber.__init__(self, name, description, type, defaultValue,
-                                              optional, minValue, maxValue)
-        self.parentLayerParameterName = parentLayerParameterName
-
-    def type(self):
-        return ParameterPixelSize.parameterType()
-
-    @staticmethod
-    def parameterType():
-        return "GpfParameterPixelSize"

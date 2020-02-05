@@ -46,9 +46,7 @@ from qgis.gui import (QgsProcessingParameterWidgetFactoryInterface,
 from processing.tools import dataobjects
 
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.GPFParameters import (ParameterBandExpression,
-                                          ParameterPolarisations,
-                                          ParameterPixelSize)
+from processing_gpf.GPFParameters import ParameterBandExpression, ParameterPolarisations
 from processing.gui.wrappers import WidgetWrapper
 
 
@@ -231,99 +229,3 @@ class GPFBandsListDialog(QDialog):
 
     def close(self):
         QDialog.close(self)
-
-
-# Special functionality for S1 Toolbox terrain-correction
-# S1 Toolbox pixel size input panel is the same as normal number
-# input panel except that it has a button next to it
-# to show selected products pixel size.
-class GPFPixelSizeWidgetWrapper(GPFBandExpressionWidgetWrapper):
-
-    def __init__(self, parameter, widgetType, row=0, col=0, **kwargs):
-        super().__init__(parameter, widgetType, row, col, **kwargs)
-
-    def createWidget(self):
-        # Numeric spin box
-        numberDef = self.parameterDefinition()
-        self._spinBox = QgsDoubleSpinBox()
-        self._spinBox.setExpressionsEnabled(False)
-        self._spinBox.setDecimals(6)
-        self._spinBox.setSingleStep(int((numberDef.maximum() - numberDef.minimum())/10.0))
-        self._spinBox.setMaximum(numberDef.maximum())
-        self._spinBox.setMinimum(numberDef.minimum())
-        if numberDef.defaultValue() is not None:
-            defaultValue = numberDef.defaultValue().toDouble()
-            self._spinBox.setClearValue(defaultValue)
-            self._spinBox.setValue(defaultValue)
-        else:
-            self._spinBox.setClearValue(numberDef.minimum())
-        self._spinBox.valueChanged.connect(lambda: self.widgetValueHasChanged(self))
-        # Button to bring up the pixel size dialog
-        metadataButton = QPushButton()
-        metadataButton.setMaximumWidth(75)
-        metadataButton.setText("Pixel Size")
-        metadataButton.clicked.connect(lambda: self.showPixelSizeDialog())
-        # Overall layout
-        horizontalLayout = QHBoxLayout()
-        horizontalLayout.setSpacing(2)
-        horizontalLayout.setMargin(0)
-        horizontalLayout.addWidget(self._spinBox)
-        horizontalLayout.addWidget(metadataButton)
-        widget = QWidget()
-        widget.setLayout(horizontalLayout)
-        widget.setToolTip(self.parameterDefinition().toolTip())
-        return widget
-
-    def showPixelSizeDialog(self):
-        sourceProduct = self._sourceProduct()
-        pixelSizes = GPFUtils.getS1TbxPixelSize(sourceProduct)
-        dlg = S1TbxPixelSizeInputDialog(pixelSizes, sourceProduct, self)
-        dlg.show()
-
-    def setValue(self, value):
-        self._spinBox.setValue(value)
-
-    def value(self):
-        return self._spinBox.value()
-
-    def parameterType(self):
-        return ParameterPixelSize.parameterType()
-
-
-# Simple dialog displaying SAR image pixel sizes
-class S1TbxPixelSizeInputDialog(QDialog):
-    def __init__(self, pixelSizes, filename, parent):
-        self.pixelSizes = pixelSizes
-        self.filename = filename
-        QDialog.__init__(self, parent)
-        self.setWindowModality(0)
-        self.setupUi()
-
-    def setupUi(self):
-        self.resize(500, 180)
-        self.setWindowTitle("Pixel Sizes: "+str(self.filename))
-        self.verticalLayout = QVBoxLayout(self)
-        self.horizontalLayout = QHBoxLayout(self)
-        self.horizontalLayout.setSpacing(2)
-        self.horizontalLayout.setMargin(0)
-        self.table = QTableWidget()
-        self.table.setColumnCount(1)
-        self.table.setColumnWidth(0, 270)
-        self.table.verticalHeader().setVisible(False)
-        self.table.horizontalHeader().setVisible(False)
-        self.table.horizontalHeader().setResizeMode(QHeaderView.Stretch)
-        self.setTableContent()
-        self.horizontalLayout.addWidget(self.table)
-        self.setLayout(self.horizontalLayout)
-        self.verticalLayout.addLayout(self.horizontalLayout)
-
-    def setTableContent(self):
-        self.table.setRowCount(len(self.pixelSizes))
-        i = 0
-        for k, v in list(self.pixelSizes.items()):
-            item = QLineEdit()
-            item.setReadOnly(True)
-            text = str(k).strip() + ":\t\t" + str(v).strip()
-            item.setText(text)
-            self.table.setCellWidget(i, 0, item)
-            i += 1
