@@ -2,9 +2,9 @@ Warp
 s1tbx_Warp
 Warp
 Radar
-ParameterRaster|sourceProduct|Cross-Correlation Image|False|False
-ParameterSelection|rmsThreshold|RMS Threshold (pixel accuracy)|0.001;0.05;0.1;0.5;1.0|1
-ParameterSelection|warpPolynomialOrder|Warp Polynomial Order|1;2;3|0
-ParameterSelection|interpolationMethod|Interpolation Method|Nearest-neighbor interpolation;Bilinear interpolation;Bicubic interpolation;Bicubic2 interpolation;Linear interpolation;Cubic convolution (4 points);Cubic convolution (6 points);Truncated sinc (6 points);Truncated sinc (8 points);Truncated sinc (16 points)|1
-*ParameterBoolean|openResidualsFile|Show Residuals|False
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|Cross-Correlation Image|None|False
+QgsProcessingParameterEnum|rmsThreshold|RMS Threshold (pixel accuracy)|0.001;0.05;0.1;0.5;1.0|False|1|False
+QgsProcessingParameterEnum|warpPolynomialOrder|Warp Polynomial Order|1;2;3|False|0|False
+QgsProcessingParameterEnum|interpolationMethod|Interpolation Method|Nearest-neighbor interpolation;Bilinear interpolation;Bicubic interpolation;Bicubic2 interpolation;Linear interpolation;Cubic convolution (4 points);Cubic convolution (6 points);Truncated sinc (6 points);Truncated sinc (8 points);Truncated sinc (16 points)|False|1|False
+*QgsProcessingParameterBoolean|openResidualsFile|Show Residuals|False
+QgsProcessingParameterRasterDestination|-out|Output Image

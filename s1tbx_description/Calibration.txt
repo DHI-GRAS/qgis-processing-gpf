@@ -2,16 +2,16 @@ Calibration
 s1tbx_Calibration
 Calibration
 Radar
-ParameterRaster|sourceProduct|Input image|False|False
+QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
 ParameterPolarisations|selectedPolarisations|Polarisations (S1 only)||sourceProduct|True
-ParameterBands|sourceBands|The list of source bands (other missions)||sourceProduct|True
-ParameterSelection|auxFile|The auxiliary file|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|0
-*ParameterFile|externalAuxFile|The antenne elevation pattern gain auxiliary data file|False|True
-*ParameterBoolean|outputImageInComplex|Save as complex output|False
-*ParameterBoolean|outputImageScaleInDb|Save in Db|False
-*ParameterBoolean|outputGammaBand|Output gamma0 band (S1 only)|False
-*ParameterBoolean|createGammaBand|Create gamma0 virtual band (other missions)|False
-*ParameterBoolean|outputBetaBand|Output beta0 band (S1 only)|False
-*ParameterBoolean|createBetaBand|Create beta0 virtual band (other missions)|False
-*ParameterBoolean|outputSigmaBand|Output sigma0 band|True
-OutputRaster|-out|Output Image
+ParameterBandExpression|sourceBands|The list of source bands (other missions)||sourceProduct|True
+QgsProcessingParameterEnum|auxFile|The auxiliary file|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|False|0|False
+*QgsProcessingParameterFile|externalAuxFile|The antenne elevation pattern gain auxiliary data file|QgsProcessingParameterFile.File|None|None|True
+*QgsProcessingParameterBoolean|outputImageInComplex|Save as complex output|False
+*QgsProcessingParameterBoolean|outputImageScaleInDb|Save in Db|False
+*QgsProcessingParameterBoolean|outputGammaBand|Output gamma0 band (S1 only)|False
+*QgsProcessingParameterBoolean|createGammaBand|Create gamma0 virtual band (other missions)|False
+*QgsProcessingParameterBoolean|outputBetaBand|Output beta0 band (S1 only)|False
+*QgsProcessingParameterBoolean|createBetaBand|Create beta0 virtual band (other missions)|False
+*QgsProcessingParameterBoolean|outputSigmaBand|Output sigma0 band|True
+QgsProcessingParameterRasterDestination|-out|Output Image

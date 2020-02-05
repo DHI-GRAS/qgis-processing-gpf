@@ -2,31 +2,30 @@ Terrain-Correction
 s1tbx_Terrain-Correction
 Range Doppler Terrain Correction
 Radar
-ParameterRaster|sourceProduct|Input image|False|False
-ParameterBands|sourceBands|The list of source bands||sourceProduct|True
-ParameterSelection|demName|The digital elevation model|ACE2_5Min;ACE30;ASTER 1sec GDEM;GETASSE30;SRTM 1Sec Grid;SRTM 1Sec HGT;SRTM 3Sec;External DEM|6
-*ParameterFile|externalDEMFile|External DEM file|False|True
-*ParameterNumber|externalDEMNoDataValue|External DEM no-data value|None|None|0.0
-*ParameterBoolean|externalDEMApplyEGM|Apply Earth Gravitational MOdel to external DEM|False
-ParameterSelection|demResamplingMethod|DEM resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION;BISINC_5_POINT_INTERPOLATION;BISINC_11_POINT_INTERPOLATION;BISINC_21_POINT_INTERPOLATION;BICUBIC_INTERPOLATION;DELAUNAY_INTERPOLATION|1
-ParameterSelection|imgResamplingMethod|Image resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION;BISINC_5_POINT_INTERPOLATION;BISINC_11_POINT_INTERPOLATION;BISINC_21_POINT_INTERPOLATION;BICUBIC_INTERPOLATION;DELAUNAY_INTERPOLATION|1
-ParameterPixelSize|pixelSpacingInDegree|The pixel spacing in degrees|0.0|None|99999.9
-ParameterPixelSize|pixelSpacingInMeter|The pixel spacing in meters|0.0|None|99999.9
-*ParameterCrs|mapProjection|Map projection||True
-*ParameterBoolean|nodataValueAtSea|No data value at sea|True
-*ParameterBoolean|saveDEM|Save DEM|False
-*ParameterBoolean|saveLatLon|Save latitude and longitude|False 
-*ParameterBoolean|saveLocalIncidenceAngle|Save local incidence angle|False
-*ParameterBoolean|saveIncidenceAngleFromEllipsoid|Save incidence angle from ellipsoid|False
-*ParameterBoolean|saveProjectedLocalIncidenceAngle|Save projected local incidence angle|False
-*ParameterBoolean|saveSelectedSourceBand|Save selected Source Band|True
-ParameterBoolean|applyRadiometricNormalization|Apply Radiometric Normalization|False
-*ParameterBoolean|outputComplex|Output complex data|False
-*ParameterBoolean|saveSigmaNought|Save Sigma Nought|False
-*ParameterBoolean|saveGammaNought|Save Gamma Nought|False
-*ParameterBoolean|saveBetaNought|Save Beta Nought|False
-ParameterSelection|incidenceAngleForSigma0|Incidence angle for Sigma 0|Use projected local incidence angle from DEM;Use local incidence angle from DEM;Use incidence angle from Ellipsoid|0
-ParameterSelection|incidenceAngleForGamma0|Incidence angle for Gamma 0|Use projected local incidence angle from DEM;Use local incidence angle from DEM;Use incidence angle from Ellipsoid|0
-ParameterSelection|auxFile|The auxiliary file (ASAR only)|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|0
-ParameterFile|externalAuxFile|The antenne elevation pattern gain auxiliary data file|False|True
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
+QgsProcessingParameterEnum|demName|The digital elevation model|ACE2_5Min;ACE30;ASTER 1sec GDEM;GETASSE30;SRTM 1Sec Grid;SRTM 1Sec HGT;SRTM 3Sec;External DEM|False|6|False
+*QgsProcessingParameterFile|externalDEMFile|External DEM file|QgsProcessingParameterFile.File|None|None|True
+*QgsProcessingParameterNumber|externalDEMNoDataValue|External DEM no-data value|QgsProcessingParameterNumber.Double|0.0|True
+*QgsProcessingParameterBoolean|externalDEMApplyEGM|Apply Earth Gravitational MOdel to external DEM|False
+QgsProcessingParameterEnum|demResamplingMethod|DEM resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION;BISINC_5_POINT_INTERPOLATION;BISINC_11_POINT_INTERPOLATION;BISINC_21_POINT_INTERPOLATION;BICUBIC_INTERPOLATION;DELAUNAY_INTERPOLATION|False|1|False
+QgsProcessingParameterEnum|imgResamplingMethod|Image resampling method|NEAREST_NEIGHBOUR;BILINEAR_INTERPOLATION;CUBIC_CONVOLUTION;BISINC_5_POINT_INTERPOLATION;BISINC_11_POINT_INTERPOLATION;BISINC_21_POINT_INTERPOLATION;BICUBIC_INTERPOLATION;DELAUNAY_INTERPOLATION|False|1|False
+QgsProcessingParameterNumber|pixelSpacingInMeter|The pixel spacing in meters|QgsProcessingParameterNumber.Double|10.0|False|0.0|99999.9
+*QgsProcessingParameterCrs|mapProjection|Map projection|None|True
+*QgsProcessingParameterBoolean|nodataValueAtSea|No data value at sea|True
+*QgsProcessingParameterBoolean|saveDEM|Save DEM|False
+*QgsProcessingParameterBoolean|saveLatLon|Save latitude and longitude|False 
+*QgsProcessingParameterBoolean|saveLocalIncidenceAngle|Save local incidence angle|False
+*QgsProcessingParameterBoolean|saveIncidenceAngleFromEllipsoid|Save incidence angle from ellipsoid|False
+*QgsProcessingParameterBoolean|saveProjectedLocalIncidenceAngle|Save projected local incidence angle|False
+*QgsProcessingParameterBoolean|saveSelectedSourceBand|Save selected Source Band|True
+QgsProcessingParameterBoolean|applyRadiometricNormalization|Apply Radiometric Normalization|False
+*QgsProcessingParameterBoolean|outputComplex|Output complex data|False
+*QgsProcessingParameterBoolean|saveSigmaNought|Save Sigma Nought|False
+*QgsProcessingParameterBoolean|saveGammaNought|Save Gamma Nought|False
+*QgsProcessingParameterBoolean|saveBetaNought|Save Beta Nought|False
+QgsProcessingParameterEnum|incidenceAngleForSigma0|Incidence angle for Sigma 0|Use projected local incidence angle from DEM;Use local incidence angle from DEM;Use incidence angle from Ellipsoid|False|0|False
+QgsProcessingParameterEnum|incidenceAngleForGamma0|Incidence angle for Gamma 0|Use projected local incidence angle from DEM;Use local incidence angle from DEM;Use incidence angle from Ellipsoid|False|0|False
+QgsProcessingParameterEnum|auxFile|The auxiliary file (ASAR only)|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|False|0|False
+QgsProcessingParameterFile|externalAuxFile|The antenne elevation pattern gain auxiliary data file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterRasterDestination|-out|Output Image
