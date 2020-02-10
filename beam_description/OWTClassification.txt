@@ -2,9 +2,9 @@ OWTClassification
 beam_OWTClassification
 MERIS OWT Classification
 Analysis - MERIS
-ParameterRaster|sourceProduct|Source Product (atmospherically corrected reflectances)|False|False
-ParameterSelection|owtType|OWT classifiction type|COASTAL;INLAND;INLAND_NO_BLUE_BAND;GLASS_5C;GLASS_6C;GLASS_6C_NORMALIZED|0
-ParameterString|reflectancesPrefix|Reflectance prefix|reflec|
-ParameterSelection|inputReflectanceIs|Input reflectance is|RADIANCE_REFLECTANCES;IRRADIANCE_REFLECTANCES|0
-ParameterBoolean|writeInputReflectances|Write input reflectances|
-OutputRaster|-out|Target Product
+QgsProcessingParameterRasterLayer|sourceProduct|Source Product (atmospherically corrected reflectances)|None|False
+QgsProcessingParameterEnum|owtType|OWT classifiction type|COASTAL;INLAND;INLAND_NO_BLUE_BAND;GLASS_5C;GLASS_6C;GLASS_6C_NORMALIZED|False|0|False
+QgsProcessingParameterString|reflectancesPrefix|Reflectance prefix|reflec
+QgsProcessingParameterEnum|inputReflectanceIs|Input reflectance is|RADIANCE_REFLECTANCES;IRRADIANCE_REFLECTANCES|False|0|False
+QgsProcessingParameterBoolean|writeInputReflectances|Write input reflectances|True
+QgsProcessingParameterRasterDestination|-out|Target Product

@@ -2,10 +2,10 @@ BiophysicalOp
 s2tbx_BiophysicalOp
 Biophysical Processor (LAI, fAPAR...)
 Optical
-ParameterRaster|sourceProduct|Input S2 image (atmospherically corrected)|False|False
-ParameterBoolean|computeLAI|Compute LAI|True
-ParameterBoolean|computeFapar|Compute fAPAR|False
-ParameterBoolean|computeFcover|Compute FVC|False
-ParameterBoolean|computeCab|Compute Cab|False
-ParameterBoolean|computeCw|Compute CWC|False
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|Input S2 image (atmospherically corrected)|None|False
+QgsProcessingParameterBoolean|computeLAI|Compute LAI|True
+QgsProcessingParameterBoolean|computeFapar|Compute fAPAR|False
+QgsProcessingParameterBoolean|computeFcover|Compute FVC|False
+QgsProcessingParameterBoolean|computeCab|Compute Cab|False
+QgsProcessingParameterBoolean|computeCw|Compute CWC|False
+QgsProcessingParameterRasterDestination|-out|Output Image

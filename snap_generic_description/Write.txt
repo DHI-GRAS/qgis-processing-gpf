@@ -2,6 +2,6 @@ Write
 SNAP_Write
 Write
 Input-Output
-ParameterRaster|sourceProduct|Source product|False|False
-ParameterSelection|formatName|Format name|CSV;GeoTIFF-BigTIFF;ENVI;NetCDF-BEAM;NetCDF4-BEAM;HDF5;Gamma;BEAM-DIMAP;Generic Binary;GeoTIFF;Snaphu;PolSARPro;GeoTIFF+XML;NetCDF-CF;JP2;JPG;PNG;BMP;GIF;BTF;NetCDF4-CF|1
-OutputRaster|file|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|Source product|None|False
+QgsProcessingParameterEnum|formatName|Format name|CSV;GeoTIFF-BigTIFF;ENVI;NetCDF-BEAM;NetCDF4-BEAM;HDF5;Gamma;BEAM-DIMAP;Generic Binary;GeoTIFF;Snaphu;PolSARPro;GeoTIFF+XML;NetCDF-CF;JP2;JPG;PNG;BMP;GIF;BTF;NetCDF4-CF|False|1|False
+QgsProcessingParameterRasterDestination|file|Output Image

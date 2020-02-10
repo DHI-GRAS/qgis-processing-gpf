@@ -2,15 +2,15 @@ Subset
 beam_Subset
 Subset image
 I/O
-ParameterRaster|sourceProduct|The product which will be subseted|False|False
-ParameterExtent|geoRegionExtent|Spatial extent ||True
-ParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|1|None|1
-ParameterNumber|subSamplingY|The pixel sub-sampling step in Y (horizontal image direction)|1|None|1
-*ParameterBoolean|fullSwath|Forces the operator to extend the subset region to the full swath.|False
-ParameterString|tiePointGridNames|The comma-separated list of names of tie-point grids to be copied. If not given, all bands are copied.||False|True
-ParameterBands|bandNames|The comma-separated list of names of bands to be copied. If not given, all bands are copied.||sourceProduct
-*ParameterBoolean|copyMetadata|Whether to copy the metadata of the source product.|False
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|The product which will be subseted|None|False
+QgsProcessingParameterExtent|geoRegionExtent|Spatial extent|None|True
+QgsProcessingParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|QgsProcessingParameterNumber.Integer|1|False|1|None
+QgsProcessingParameterNumber|subSamplingY|The pixel sub-sampling step in Y (horizontal image direction)|QgsProcessingParameterNumber.Integer|1|False|1|None
+*QgsProcessingParameterBoolean|fullSwath|Forces the operator to extend the subset region to the full swath|False
+QgsProcessingParameterString|tiePointGridNames|The comma-separated list of names of tie-point grids to be copied. If not given, all bands are copied.|None|False|True
+ParameterBandExpression|bandNames|The comma-separated list of names of bands to be copied. If not given, all bands are copied.||sourceProduct
+*QgsProcessingParameterBoolean|copyMetadata|Whether to copy the metadata of the source product|False
+QgsProcessingParameterRasterDestination|-out|Output Image
 
 NOTE:
 The geoRegionExtent parameter is there to allow the geoRegion to be either typed in or selected from extent on canvas. 

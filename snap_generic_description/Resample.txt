@@ -2,11 +2,11 @@ Resample
 snap_Resample
 Resampling
 Raster
-ParameterRaster|sourceProduct|Input image|False|False
-ParameterBands|referenceBand|By reference band from source product||sourceProduct|True
-ParameterNumber|targetResolution|By pixel resolution in m (set to 99999 if resampling by reference band)|0|None|99999
-*ParameterSelection|upsampling|Upsampling method|Nearest;Bilinear;Bicubic|0
-*ParameterSelection|downsampling|Downsampling method|First;Min;Max;Mean;Median|0
-*ParameterSelection|flagDownsampling|Flag downsampling method|First;FlagAnd;FlagOr;FlagMedianAnd;FlagMedianOr|0
-*ParameterBoolean|resampleOnPyramidLevels|Resample on pyramid level (for faster imaging)|True
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|Input image|False|False
+ParameterBandExpression|referenceBand|By reference band from source product||sourceProduct|True
+QgsProcessingParameterNumber|targetResolution|By pixel resolution in m (set to 99999 if resampling by reference band)|0|None|99999
+*QgsProcessingParameterEnum|upsampling|Upsampling method|Nearest;Bilinear;Bicubic|0
+*QgsProcessingParameterEnum|downsampling|Downsampling method|First;Min;Max;Mean;Median|0
+*QgsProcessingParameterEnum|flagDownsampling|Flag downsampling method|First;FlagAnd;FlagOr;FlagMedianAnd;FlagMedianOr|0
+*QgsProcessingParameterBoolean|resampleOnPyramidLevels|Resample on pyramid level (for faster imaging)|True
+QgsProcessingParameterRasterDestination|-out|Output Image

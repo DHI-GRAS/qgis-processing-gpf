@@ -2,9 +2,9 @@ MERIS.MPH
 beam_MERIS.MPH
 MERIS MPH Processor
 Analysis - MERIS
-ParameterRaster|sourceProduct|MERIS BBR source product|False|False
-ParameterString|validPixelExpression|Valid pixel expression|not (l1_flags.LAND_OCEAN or l1_flags.INVALID)|
-ParameterNumber|cyanoMaxValue|Cyano max value|None|None|1000.0
-ParameterNumber|chlThreshForFloatFlag|Chl thresh for float flag|None|None|350.0
-ParameterBoolean|exportMph|Export mph|False
-OutputRaster|-out|Target Product
+QgsProcessingParameterRasterLayer|sourceProduct|MERIS BBR source product|None|False
+QgsProcessingParameterString|validPixelExpression|Valid pixel expression|not (l1_flags.LAND_OCEAN or l1_flags.INVALID)
+QgsProcessingParameterNumber|cyanoMaxValue|Cyano max value|QgsProcessingParameterNumber.Double|1000.0|0|None
+QgsProcessingParameterNumber|chlThreshForFloatFlag|Chl thresh for float flag|QgsProcessingParameterNumber.Double|350.0|0|None
+QgsProcessingParameterBoolean|exportMph|Export mph|False
+QgsProcessingParameterRasterDestination|-out|Target Product

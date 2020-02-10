@@ -2,12 +2,12 @@ Aatsr.SST
 beam_Aatsr.SST
 Compute Sea Surface Temperature (SST)
 Analysis - AATSR
-ParameterRaster|sourceProduct|AATSR source product|False|False
-ParameterBoolean|dual|Enable generation of the dual-view SST|True
-ParameterSelection|dualCoefficientsFile|Coefficient file for the dual-view SST|AVERAGE_POLAR_DUAL_VIEW;AVERAGE_TEMPERATE_DUAL_VIEW;AVERAGE_TROPICAL_DUAL_VIEW;GRIDDED_POLAR_DUAL_VIEW;GRIDDED_TEMPERATE_DUAL_VIEW;GRIDDED_TROPICAL_DUAL_VIEW;GRIDDED_DUAL_VIEW_IPF|0
-*ParameterString|dualMaskExpression|ROI-mask used for the dual-view SST|!cloud_flags_nadir.LAND and !cloud_flags_nadir.CLOUDY and !cloud_flags_nadir.SUN_GLINT and !cloud_flags_fward.LAND and !cloud_flags_fward.CLOUDY and !cloud_flags_fward.SUN_GLINT|
-ParameterBoolean|nadir|Enable generation of the nadir-view SST|True
-ParameterSelection|nadirCoefficientsFile|Coefficient file for the nadir-view SST|AVERAGE_POLAR_SINGLE_VIEW;AVERAGE_TEMPERATE_SINGLE_VIEW;AVERAGE_TROPICAL_SINGLE_VIEW;GRIDDED_POLAR_SINGLE_VIEW;GRIDDED_TEMPERATE_SINGLE_VIEW;GRIDDED_TROPICAL_SINGLE_VIEW|0
-*ParameterString|nadirMaskExpression|ROI-mask used for the nadir-view SST|!cloud_flags_nadir.LAND and !cloud_flags_nadir.CLOUDY and !cloud_flags_nadir.SUN_GLINT|
-ParameterNumber|invalidSstValue|Value used to fill invalid SST pixels|None|None|-999.0
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|AATSR source product|None|False
+QgsProcessingParameterBoolean|dual|Enable generation of the dual-view SST|True
+QgsProcessingParameterEnum|dualCoefficientsFile|Coefficient file for the dual-view SST|AVERAGE_POLAR_DUAL_VIEW;AVERAGE_TEMPERATE_DUAL_VIEW;AVERAGE_TROPICAL_DUAL_VIEW;GRIDDED_POLAR_DUAL_VIEW;GRIDDED_TEMPERATE_DUAL_VIEW;GRIDDED_TROPICAL_DUAL_VIEW;GRIDDED_DUAL_VIEW_IPF|False|0|False
+*QgsProcessingParameterString|dualMaskExpression|ROI-mask used for the dual-view SST|!cloud_flags_nadir.LAND and !cloud_flags_nadir.CLOUDY and !cloud_flags_nadir.SUN_GLINT and !cloud_flags_fward.LAND and !cloud_flags_fward.CLOUDY and !cloud_flags_fward.SUN_GLINT|
+QgsProcessingParameterBoolean|nadir|Enable generation of the nadir-view SST|True
+QgsProcessingParameterEnum|nadirCoefficientsFile|Coefficient file for the nadir-view SST|AVERAGE_POLAR_SINGLE_VIEW;AVERAGE_TEMPERATE_SINGLE_VIEW;AVERAGE_TROPICAL_SINGLE_VIEW;GRIDDED_POLAR_SINGLE_VIEW;GRIDDED_TEMPERATE_SINGLE_VIEW;GRIDDED_TROPICAL_SINGLE_VIEW|False|0|False
+*QgsProcessingParameterString|nadirMaskExpression|ROI-mask used for the nadir-view SST|!cloud_flags_nadir.LAND and !cloud_flags_nadir.CLOUDY and !cloud_flags_nadir.SUN_GLINT|
+QgsProcessingParameterNumber|invalidSstValue|Value used to fill invalid SST pixels|QgsProcessingParameterNumber.Double|-999.0|False|None|None
+QgsProcessingParameterRasterDestination|-out|Output Image

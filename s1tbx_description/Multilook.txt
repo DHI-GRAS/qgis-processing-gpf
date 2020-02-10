@@ -2,10 +2,10 @@ Multilook
 s1tbx_Multilook
 Multilook
 Radar
-ParameterRaster|sourceProduct|Input image|False|False
-ParameterBands|sourceBands|The list of source bands||sourceProduct|True
-ParameterNumber|nAzLooks|The user defined number of azimuth looks|1|None|1
-ParameterNumber|nRgLooks|The user defined number of range looks|1|None|1
-ParameterBoolean|outputIntensity|Output intensity for complex products? Otherwise output i and q.|True
-ParameterBoolean|grSquarePixel|Use ground square pixel? Otherwise range and azimuth looks are independent|True
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
+QgsProcessingParameterNumber|nAzLooks|The user defined number of azimuth looks|QgsProcessingParameterNumber.Integer|1|False|1|None
+QgsProcessingParameterNumber|nRgLooks|The user defined number of range looks|QgsProcessingParameterNumber.Integer|1|False|1|None
+QgsProcessingParameterBoolean|outputIntensity|Output intensity for complex products? Otherwise output i and q.|True
+QgsProcessingParameterBoolean|grSquarePixel|Use ground square pixel? Otherwise range and azimuth looks are independent|True
+QgsProcessingParameterRasterDestination|-out|Output Image

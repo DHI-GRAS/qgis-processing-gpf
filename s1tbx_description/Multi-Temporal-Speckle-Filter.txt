@@ -2,17 +2,17 @@ Multi-Temporal-Speckle-Filter
 s1tbx_Multi-Temporal-Speckle-Filter
 Apply Multi Temporal Speckle Filter
 Radar
-ParameterRaster|sourceProduct|The product which will be despeckled|False|False
-ParameterBands|sourceBands|The list of source bands||sourceProduct|True
-ParameterSelection|filter|Filter type|None;Boxcar;Median;Frost;Gamma Map;Lee;Refined Lee;Lee Sigma;IDAN|6
-ParameterNumber|filterSizeX|The kernel X dimension|1|100|3
-ParameterNumber|filterSizeY|The kernel Y dimension|1|100|3
-*ParameterNumber|dampingFactor|The damping factor (Frost filter only)|0|100|2
-*ParameterSelection|windowSize|Window Size (Lee Sigma filter only)|5x5;7x7;9x9;11x11;13x13;15x15;17x17|1
-*ParameterSelection|targetWindowSizeStr|Target Window Size (Lee Sigma filter only)|3x3;6x6|0
-*ParameterNumber|sigmaStr|Sigma (Lee Sigma filter only)|None|None|0.9
-*ParameterNumber|anSize|Adaptive Neighbour Size (IDAN filter only)|1|None|50
-*ParameterBoolean|estimateENL|Estimate the number of looks (Gamma map and Lee filters only)|False
-*ParameterSelection|numLooksStr|Number of looks (Lee Sigma and IDAN filters only)|1;2;3;4|0
-*ParameterNumber|enl|Number of looks (Gamma map and Lee filters only)|1|None|1
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|The product which will be despeckled|None|False
+ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
+QgsProcessingParameterEnum|filter|Filter type|None;Boxcar;Median;Frost;Gamma Map;Lee;Refined Lee;Lee Sigma;IDAN|False|6|False
+QgsProcessingParameterNumber|filterSizeX|The kernel X dimension|QgsProcessingParameterNumber.Integer|3|False|1|100
+QgsProcessingParameterNumber|filterSizeY|The kernel Y dimension|QgsProcessingParameterNumber.Integer|3|False|1|100
+*QgsProcessingParameterNumber|dampingFactor|The damping factor (Frost filter only)|QgsProcessingParameterNumber.Integer|2|False|0|100
+*QgsProcessingParameterEnum|windowSize|Window Size (Lee Sigma filter only)|5x5;7x7;9x9;11x11;13x13;15x15;17x17|False|1|False
+*QgsProcessingParameterEnum|targetWindowSizeStr|Target Window Size (Lee Sigma filter only)|3x3;6x6|False|0|False
+*QgsProcessingParameterNumber|sigmaStr|Sigma (Lee Sigma filter only)|QgsProcessingParameterNumber.Double|0.9|False|None|None
+*QgsProcessingParameterNumber|anSize|Adaptive Neighbour Size (IDAN filter only)|QgsProcessingParameterNumber.Integer|50|False|1|None
+*QgsProcessingParameterBoolean|estimateENL|Estimate the number of looks (Gamma map and Lee filters only)|False
+*QgsProcessingParameterEnum|numLooksStr|Number of looks (Lee Sigma and IDAN filters only)|1;2;3;4|False|0|False
+*QgsProcessingParameterNumber|enl|Number of looks (Gamma map and Lee filters only)|QgsProcessingParameterNumber.Integer|1|False|1|None
+QgsProcessingParameterRasterDestination|-out|Output Image

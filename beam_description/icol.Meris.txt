@@ -2,23 +2,23 @@ icol.Meris
 beam_icol.Meris
 Correct for the adjacency effect
 Analysis - MERIS
-ParameterRaster|sourceProduct|MERIS L1b source product|False|False
-*ParameterRaster|cloudMaskProduct|Cloud Mask product|True|False
-ParameterBands|cloudMaskExpression|The arithmetic expression used for cloud/ice detection|toa_reflec_14 > 0.2|sourceProduct
-ParameterBoolean|useUserCtp|User user defined cloud top pressure value in AE correction algorithm|False
-ParameterNumber|userCtp|User defined cloud top pressure value to be used by AE correction algorithm|0.0|1013.0|1013.0
-ParameterBoolean|exportSeparateDebugBands|Export the aerosol and fresnel correction terms as bands|False
-ParameterBoolean|icolAerosolForWater|Compute aerosol type over water in AE correction algorithm|True
-ParameterBoolean|icolAerosolCase2|Consider case 2 waters in AE correction algorithm|False
-*ParameterNumber|userAerosolReferenceWavelength|The Aerosol optical thickness reference wavelength|440.0|900.0|550.0
-*ParameterNumber|userAlpha|The Angstrom coefficient|-2.1|-0.4|-1
-*ParameterNumber|userAot|The aerosol optical thickness at reference wavelength|0.0|1.5|0.2
-*ParameterBoolean|exportRhoToaRayleigh|Export Rho TOA Rayleigh|True
-*ParameterBoolean|exportRhoToaAerosol|Export Rho TOA Aerosol|True
-*ParameterBoolean|exportAeRayleigh|Export AE Rayleigh|True
-*ParameterBoolean|exportAeAerosol|Export AE Aerosol|True
-*ParameterBoolean|exportAlphaAot|Export Alpha AOT|True
-*ParameterNumber|productType|Product type: Radiance product = 0; Rho TOA product = 1|0|1|0
-ParameterSelection|aeArea|The area where the AE correction will be applied|EVERYWHERE;COASTAL_ZONE;COASTAL_OCEAN;OCEAN|0
-*ParameterBoolean|useAdvancedLandWaterMask|Use new, improved land/water mask|True
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|MERIS L1b source product|None|False
+*QgsProcessingParameterRasterLayer|cloudMaskProduct|Cloud Mask product|None|True
+ParameterBandExpression|cloudMaskExpression|The arithmetic expression used for cloud/ice detection|toa_reflec_14 > 0.2|sourceProduct
+QgsProcessingParameterBoolean|useUserCtp|User user defined cloud top pressure value in AE correction algorithm|False
+QgsProcessingParameterNumber|userCtp|User defined cloud top pressure value to be used by AE correction algorithm|QgsProcessingParameterNumber.Double|1013|False|0.0|1013.0
+QgsProcessingParameterBoolean|exportSeparateDebugBands|Export the aerosol and fresnel correction terms as bands|False
+QgsProcessingParameterBoolean|icolAerosolForWater|Compute aerosol type over water in AE correction algorithm|True
+QgsProcessingParameterBoolean|icolAerosolCase2|Consider case 2 waters in AE correction algorithm|False
+*QgsProcessingParameterNumber|userAerosolReferenceWavelength|The Aerosol optical thickness reference wavelength|QgsProcessingParameterNumber.Double|550.0|False|440.0|900.0
+*QgsProcessingParameterNumber|userAlpha|The Angstrom coefficient|QgsProcessingParameterNumber.Double|-1|False|-2.1|-0.4
+*QgsProcessingParameterNumber|userAot|The aerosol optical thickness at reference wavelength|QgsProcessingParameterNumber.Double|0.2|False|0.0|1.5
+*QgsProcessingParameterBoolean|exportRhoToaRayleigh|Export Rho TOA Rayleigh|True
+*QgsProcessingParameterBoolean|exportRhoToaAerosol|Export Rho TOA Aerosol|True
+*QgsProcessingParameterBoolean|exportAeRayleigh|Export AE Rayleigh|True
+*QgsProcessingParameterBoolean|exportAeAerosol|Export AE Aerosol|True
+*QgsProcessingParameterBoolean|exportAlphaAot|Export Alpha AOT|True
+*QgsProcessingParameterNumber|productType|Product type: Radiance product = 0; Rho TOA product = 1|QgsProcessingParameterNumber.Integer|0|False|0|1
+QgsProcessingParameterEnum|aeArea|The area where the AE correction will be applied|EVERYWHERE;COASTAL_ZONE;COASTAL_OCEAN;OCEAN|False|0|False
+*QgsProcessingParameterBoolean|useAdvancedLandWaterMask|Use new, improved land/water mask|True
+QgsProcessingParameterRasterDestination|-out|Output Image

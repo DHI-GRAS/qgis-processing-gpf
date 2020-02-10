@@ -2,12 +2,12 @@ Meris.CorrectRadiometry
 s3tbx_Meris.CorrectRadiometry
 MERIS Radiometric correction
 Optical
-ParameterRaster|sourceProduct|MERIS L1b source product|False|False
-ParameterBoolean|doCalibration|Perform calibration|True
-ParameterFile|sourceRacFile|The radiometric correction auxiliary file for the source product|False|True
-ParameterFile|targetRacFile|The radiometric correction auxiliary file for the target product|False|True
-ParameterBoolean|doSmile|Perform Smile-effect correction|True
-ParameterBoolean|doEqualization|Perform equalization, the removal of detector-to-detector systematic radiometric differences in MERIS L1b data products|True
-ParameterSelection|reproVersion|The version of the reprocessing the product comes from. Is only used if equalisation is enabled|AUTO_DETECT;REPROCESSING_2;REPROCESSING_3|0
-ParameterBoolean|doRadToRefl|Perform radiance-to-reflectance conversion|False
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|MERIS L1b source product|None|False
+QgsProcessingParameterBoolean|doCalibration|Perform calibration|True
+QgsProcessingParameterFile|sourceRacFile|The radiometric correction auxiliary file for the source product|QgsProcessingParameterFile.File||None|True
+QgsProcessingParameterFile|targetRacFile|The radiometric correction auxiliary file for the target product|QgsProcessingParameterFile.File||None|True
+QgsProcessingParameterBoolean|doSmile|Perform Smile-effect correction|True
+QgsProcessingParameterBoolean|doEqualization|Perform equalization, the removal of detector-to-detector systematic radiometric differences in MERIS L1b data products|True
+QgsProcessingParameterEnum|reproVersion|The version of the reprocessing the product comes from. Is only used if equalisation is enabled|AUTO_DETECT;REPROCESSING_2;REPROCESSING_3|False|0|False
+QgsProcessingParameterBoolean|doRadToRefl|Perform radiance-to-reflectance conversion|False
+QgsProcessingParameterRasterDestination|-out|Output Image

@@ -2,10 +2,10 @@ KMeansClusterAnalysis
 beam_KMeansClusterAnalysis
 K Means Cluster Analysis
 Classification
-ParameterRaster|sourceProduct|The product to be classified|False|False
-OutputRaster|-out|Output Image
-ParameterNumber|clusterCount|Number of clusters|0|100|14
-*ParameterNumber|iterationCount|Number of iterations|0|1000|30
-*ParameterNumber|randomSeed|Seed for the random generator, used for initialising the algorithm|0|1000000|31415
-ParameterBands|sourceBandNames|The names of the bands being used for the cluster analysis||sourceProduct
-*ParameterString|roiMaskName|The name of the ROI-Mask that should be used.||False|True
+QgsProcessingParameterRasterLayer|sourceProduct|The product to be classified|None|False
+QgsProcessingParameterRasterDestination|-out|Output Image
+QgsProcessingParameterNumber|clusterCount|Number of clusters|QgsProcessingParameterNumber.Integer|14|False|0|100
+*QgsProcessingParameterNumber|iterationCount|Number of iterations|QgsProcessingParameterNumber.Integer|30|False|0|1000
+*QgsProcessingParameterNumber|randomSeed|Seed for the random generator, used for initialising the algorithm|QgsProcessingParameterNumber.Integer|31415|0|1000000
+ParameterBandExpression|sourceBandNames|The names of the bands being used for the cluster analysis||sourceProduct
+*QgsProcessingParameterString|roiMaskName|The name of the ROI-Mask that should be used.||False|True

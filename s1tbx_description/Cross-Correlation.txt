@@ -2,20 +2,20 @@ Cross-Correlation
 s1tbx_Cross-Correlation
 Cross Correlation
 Radar
-ParameterRaster|sourceProduct|Stack Image|False|False
-ParameterNumber|numGCPtoGenerate|Number of GCPs|1|None|2000
-ParameterSelection|coarseRegistrationWindowWidth|Coarse Window Width|32;64;128;256;512;1024;2048|2
-ParameterSelection|coarseRegistrationWindowHeight|Coarse Window Height|32;64;128;256;512;1024;2048|2
-ParameterSelection|rowInterpFactor|Row Interpolation Factor|2;4;8;16|0
-ParameterSelection|columnInterpFactor|Column Interpolation Factor|2;4;8;16|0
-ParameterNumber|maxIteration|Max Iterations|1|10|10
-ParameterNumber|gcpTolerance|GPC Tolerance|0|None|0.5
-*ParameterBoolean|applyFineRegistration|Apply Fine Registration for SLCs|False
-*ParameterSelection|fineRegistrationWindowWidth|Fine Registration Window Width|8;16;32;64;128;256;512|2
-*ParameterSelection|fineRegistrationWindowHeight|Fine Registration Window Height|8;16;32;64;128;256;512|2
-*ParameterNumber|coherenceWindowSize|Coherence Window Size|1|16|3
-*ParameterNumber|coherenceThreshold|Coherence Threshold|0|None|0.6
-*ParameterBoolean|useSlidingWindow|Use coherence sliding window|False
-*ParameterBoolean|computeOffset|Estimate Coarse Offset|False
-*ParameterBoolean|onlyGCPsOnLand|Test GCPs are on land|False
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|Stack Image|None|False
+QgsProcessingParameterNumber|numGCPtoGenerate|Number of GCPs|QgsProcessingParameterNumber.Integer|2000|False|1|None
+QgsProcessingParameterEnum|coarseRegistrationWindowWidth|Coarse Window Width|32;64;128;256;512;1024;2048|False|2|False
+QgsProcessingParameterEnum|coarseRegistrationWindowHeight|Coarse Window Height|32;64;128;256;512;1024;2048|False|2|False
+QgsProcessingParameterEnum|rowInterpFactor|Row Interpolation Factor|2;4;8;16|False|0|False
+QgsProcessingParameterEnum|columnInterpFactor|Column Interpolation Factor|2;4;8;16|False|0|False
+QgsProcessingParameterNumber|maxIteration|Max Iterations|QgsProcessingParameterNumber.Integer|10|False1|10
+QgsProcessingParameterNumber|gcpTolerance|GPC Tolerance|QgsProcessingParameterNumber.Double|0.5|False|0|None
+*QgsProcessingParameterBoolean|applyFineRegistration|Apply Fine Registration for SLCs|False
+*QgsProcessingParameterEnum|fineRegistrationWindowWidth|Fine Registration Window Width|8;16;32;64;128;256;512|False|2|False
+*QgsProcessingParameterEnum|fineRegistrationWindowHeight|Fine Registration Window Height|8;16;32;64;128;256;512|False|2|False
+*QgsProcessingParameterNumber|coherenceWindowSize|Coherence Window Size|QgsProcessingParameterNumber.Integer|3|False|1|16
+*QgsProcessingParameterNumber|coherenceThreshold|Coherence Threshold|QgsProcessingParameterNumber.Double|0.6|False|0|None
+*QgsProcessingParameterBoolean|useSlidingWindow|Use coherence sliding window|False
+*QgsProcessingParameterBoolean|computeOffset|Estimate Coarse Offset|False
+*QgsProcessingParameterBoolean|onlyGCPsOnLand|Test GCPs are on land|False
+QgsProcessingParameterRasterDestination|-out|Output Image

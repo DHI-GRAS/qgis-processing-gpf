@@ -2,21 +2,21 @@ GLCM
 SNAP_GLCM
 Grey Level Co-occurance Matrix
 Raster
-ParameterRaster|sourceProduct|Input image|False|False
-ParameterBands|sourceBands|The list of source bands||sourceProduct|True
-ParameterSelection|windowSizeStr|Window Size|5x5;7x7;9x9;11x11|2
-ParameterSelection|angleStr|Angle|0;45;90;135;ALL|4
-ParameterSelection|quantizerStr|Quantizer|Equal Distance Quantizer;Probabilistic Quantizer|1
-ParameterSelection|quantizationLevelsStr|Quantization Levels|8;16;32;64;128|2
-ParameterNumber|displacement|Pixel displacement|1|8|4
-ParameterBoolean|outputContrast|Output Contrast|True
-ParameterBoolean|outputDissimilarity|Output Dissimilarity|True
-ParameterBoolean|outputHomogeneity|Output Homogeneity|True
-ParameterBoolean|outputASM|Output Angular Second Moment|True
-ParameterBoolean|outputEnergy|Output Energy|True
-ParameterBoolean|outputMAX|Output Maximum Probability|True
-ParameterBoolean|outputEntropy|Output Entropy|True
-ParameterBoolean|outputMean|Output GLCM Mean|True
-ParameterBoolean|outputVariance|Output GLCM Variance|True
-ParameterBoolean|outputCorrelation|Output GLCM Correlation|True
-OutputRaster|-out|Output Image
+QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
+QgsProcessingParameterEnum|windowSizeStr|Window Size|5x5;7x7;9x9;11x11|False|2|False
+QgsProcessingParameterEnum|angleStr|Angle|0;45;90;135;ALL|False|4|False
+QgsProcessingParameterEnum|quantizerStr|Quantizer|Equal Distance Quantizer;Probabilistic Quantizer|False|1|False
+QgsProcessingParameterEnum|quantizationLevelsStr|Quantization Levels|8;16;32;64;128|False|2|False
+QgsProcessingParameterNumber|displacement|Pixel displacement|QgsProcessingParameterNumber.Integer|4|False1|8
+QgsProcessingParameterBoolean|outputContrast|Output Contrast|True
+QgsProcessingParameterBoolean|outputDissimilarity|Output Dissimilarity|True
+QgsProcessingParameterBoolean|outputHomogeneity|Output Homogeneity|True
+QgsProcessingParameterBoolean|outputASM|Output Angular Second Moment|True
+QgsProcessingParameterBoolean|outputEnergy|Output Energy|True
+QgsProcessingParameterBoolean|outputMAX|Output Maximum Probability|True
+QgsProcessingParameterBoolean|outputEntropy|Output Entropy|True
+QgsProcessingParameterBoolean|outputMean|Output GLCM Mean|True
+QgsProcessingParameterBoolean|outputVariance|Output GLCM Variance|True
+QgsProcessingParameterBoolean|outputCorrelation|Output GLCM Correlation|True
+QgsProcessingParameterRasterDestination|-out|Output Image

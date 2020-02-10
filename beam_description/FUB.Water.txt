@@ -2,11 +2,11 @@ FUB.Water
 beam_FUB.Water
 MERIS FUB/WeW Water Processor
 Analysis - MERIS
-ParameterRaster|sourceProduct|Source Product|False|False
-ParameterBoolean|computeCHL|Compute chl-a concentration band|True
-ParameterBoolean|computeYS|Compute yellow substances band|True
-ParameterBoolean|computeTSM|Compute total suspended matter band|True
-ParameterBoolean|computeAtmCorr|Compute water leaving reflectances and AOT bands|True
-*ParameterBoolean|checkWhetherSuspectIsValid|Check whether 'l1_flags.SUSPECT' is valid|True
-*ParameterString|expression|Valid expression|not l1_flags.GLINT_RISK and not l1_flags.BRIGHT and not l1_flags.INVALID and not l1_flags.SUSPECT|
-OutputRaster|-out|Target Product
+QgsProcessingParameterRasterLayer|sourceProduct|Source Product|False|False
+QgsProcessingParameterBoolean|computeCHL|Compute chl-a concentration band|True
+QgsProcessingParameterBoolean|computeYS|Compute yellow substances band|True
+QgsProcessingParameterBoolean|computeTSM|Compute total suspended matter band|True
+QgsProcessingParameterBoolean|computeAtmCorr|Compute water leaving reflectances and AOT bands|True
+*QgsProcessingParameterBoolean|checkWhetherSuspectIsValid|Check whether 'l1_flags.SUSPECT' is valid|True
+*QgsProcessingParameterString|expression|Valid expression|not l1_flags.GLINT_RISK and not l1_flags.BRIGHT and not l1_flags.INVALID and not l1_flags.SUSPECT
+QgsProcessingParameterRasterDestination|-out|Target Product

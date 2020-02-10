@@ -2,15 +2,15 @@ CoastColour.L1P
 beam_CoastColour.L1P
 CoastColour Pre-Processing and Pixel Classification
 Analysis - MERIS - CoastColour
-ParameterRaster|sourceProduct|MERIS L1B source product|False|False
-ParameterBoolean|doIcol|Perform ICOL correction|False
-ParameterBoolean|doCalibration|Perform re-calibration|False
-ParameterBoolean|doSmile|Perform Smile-effect correction|True
-ParameterBoolean|doEqualization|Perform equalization|True
-ParameterBoolean|ccIgnoreSeaIceClimatology|Check for sea/lake ice also outside sea ice climatology area|False
-*ParameterNumber|ccCloudBufferWidth|Width of cloud buffer (# of pixels)|None|None|2
-*ParameterNumber|ccCloudScreeningAmbiguous|Cloud screening 'ambiguous' threshold|None|None|1.4
-*ParameterNumber|ccCloudScreeningSure|Cloud screening 'sure' threshold|None|None|1.8
-*ParameterNumber|ccGlintCloudThresholdAddition|Cloud screening threshold addition in case of glint|None|None|0.1
-*ParameterBoolean|ccOutputCloudProbabilityFeatureValue|Write Cloud Probability Feature Value to the target product|False
-OutputRaster|-out|Target product
+QgsProcessingParameterRasterLayer|sourceProduct|MERIS L1B source product|None|False
+QgsProcessingParameterBoolean|doIcol|Perform ICOL correction|False
+QgsProcessingParameterBoolean|doCalibration|Perform re-calibration|False
+QgsProcessingParameterBoolean|doSmile|Perform Smile-effect correction|True
+QgsProcessingParameterBoolean|doEqualization|Perform equalization|True
+QgsProcessingParameterBoolean|ccIgnoreSeaIceClimatology|Check for sea/lake ice also outside sea ice climatology area|False
+*QgsProcessingParameterNumber|ccCloudBufferWidth|Width of cloud buffer (# of pixels)|QgsProcessingParameterNumber.Integer|2|False|0|None
+*QgsProcessingParameterNumber|ccCloudScreeningAmbiguous|Cloud screening 'ambiguous' threshold|QgsProcessingParameterNumber.Double|1.4|False|0|None
+*QgsProcessingParameterNumber|ccCloudScreeningSure|Cloud screening 'sure' threshold|QgsProcessingParameterNumber.Double|1.8|False|0|None
+*QgsProcessingParameterNumber|ccGlintCloudThresholdAddition|Cloud screening threshold addition in case of glint|QgsProcessingParameterNumber.Double|0.1|False|0|None
+*QgsProcessingParameterBoolean|ccOutputCloudProbabilityFeatureValue|Write Cloud Probability Feature Value to the target product|False
+QgsProcessingParameterRasterDestination|-out|Target product
