@@ -65,7 +65,7 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
         self._short_description = ''
         self._group = ''
         self._groupId = ''
-        self.groupIdRegex = re.compile(r'^[^\s\(]+')
+        self.groupIdRegex = re.compile(r'^[^\(]+')
         self.descriptionFile = descriptionfile
         self.defineCharacteristicsFromFile()
         self.nodeID = ""+self.operator+"_"+str(GPFAlgorithm.nodeIDNum)
@@ -117,7 +117,7 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
             self._short_description = self.tr(line)
             line = lines.readline().strip("\n").strip()
             self._group = self.tr(line)
-            self._groupId = self.groupIdRegex.search(line).group(0).lower()
+            self._groupId = self.groupIdRegex.search(line).group(0).lower().replace(" ", "_")
             line = lines.readline().strip("\n").strip()
             while line != "":
                 try:
