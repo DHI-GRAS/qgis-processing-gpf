@@ -46,5 +46,5 @@ class BEAMAlgorithm(GPFAlgorithm):
 
     def getCopy(self):
         newone = BEAMAlgorithm(self.descriptionFile)
-        newone.provider = self.provider
+        newone.setProvider(self.provider())
         return newone

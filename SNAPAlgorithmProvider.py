@@ -76,7 +76,7 @@ class SNAPAlgorithmProvider(QgsProcessingProvider):
                 try:
                     alg = gpfAlgorithm(os.path.join(folder, descriptionFile))
                     if alg.name().strip() != "":
-                        alg.provider = self
+                        alg.setProvider(self)
                         algs.append(alg)
                     else:
                         QgsMessageLog.logMessage(

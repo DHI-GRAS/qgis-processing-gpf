@@ -40,5 +40,5 @@ class S3TbxAlgorithm(SNAPAlgorithm):
 
     def getCopy(self):
         newone = S3TbxAlgorithm(self.descriptionFile)
-        newone.provider = self.provider
+        newone.setProvider(self.provider())
         return newone

@@ -74,5 +74,5 @@ class SNAPAlgorithm(GPFAlgorithm):
 
     def getCopy(self):
         newone = SNAPAlgorithm(self.descriptionFile)
-        newone.provider = self.provider
+        newone.setProvider(self.provider())
         return newone
