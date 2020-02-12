@@ -2,7 +2,7 @@ NdviOp
 SNAP_NdviOp
 NDVI Processor
 Optical
-QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterSnapRasterLayer|sourceProduct|Input image|None|False
 QgsProcessingParameterNumber|redFactor|Red Factor|QgsProcessingParameterNumber.Double|1.0|False|0.0|1000.0
 QgsProcessingParameterNumber|nirFactor|NIR Factor|QgsProcessingParameterNumber.Double|1.0|False|0.0|1000.0
 ParameterBandExpression|redSourceBand|Red source band||sourceProduct|False

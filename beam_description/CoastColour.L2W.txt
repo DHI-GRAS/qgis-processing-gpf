@@ -2,7 +2,7 @@ CoastColour.L2W
 beam_CoastColour.L2W
 CoastColour In-Water Processing
 Analysis - MERIS - CoastColour
-QgsProcessingParameterRasterLayer|sourceProduct|Source Product (CC L2R, CC L1P or MERIS L1B product)|None|False
+ParameterSnapRasterLayer|sourceProduct|Source Product (CC L2R, CC L1P or MERIS L1B product)|None|False
 QgsProcessingParameterBoolean|doCalibration|[L1P] Perform re-calibration|False
 QgsProcessingParameterBoolean|doSmile|[L1P] Perform Smile-effect correction|True
 QgsProcessingParameterBoolean|doEqualization|[L1P] Perform equalization|True

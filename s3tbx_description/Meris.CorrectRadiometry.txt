@@ -2,7 +2,7 @@ Meris.CorrectRadiometry
 s3tbx_Meris.CorrectRadiometry
 MERIS Radiometric correction
 Optical
-QgsProcessingParameterRasterLayer|sourceProduct|MERIS L1b source product|None|False
+ParameterSnapRasterLayer|sourceProduct|MERIS L1b source product|None|False
 QgsProcessingParameterBoolean|doCalibration|Perform calibration|True
 QgsProcessingParameterFile|sourceRacFile|The radiometric correction auxiliary file for the source product|QgsProcessingParameterFile.File||None|True
 QgsProcessingParameterFile|targetRacFile|The radiometric correction auxiliary file for the target product|QgsProcessingParameterFile.File||None|True

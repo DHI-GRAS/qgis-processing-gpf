@@ -2,7 +2,7 @@ Multi-Temporal-Speckle-Filter
 s1tbx_Multi-Temporal-Speckle-Filter
 Apply Multi Temporal Speckle Filter
 Radar
-QgsProcessingParameterRasterLayer|sourceProduct|The product which will be despeckled|None|False
+ParameterSnapRasterLayer|sourceProduct|The product which will be despeckled|None|False
 ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
 QgsProcessingParameterEnum|filter|Filter type|None;Boxcar;Median;Frost;Gamma Map;Lee;Refined Lee;Lee Sigma;IDAN|False|6|False
 QgsProcessingParameterNumber|filterSizeX|The kernel X dimension|QgsProcessingParameterNumber.Integer|3|False|1|100

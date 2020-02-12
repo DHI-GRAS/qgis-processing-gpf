@@ -2,6 +2,6 @@ LinearToFromdB
 s1tbx_LinearToFromdB
 Linear to/from dB
 Raster
-QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterSnapRasterLayer|sourceProduct|Input image|None|False
 ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
 QgsProcessingParameterRasterDestination|-out|Output Image

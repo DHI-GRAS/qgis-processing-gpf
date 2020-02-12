@@ -2,7 +2,7 @@ Calibration
 s1tbx_Calibration
 Calibration
 Radar
-QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterSnapRasterLayer|sourceProduct|Input image|None|False
 ParameterPolarisations|selectedPolarisations|Polarisations (S1 only)||sourceProduct|True
 ParameterBandExpression|sourceBands|The list of source bands (other missions)||sourceProduct|True
 QgsProcessingParameterEnum|auxFile|The auxiliary file|Latest Auxiliary File;Product Auxiliary File;External Auxiliary File|False|0|False

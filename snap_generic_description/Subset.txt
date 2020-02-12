@@ -2,7 +2,7 @@ Subset
 SNAP_Subset
 Subset image
 Raster
-QgsProcessingParameterRasterLayer|sourceProduct|The product which will be subseted|None|False
+ParameterSnapRasterLayer|sourceProduct|The product which will be subseted|None|False
 QgsProcessingParameterExtent|geoRegionExtent|Spatial extent|None|True
 QgsProcessingParameterNumber|subSamplingX|The pixel sub-sampling step in X (horizontal image direction)|QgsProcessingParameterNumber.Integer|1|False|1|None
 QgsProcessingParameterNumber|subSamplingY|The pixel sub-sampling step in Y (horizontal image direction)|QgsProcessingParameterNumber.Integer|1|False|1|None

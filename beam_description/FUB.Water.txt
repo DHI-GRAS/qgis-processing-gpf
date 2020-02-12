@@ -2,7 +2,7 @@ FUB.Water
 beam_FUB.Water
 MERIS FUB/WeW Water Processor
 Analysis - MERIS
-QgsProcessingParameterRasterLayer|sourceProduct|Source Product|False|False
+ParameterSnapRasterLayer|sourceProduct|Source Product|False|False
 QgsProcessingParameterBoolean|computeCHL|Compute chl-a concentration band|True
 QgsProcessingParameterBoolean|computeYS|Compute yellow substances band|True
 QgsProcessingParameterBoolean|computeTSM|Compute total suspended matter band|True

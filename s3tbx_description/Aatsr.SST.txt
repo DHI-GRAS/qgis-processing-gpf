@@ -2,7 +2,7 @@ Aatsr.SST
 s3tbx_Aatsr.SST
 (A)ATSR Sea Surface Temperature (SST)
 Optical
-QgsProcessingParameterRasterLayer|sourceProduct|AATSR source product|None|False
+ParameterSnapRasterLayer|sourceProduct|AATSR source product|None|False
 QgsProcessingParameterBoolean|dual|Enable generation of the dual-view SST|True
 QgsProcessingParameterEnum|dualCoefficientsFile|Coefficient file for the dual-view SST|AVERAGE_POLAR_DUAL_VIEW;AVERAGE_TEMPERATE_DUAL_VIEW;AVERAGE_TROPICAL_DUAL_VIEW;GRIDDED_POLAR_DUAL_VIEW;GRIDDED_TEMPERATE_DUAL_VIEW;GRIDDED_TROPICAL_DUAL_VIEW;GRIDDED_DUAL_VIEW_IPF|False|0|False
 *QgsProcessingParameterString|dualMaskExpression|ROI-mask used for the dual-view SST|!cloud_flags_nadir.LAND and !cloud_flags_nadir.CLOUDY and !cloud_flags_nadir.SUN_GLINT and !cloud_flags_fward.LAND and !cloud_flags_fward.CLOUDY and !cloud_flags_fward.SUN_GLINT|

@@ -2,7 +2,7 @@ Terrain-Correction
 s1tbx_Terrain-Correction
 Range Doppler Terrain Correction
 Radar
-QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterSnapRasterLayer|sourceProduct|Input image|None|False
 ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
 QgsProcessingParameterEnum|demName|The digital elevation model|ACE2_5Min;ACE30;ASTER 1sec GDEM;GETASSE30;SRTM 1Sec Grid;SRTM 1Sec HGT;SRTM 3Sec;External DEM|False|6|False
 *QgsProcessingParameterFile|externalDEMFile|External DEM file|QgsProcessingParameterFile.File|None|None|True

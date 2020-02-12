@@ -2,7 +2,7 @@ CoastColour.L1P
 beam_CoastColour.L1P
 CoastColour Pre-Processing and Pixel Classification
 Analysis - MERIS - CoastColour
-QgsProcessingParameterRasterLayer|sourceProduct|MERIS L1B source product|None|False
+ParameterSnapRasterLayer|sourceProduct|MERIS L1B source product|None|False
 QgsProcessingParameterBoolean|doIcol|Perform ICOL correction|False
 QgsProcessingParameterBoolean|doCalibration|Perform re-calibration|False
 QgsProcessingParameterBoolean|doSmile|Perform Smile-effect correction|True

@@ -2,10 +2,10 @@ Reproject
 SNAP_Reproject
 Reproject
 Raster
-QgsProcessingParameterRasterLayer|sourceProduct|The product which will be reprojected|None|False
+ParameterSnapRasterLayer|sourceProduct|The product which will be reprojected|None|False
 QgsProcessingParameterCrs|crs|CRS of the required projection|
 QgsProcessingParameterRasterDestination|-out|Output Image
-*QgsProcessingParameterRasterLayer|collocateWith|The source product will be collocated with this product|None|True
+*ParameterSnapRasterLayer|collocateWith|The source product will be collocated with this product|None|True
 *QgsProcessingParameterFile|wktFile|A file which contains the target Coordinate Reference System in WKT format|QgsProcessingParameterFile.File||None|True
 QgsProcessingParameterEnum|resampling|The method used for resampling of floating-point raster data|Nearest;Bilinear;Bicubic|False|1|False
 QgsProcessingParameterBoolean|includeTiePointGrids|Include tie point grids|True

@@ -2,7 +2,7 @@ Multilook
 s1tbx_Multilook
 Multilook
 Radar
-QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterSnapRasterLayer|sourceProduct|Input image|None|False
 ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
 QgsProcessingParameterNumber|nAzLooks|The user defined number of azimuth looks|QgsProcessingParameterNumber.Integer|1|False|1|None
 QgsProcessingParameterNumber|nRgLooks|The user defined number of range looks|QgsProcessingParameterNumber.Integer|1|False|1|None

@@ -2,5 +2,5 @@ Read
 SNAP_Read
 Read
 Input-Output
-QgsProcessingParameterRasterLayer|file|Source product|None|False
+ParameterSnapRasterLayer|file|Source product|None|False
 QgsProcessingParameterRasterDestination|-out|Output Image

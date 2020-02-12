@@ -2,5 +2,5 @@ Read
 beam_Read
 Read N1 image
 I/O
-QgsProcessingParameterRasterLayer|file|Name of input image|None|False
+ParameterSnapRasterLayer|file|Name of input image|None|False
 QgsProcessingParameterRasterDestination|-out|Output Image

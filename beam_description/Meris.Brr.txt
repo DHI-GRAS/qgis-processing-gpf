@@ -2,7 +2,7 @@ Meris.Brr
 beam_Meris.Brr
 MERIS Rayleigh Correction
 Analysis - MERIS
-QgsProcessingParameterRasterLayer|sourceProduct|MERIS L1B source product|None|False
+ParameterSnapRasterLayer|sourceProduct|MERIS L1B source product|None|False
 QgsProcessingParameterBoolean|copyAllTiePoints|Write all tie points to the target product|True
 QgsProcessingParameterBoolean|copyL1Flags|Write L1 flags to the target product|True
 QgsProcessingParameterBoolean|outputToar|Write TOA reflectances to the target product|False

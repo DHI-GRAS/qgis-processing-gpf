@@ -2,7 +2,7 @@ KMeansClusterAnalysis
 beam_KMeansClusterAnalysis
 K Means Cluster Analysis
 Classification
-QgsProcessingParameterRasterLayer|sourceProduct|The product to be classified|None|False
+ParameterSnapRasterLayer|sourceProduct|The product to be classified|None|False
 QgsProcessingParameterRasterDestination|-out|Output Image
 QgsProcessingParameterNumber|clusterCount|Number of clusters|QgsProcessingParameterNumber.Integer|14|False|0|100
 *QgsProcessingParameterNumber|iterationCount|Number of iterations|QgsProcessingParameterNumber.Integer|30|False|0|1000

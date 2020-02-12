@@ -2,7 +2,7 @@ Apply-Orbit-File
 s1tbx_Apply-Orbit-File
 Apply Orbit File
 Radar
-QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterSnapRasterLayer|sourceProduct|Input image|None|False
 QgsProcessingParameterEnum|orbitType|Orbit type|Sentinel Precise (Auto Download);Sentinel Restituted (Auto Download);DORIS Preliminary POR (ENVISAT);DORIS Precise VOR (ENVISAT) (Auto Download);DELFT Precise (ENVISAT, ERS1&2) (Auto Download);PRARE Precise (ERS1&2) (Auto Download)|False|0|False
 QgsProcessingParameterNumber|polyDegree|Polynomial Degree|QgsProcessingParameterNumber.Integer|3|False|1|10
 QgsProcessingParameterBoolean|continueOnFail|Do not fail if new orbit file is not found|False

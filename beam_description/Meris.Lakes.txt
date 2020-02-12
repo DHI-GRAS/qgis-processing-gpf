@@ -2,7 +2,7 @@ Meris.Lakes
 beam_Meris.Lakes
 Perform IOP retrieval for eutrophic and boreal Lakes
 Analysis - MERIS
-QgsProcessingParameterRasterLayer|sourceProduct|MERIS L1b source product|None|False
+ParameterSnapRasterLayer|sourceProduct|MERIS L1b source product|None|False
 QgsProcessingParameterBoolean|doAtmosphericCorrection|Perform atmospheric correction|True
 *QgsProcessingParameterFile|atmoNetFile|The file of the atmospheric net to be used instead of the default neural net|QgsProcessingParameterFile.File||None|True
 QgsProcessingParameterBoolean|doSmileCorrection|Perform SMILE correction|True

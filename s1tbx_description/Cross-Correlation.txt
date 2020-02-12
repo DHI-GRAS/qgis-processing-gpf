@@ -2,7 +2,7 @@ Cross-Correlation
 s1tbx_Cross-Correlation
 Cross Correlation
 Radar
-QgsProcessingParameterRasterLayer|sourceProduct|Stack Image|None|False
+ParameterSnapRasterLayer|sourceProduct|Stack Image|None|False
 QgsProcessingParameterNumber|numGCPtoGenerate|Number of GCPs|QgsProcessingParameterNumber.Integer|2000|False|1|None
 QgsProcessingParameterEnum|coarseRegistrationWindowWidth|Coarse Window Width|32;64;128;256;512;1024;2048|False|2|False
 QgsProcessingParameterEnum|coarseRegistrationWindowHeight|Coarse Window Height|32;64;128;256;512;1024;2048|False|2|False

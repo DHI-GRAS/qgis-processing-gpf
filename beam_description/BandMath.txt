@@ -2,7 +2,7 @@ BandMaths
 beam_BandMaths
 Band Maths
 Miscellaneous
-QgsProcessingParameterRasterLayer|sourceProduct|The product with the bands|None|False
+ParameterSnapRasterLayer|sourceProduct|The product with the bands|None|False
 QgsProcessingParameterRasterDestination|-out|Output Image
 ParameterBandExpression|!targetBands>!targetBand>expression|Expression||sourceProduct|False|False
 QgsProcessingParameterString|targetBands>targetBand>name|Name of output band|result|False|False

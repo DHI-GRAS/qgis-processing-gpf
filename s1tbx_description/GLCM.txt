@@ -2,7 +2,7 @@ GLCM
 SNAP_GLCM
 Grey Level Co-occurance Matrix
 Raster
-QgsProcessingParameterRasterLayer|sourceProduct|Input image|None|False
+ParameterSnapRasterLayer|sourceProduct|Input image|None|False
 ParameterBandExpression|sourceBands|The list of source bands||sourceProduct|True
 QgsProcessingParameterEnum|windowSizeStr|Window Size|5x5;7x7;9x9;11x11|False|2|False
 QgsProcessingParameterEnum|angleStr|Angle|0;45;90;135;ALL|False|4|False

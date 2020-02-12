@@ -160,7 +160,9 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
 
             # add a source product
             if isinstance(param, QgsProcessingParameterRasterLayer):
-                value = self.parameterAsRasterLayer(parameters, param.name(), context).source()
+                value = self.parameterAsString(parameters, param.name(), context)
+                if not os.path.exists(value):
+                    value = self.parameterAsRasterLayer(parameters, param.name(), context).source()
                 if value:
                     value, dataFormat = GPFUtils.gdalPathToSnapPath(value)
                     if value.startswith("Error:"):

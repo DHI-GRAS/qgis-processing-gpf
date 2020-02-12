@@ -30,8 +30,8 @@ import sys
 
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (QgsProcessingParameterBand,
-                       QgsProcessingParameterNumber,
-                       QgsProcessingParameterDefinition)
+                       QgsProcessingParameterDefinition,
+                       QgsProcessingParameterRasterLayer)
 
 
 def getParameterFromString(s, context=''):
@@ -57,22 +57,15 @@ def getParameterFromString(s, context=''):
                 params[4] = True if params[4].lower() == 'true' else False
             if len(params) > 5:
                 params[5] = True if params[5].lower() == 'true' else False
+        elif clazz == ParameterSnapRasterLayer:
+            if len(params) > 3:
+                params[3] = True if params[3].lower() == 'true' else False
         else:
             return None
 
         param = clazz(*params)
         if isAdvanced:
             param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
-
-        # set widgets
-        if clazz == ParameterBandExpression:
-            param.setMetadata(
-                    {'widget_wrapper': {
-                            'class': 'processing_gpf.GPFParameterWidgets.GPFBandExpressionWidgetWrapper'}})
-        elif clazz == ParameterPolarisations:
-            param.setMetadata(
-                    {'widget_wrapper': {
-                            'class': 'processing_gpf.GPFParameterWidgets.GPFPolarisationsWidgetWrapper'}})
 
         param.setDescription(QCoreApplication.translate(context, param.description()))
 
@@ -89,6 +82,12 @@ class ParameterBandExpression(QgsProcessingParameterBand):
                  optional=False, allowMultiple=False):
         QgsProcessingParameterBand.__init__(self, name, description, defaultValue,
                                             parentLayerParameterName, optional, allowMultiple)
+        self.setCustomWidget()
+
+    def setCustomWidget(self):
+        self.setMetadata(
+            {'widget_wrapper': {
+                'class': 'processing_gpf.GPFParameterWidgets.GPFBandExpressionWidgetWrapper'}})
 
     def type(self):
         return ParameterBandExpression.parameterType()
@@ -109,6 +108,12 @@ class ParameterPolarisations(QgsProcessingParameterBand):
                  optional=False, allowMultiple=False):
         QgsProcessingParameterBand.__init__(self, name, description, defaultValue,
                                             parentLayerParameterName, optional, allowMultiple)
+        self.setCustomWidget()
+
+    def setCustomWidget(self):
+        self.setMetadata(
+            {'widget_wrapper': {
+                    'class': 'processing_gpf.GPFParameterWidgets.GPFPolarisationsWidgetWrapper'}})
 
     def type(self):
         ParameterPolarisations.parameterType()
@@ -116,3 +121,15 @@ class ParameterPolarisations(QgsProcessingParameterBand):
     @staticmethod
     def parameterType():
         return "GpfParameterPolarisations"
+
+
+# ParameterSnapRasterLayer is exactly the same as QgsProcessingParameterRasterLayer except that
+# it avoids being loaded as QgsRasterLayer since SNAP can open some formats not supported by
+# GDAL
+class ParameterSnapRasterLayer(QgsProcessingParameterRasterLayer):
+
+    def checkValueIsAcceptable(self, value, context=None):
+        return QgsProcessingParameterDefinition.checkValueIsAcceptable(self, value, context)
+
+    def valueAsPythonString(self, value, context):
+        return QgsProcessingParameterDefinition.valueAsPythonString(self, value, context)
