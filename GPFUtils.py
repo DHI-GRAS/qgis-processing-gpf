@@ -77,9 +77,9 @@ class GPFUtils(object):
 
     @staticmethod
     def getKeyFromProviderName(providerName):
-        if providerName == "beam":
+        if providerName.lower() == "beam":
             return GPFUtils.beamKey()
-        elif providerName == "snap":
+        elif providerName.lower() == "snap":
             return GPFUtils.snapKey()
         else:
             raise QgsProcessingException("Invalid GPF provider name!")
