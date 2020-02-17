@@ -72,7 +72,6 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
         GPFAlgorithm.nodeIDNum += 1
         self.previousAlgInGraph = None
         self.programKey = GPFUtils.snapKey()
-        
 
     def createInstance(self):
         return self.__class__(self.descriptionFile)
@@ -102,6 +101,9 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
             helpfile = os.path.join(str(folder), self.operator + ".html")
             return QUrl.fromLocalFile(helpfile).toString
         return None
+
+    def svgIconPath(self):
+        return ""
 
     def initAlgorithm(self, config=None):
         pass
@@ -161,9 +163,11 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
             # add a source product
             if isinstance(param, QgsProcessingParameterRasterLayer):
                 value = self.parameterAsString(parameters, param.name(), context)
-                if not os.path.exists(value):
-                    value = self.parameterAsRasterLayer(parameters, param.name(), context).source()
                 if value:
+                    if not os.path.exists(value):
+                        value = self.parameterAsRasterLayer(parameters,
+                                                            param.name(),
+                                                            context).source()
                     value, dataFormat = GPFUtils.gdalPathToSnapPath(value)
                     if value.startswith("Error:"):
                         raise QgsProcessingException(value)
@@ -333,7 +337,7 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
     def processAlgorithm(self, parameters, context, progress):
         key = self.programKey
         results = {}
-        
+
         # Create a GFP for execution with SNAP's GPT
         graph = ET.Element("graph", {'id': self.operator+'_gpf'})
         version = ET.SubElement(graph, "version")
