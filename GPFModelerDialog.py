@@ -28,177 +28,79 @@
 
 from builtins import str
 import sys
-import codecs
-from qgis.PyQt.QtCore import Qt, QPoint, QPointF, QRectF
-from qgis.PyQt.QtWidgets import QMessageBox, QTreeWidgetItem, QFileDialog
-from processing.modeler.ModelerDialog import ModelerDialog, TreeAlgorithmItem
-from processing.gui.HelpEditionDialog import HelpEditionDialog
-from processing.gui.AlgorithmDialog import AlgorithmDialog
-from processing.core.ProcessingLog import ProcessingLog
-from processing.modeler.WrongModelException import WrongModelException
-from processing.modeler.ModelerAlgorithm import ModelerParameter
+from qgis.PyQt.QtCore import QDir, QUrl
+from qgis.PyQt.QtWidgets import QMessageBox, QFileDialog
+from qgis.core import Qgis, QgsApplication, QgsMessageLog
+from processing.modeler.ModelerDialog import ModelerDialog
 from processing_gpf.GPFModelerAlgorithm import GPFModelerAlgorithm
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.GPFModelerParameterDefinitionDialog import GPFModelerParameterDefinitionDialog
-from processing_gpf.GPFModelerScene import GPFModelerScene
 
 
 class GPFModelerDialog(ModelerDialog):
 
-    def __init__(self, gpfAlgorithmProvider, alg=None):
-        self.gpfAlgorithmProvider = gpfAlgorithmProvider
-        ModelerDialog.__init__(self, alg)
-        if alg is None:
-            self.alg = GPFModelerAlgorithm(gpfAlgorithmProvider)
-            self.alg.modelerdialog = self
+    def __init__(self, model=None):
+        ModelerDialog.__init__(self, model)
 
-    def editHelp(self):
-        if self.alg.provider is None:
-            # Might happen if model is opened from modeler dialog
-            self.alg.provider = self.gpfAlgorithmProvider
-        alg = self.alg.getCopy()
-        dlg = HelpEditionDialog(alg)
-        dlg.exec_()
-        if dlg.descriptions:
-            self.hasChanged = True
+        # Customise the GUI
+        self.variables_dock.hide()
+        self.algorithmTree.setFilterString("esa_snap")
+        self.searchBox.hide()
 
-    def runModel(self):
-        if len(self.alg.algs) == 0:
-            QMessageBox.warning(self, self.tr('Empty model'),
-                                self.tr("Model doesn't contains any algorithms and/or "
-                                        "parameters and can't be executed"))
-            return
-
-        if self.alg.provider is None:
-            # Might happen if model is opened from modeler dialog
-            self.alg.provider = self.gpfAlgorithmProvider
-        alg = self.alg.getCopy()
-        dlg = AlgorithmDialog(alg)
-        dlg.exec_()
-
-    def fillAlgorithmTree(self):
-
-        self.fillAlgorithmTreeUsingProviders()
-
-        self.algorithmTree.sortItems(0, Qt.AscendingOrder)
-
-        text = str(self.searchBox.text())
-        if text != '':
-            self.algorithmTree.expandAll()
-
-    def fillAlgorithmTreeUsingProviders(self):
-        self.algorithmTree.clear()
-        text = str(self.searchBox.text())
-        groups = {}
-
-        # Add only GPF algorithms
-        for alg in self.gpfAlgorithmProvider.algs:
-            if not alg.showInModeler or alg.allowOnlyOpenedLayers:
-                continue
-            if text == '' or text.lower() in alg.name.lower():
-                if alg.group in groups:
-                    groupItem = groups[alg.group]
-                else:
-                    groupItem = QTreeWidgetItem()
-                    groupItem.setText(0, alg.group)
-                    groupItem.setToolTip(0, alg.group)
-                    groups[alg.group] = groupItem
-                algItem = TreeAlgorithmItem(alg)
-                groupItem.addChild(algItem)
-
-        if len(groups) > 0:
-            providerItem = QTreeWidgetItem()
-            providerItem.setText(0,
-                                 self.gpfAlgorithmProvider.getDescription())
-            providerItem.setToolTip(0,
-                                    self.gpfAlgorithmProvider.getDescription())
-            providerItem.setIcon(0,
-                                 self.gpfAlgorithmProvider.getIcon())
-            for groupItem in list(groups.values()):
-                providerItem.addChild(groupItem)
-            self.algorithmTree.addTopLevelItem(providerItem)
-            providerItem.setExpanded(text != '')
-            for groupItem in list(groups.values()):
-                if text != '':
-                    groupItem.setExpanded(True)
-
-        self.algorithmTree.sortItems(0, Qt.AscendingOrder)
-
-    # This is a copy of implementation from ModelerDialog except that
-    # it uses GPFModelerParameterDefinitionDialog
-    def addInputOfType(self, paramType, pos=None):
-        if paramType in GPFModelerParameterDefinitionDialog.paramTypes:
-            dlg = GPFModelerParameterDefinitionDialog(self.alg, paramType)
-            dlg.exec_()
-            if dlg.param is not None:
-                if pos is None:
-                    pos = self.getPositionForParameterItem()
-                if isinstance(pos, QPoint):
-                    pos = QPointF(pos)
-                self.alg.addParameter(ModelerParameter(dlg.param, pos))
-                self.repaintModel()
-                # self.view.ensureVisible(self.scene.getLastParameterItem())
-                self.hasChanged = True
+        if model is None:
+            self.model = GPFModelerAlgorithm()
+            self.model.modelerdialog = self
 
     def openModel(self):
-        filename, __ = str(QFileDialog.getOpenFileName(self,
-                                                       self.tr('Open GPF Model'),
-                                                       GPFUtils.modelsFolder(),
-                                                       self.tr('GPF models (*.xml *.XML)')))
+        filename, __ = QFileDialog.getOpenFileName(self,
+                                                   self.tr('Open GPF Model'),
+                                                   GPFUtils.modelsFolder(),
+                                                   self.tr('GPF models (*.xml *.XML)'))
         if filename:
-            try:
-                alg = GPFModelerAlgorithm.fromFile(filename, self.gpfAlgorithmProvider)
-                self.alg = alg
-                self.alg.setModelerView(self)
-                self.textGroup.setText(alg.group)
-                self.textName.setText(alg.name)
-                self.repaintModel()
+            self.loadModel(filename)
 
-                self.view.centerOn(0, 0)
-                self.hasChanged = False
+    def loadModel(self, filename):
+        alg = GPFModelerAlgorithm()
+        if alg.fromFile(filename):
+            self.model = alg
+            self.model.setProvider(QgsApplication.processingRegistry().providerById('esa_snap'))
+            self.textGroup.setText(alg.group())
+            self.textName.setText(alg.name())
+            self.repaintModel()
 
-            except WrongModelException as e:
-                ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
-                                       self.tr('Could not load model %s\n%s') % (filename, e.msg))
-                QMessageBox.critical(self, self.tr('Could not open model'),
-                                     self.tr('The selected model could not be loaded.\n'
-                                             'See the log for more information.'))
-            except Exception as e:
-                ProcessingLog.addToLog(ProcessingLog.LOG_ERROR,
-                                       self.tr('Could not load model %s\n%s') % (filename, e.args[0]))
-                QMessageBox.critical(self, self.tr('Could not open model'),
-                                     self.tr('The selected model could not be loaded.\n'
-                                             'See the log for more information.'))
+            self.update_variables_gui()
+
+            self.view.centerOn(0, 0)
+            self.hasChanged = False
+
+        else:
+            QgsMessageLog.logMessage(self.tr('Could not load model {0}').format(filename),
+                                     self.tr('Processing'),
+                                     Qgis.Critical)
+            QMessageBox.critical(self, self.tr('Open Model'),
+                                 self.tr('The selected model could not be loaded.\n'
+                                         'See the log for more information.'))
 
     def saveModel(self, saveAs):
-        if str(self.textGroup.text()).strip() == '' \
-                or str(self.textName.text()).strip() == '':
-            QMessageBox.warning(self, self.tr('Warning'),
-                                self.tr('Please enter group and model names before saving'))
+        if not self.can_save():
             return
-        self.alg.name = str(self.textName.text())
-        self.alg.group = str(self.textGroup.text())
-        if self.alg.descriptionFile is not None and not saveAs:
-            filename = self.alg.descriptionFile
+        self.model.setName(str(self.textName.text()))
+        self.model.setGroup(str(self.textGroup.text()))
+        if self.model.sourceFilePath() and not saveAs:
+            filename = self.model.sourceFilePath()
         else:
-            filename, __ = str(QFileDialog.getSaveFileName(self,
+            filename, filter = QFileDialog.getSaveFileName(self,
                                                            self.tr('Save GPF Model'),
                                                            GPFUtils.modelsFolder(),
-                                                           self.tr('GPF models (*.xml)')))
+                                                           self.tr('GPF models (*.xml)'))
             if filename:
                 if not filename.endswith('.xml'):
                     filename += '.xml'
-                self.alg.descriptionFile = filename
+                self.model.setSourceFilePath(filename)
         if filename:
-            text = self.alg.toXml()
-            if not text:
-                return
-            try:
-                fout = codecs.open(filename, 'w', encoding='utf-8')
-            except:
+            if not self.model.toFile(filename):
                 if saveAs:
                     QMessageBox.warning(self, self.tr('I/O error'),
-                                        self.tr('Unable to save edits. Reason:\n %s') % str(sys.exc_info()[1]))
+                                        self.tr('Unable to save edits. Reason:\n {0}').format(str(sys.exc_info()[1])))
                 else:
                     QMessageBox.warning(self, self.tr("Can't save model"),
                                         self.tr("This model can't be saved in its "
@@ -206,20 +108,10 @@ class GPFModelerDialog(ModelerDialog):
                                                 "have permission to do it). Please, use "
                                                 "the 'Save as...' option."))
                 return
-            fout.write(text)
-            fout.close()
-            self.update = True
-            QMessageBox.information(self, self.tr('Model saved'),
-                                    self.tr('Model was correctly saved.'))
+            self.update_model.emit()
+            if saveAs:
+                self.bar.pushMessage("", self.tr("GPF model was correctly saved to <a href=\"{}\">{}</a>").format(QUrl.fromLocalFile(filename).toString(), QDir.toNativeSeparators(filename)), level=Qgis.Success, duration=5)
+            else:
+                self.bar.pushMessage("", self.tr("GPF model was correctly saved"), level=Qgis.Success, duration=5)
 
             self.hasChanged = False
-
-    # Function repaintModel is exactly the same as in ModelerDialog class from
-    # QGIS 2.18.3 except that ModelerScene is replaced by GPFModelerScene
-    # and ModelerAlgorithm is replaced by GPFModelerAlgorithm
-    def repaintModel(self):
-        self.scene = GPFModelerScene()
-        self.scene.setSceneRect(QRectF(0, 0, GPFModelerAlgorithm.CANVAS_SIZE,
-                                       GPFModelerAlgorithm.CANVAS_SIZE))
-        self.scene.paintModel(self.alg)
-        self.view.setScene(self.scene)

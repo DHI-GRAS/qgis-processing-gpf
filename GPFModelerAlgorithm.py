@@ -16,7 +16,7 @@
 * by the Free Software Foundation, either version 3 of the License,       *
 * or (at your option) any later version.                                  *
 *                                                                         *
-* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY * 
+* WOIS is distributed in the hope that it will be useful, but WITHOUT ANY *
 * WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
 * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
 * for more details.                                                       *
@@ -28,22 +28,31 @@
 
 from builtins import str
 import os
-import copy
 import ast
 import re
-from qgis.core import QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
-from qgis.gui import QgsMessageBar
-from qgis.utils import iface
-from processing.core.parameters import getParameterFromString, ParameterSelection, ParameterCrs, ParameterRaster, ParameterVector, ParameterTable, ParameterTableField, ParameterBoolean, ParameterString, ParameterNumber, ParameterExtent, ParameterDataObject, ParameterMultipleInput
-from processing.core.outputs import OutputRaster
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
-from processing.core.ProcessingLog import ProcessingLog
-from processing.tools import dataobjects
-from processing.modeler.ModelerAlgorithm import Algorithm, ValueFromOutput, ValueFromInput, ModelerParameter, ModelerOutput
-from processing.modeler.WrongModelException import WrongModelException
-from processing.gui.Help2Html import getHtmlFromDescriptionsDict
+
+from qgis.PyQt.QtCore import QCoreApplication
+from qgis.core import (Qgis,
+                       QgsApplication,
+                       QgsMessageLog,
+                       QgsProcessingAlgorithm,
+                       QgsCoordinateReferenceSystem,
+                       QgsProcessingModelAlgorithm,
+                       QgsProcessingModelParameter,
+                       QgsProcessingModelOutput,
+                       QgsProcessingModelChildAlgorithm,
+                       QgsProcessingModelChildParameterSource,
+                       QgsProcessingParameterRasterDestination,
+                       QgsProcessingParameterEnum,
+                       QgsProcessingParameterBoolean,
+                       QgsProcessingParameterCrs,
+                       QgsProcessingParameterExtent,
+                       QgsProcessingException)
+from processing.tools.dataobjects import createContext
+from processing_gpf.GPFParameters import (getParameterFromString,
+                                          ParameterBandExpression,
+                                          ParameterPolarisations)
 from processing_gpf.GPFUtils import GPFUtils
-from processing_gpf.GPFParametersDialog import GPFParametersDialog
 from qgis.PyQt.QtCore import QPointF
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMessageBox
@@ -52,162 +61,180 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
-from processing.core.GeoAlgorithm import GeoAlgorithm
 
-# NOTE
-# GPFModelerAlgorithm should really be a subclass of ModelerAlgorithm.
-# However, that was causing EditModelAction to appear in the context menu
-# of GPF Models present in the Processing Toolbox. To overcome this issue
-# GPFModelerAlgorithm is now a subclass of GeoAlgorithm but still has the
-# same interface as ModelerAlgorithm
+SNAP_ID = "snap"
 
 
-class GPFModelerAlgorithm (GeoAlgorithm):
+class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):
 
-    def __init__(self, gpfAlgorithmProvider):
+    def __init__(self, name=None, group=None, groupId=None):
 
-        self.name = self.tr('GpfModel', 'GpfModelerAlgorithm')
-
-        # The dialog where this model is being edited
-        self.modelerdialog = None
+        QgsProcessingModelAlgorithm.__init__(self, name, group, groupId)
+        self._group = ""
+        self._groupId = ""
         self.descriptionFile = None
-        self.helpContent = {}
-        # Geoalgorithms in this model. A dict of Algorithm objects, with names as keys
-        self.algs = {}
-        # Input parameters. A dict of Input objects, with names as keys
-        self.inputs = {}
 
-        # NOTE:
-        # This doesn't seem used so remove it later from BEAMParmetersPanel and S1TbxAlgorithm
-        self.multipleRasterInput = False
+        self.setProvider(QgsApplication.processingRegistry().providerById(SNAP_ID))
+        self.programKey = GPFUtils.getKeyFromProviderName(self.provider().name())
 
-        GeoAlgorithm.__init__(self)
-
-        self.provider = gpfAlgorithmProvider
-        self.programKey = GPFUtils.getKeyFromProviderName(self.provider.getName())
-
-    def getIcon(self):
+    def icon(self):
         return QIcon(os.path.dirname(__file__) + "/images/snap_graph.png")
 
-    # GPF parameters dialog is the same as normal parameters dialog except
-    # it can handle special GPF parameters.
-    def getCustomParametersDialog(self):
-        return GPFParametersDialog(self)
+    def group(self):
+        return self._group
 
-    def getCopy(self):
-        newone = GPFModelerAlgorithm(self.provider)
-        newone.algs = {}
-        for algname, alg in self.algs.items():
-            newone.algs[algname] = Algorithm()
-            newone.algs[algname].__dict__.update(copy.deepcopy(alg.todict()))
-        newone.inputs = copy.deepcopy(self.inputs)
-        newone.defineCharacteristics()
-        newone.name = self.name
-        newone.group = self.group
-        newone.descriptionFile = self.descriptionFile
-        newone.helpContent = copy.deepcopy(self.helpContent)
-        return newone
+    def setGroup(self, name):
+        self._group = name
 
-    def processAlgorithm(self, progress):
-        gpfXml = self.toXml(forExecution=True)
+    def groupId(self):
+        groupIdRegex = re.compile(r'^[^\(]+')
+        return groupIdRegex.search(self.group()).group(0).lower().replace(" ", "_")
+
+    def flags(self):
+        # TODO - maybe it's safe to background thread this?
+        return super().flags() | QgsProcessingAlgorithm.FlagNoThreading | QgsProcessingAlgorithm.FlagDisplayNameIsLiteral
+
+    def processAlgorithm(self, parameters, context, feedback):
+        gpfXml = self.toXml(executionParameters=parameters, context=context)
         loglines = []
         loglines.append("GPF Graph")
         for line in gpfXml.splitlines():
             loglines.append(line)
-        ProcessingLog.addToLog(ProcessingLog.LOG_INFO, loglines)
-        GPFUtils.executeGpf(GPFUtils.getKeyFromProviderName(self.provider.getName()),
+        QgsMessageLog.logMessage("".join(loglines), self.tr("Processing"), Qgis.Info)
+        GPFUtils.executeGpf(GPFUtils.getKeyFromProviderName(self.provider().name()),
                             gpfXml,
-                            progress)
+                            feedback)
 
-    def commandLineName(self):
-        if self.descriptionFile is None:
-            return ''
-        else:
-            return self.provider.getName()+':' + os.path.basename(self.descriptionFile)[:-4].lower()
+        # Extract paths to model outputs from XML
+        # TODO: Check why the output layer does not automatically load in QGIS
+        results = {}
+        root = ET.fromstring(gpfXml)
+        for out in self.destinationParameterDefinitions():
+            outputNodeId = out.name().split(":")[1]
+            node = root.find("./node[@id='"+outputNodeId+"']")
+            value = node.find("./parameters/file").text
+            results[out.name()] = value
+        return results
 
-    def toXml(self, forExecution=False):
-        graph = ET.Element("graph", {'id': "Graph"})
+    def createInstance(self):
+        instance = GPFModelerAlgorithm()
+        instance.fromXml(self.toXml())
+        instance.setSourceFilePath(self.sourceFilePath())
+        return instance
+
+    def toFile(self, filename):
+        try:
+            with open(filename, "w") as fp:
+                fp.write(self.toXml())
+            return True
+        except Exception:
+            return False
+
+    def toXml(self, executionParameters=None, context=None):
+        if context is None:
+            context = createContext()
+        graph = ET.Element("graph", {"id": "Graph"})
         version = ET.SubElement(graph, "version")
         version.text = "1.0"
 
-        # If the XML is made to be saved then set parameters and outputs.
-        # If it is made for execution then parameters and outputs are already set.
-        if not forExecution:
-            self.defineCharacteristics()
+        # Every time self.childAlgorithms() is called it creates new objects for the actual
+        # algorithms (SNAP operators) of the model child algorithms. So it might be better to call
+        # it once to get algorithm Id's and then use them to get the algorithms.
+        for algId in self.childAlgorithms().keys():
+            alg = self.childAlgorithm(algId)
+            if isinstance(alg.algorithm(), GPFModelerAlgorithm):
+                QMessageBox.warning(None, self.tr("Unable to save model"),
+                                    self.tr("Sub-graphs are currently not supported."))
+                return
+            staticParameters = {}
+            modelParameters = {}
+            childOutputParameters = {}
+            for name, source in alg.parameterSources().items():
+                if source[0].staticValue():
+                    staticParameters[name] = source[0].staticValue()
+                elif source[0].parameterName():
+                    modelParameters[name] = source[0].parameterName()
+                elif source[0].outputChildId():
+                    childOutputParameters[name] = source[0].outputChildId()
 
-        # Set the connections between nodes
-        for alg in list(self.algs.values()):
-            for output in alg.algorithm.outputs:
-                output.setValue(alg.algorithm.nodeID)
-            for param in alg.params:
-                if isinstance(alg.params[param], ValueFromOutput):
-                    alg.algorithm.getParameterFromName(param).setValue(
-                        self.algs[alg.params[param].alg].algorithm.nodeID)
+            # If graph is being created for execution then values of parameters and outputs taken
+            # from model inputs and outputs should also be set.
+            if executionParameters is not None:
+                for algParamName, modelParamName in modelParameters.items():
+                    staticParameters[algParamName] = executionParameters[modelParamName]
+                for algParamName, modelOutput in alg.modelOutputs().items():
+                    outputId = ":".join([algId, algParamName])
+                    output = executionParameters[outputId]
+                    outputValue = output.sink.staticValue()
+                    staticParameters[algParamName] = outputValue
 
-        # Save model algorithms
-        for alg in list(self.algs.values()):
-            self.prepareAlgorithm(alg)
+            # Save model algorithm
+            if alg.algorithm().nodeId == alg.algorithm().operator:
+                nodeId = alg.childId().split(":")[1]
+            else:
+                nodeId = alg.algorithm().nodeId
 
-            graph = alg.algorithm.addGPFNode(graph)
+            graph = alg.algorithm().addGPFNode(staticParameters, graph, createContext(), nodeId)
 
-            # Save custom names of model outputs
-            for out in alg.algorithm.outputs:
+            # Save connections between nodes
+            for name, sourceNodeId in childOutputParameters.items():
+                sources = graph.find("./node[@id='"+alg.algorithm().nodeId+"']/sources")
+                source = ET.SubElement(sources, name)
+                source.set("refid", sourceNodeId.split(":")[1])
+
+            # Save model parameters connected to that algorithm
+            for name, modelParameterName in modelParameters.items():
+                # Only Read operators can load raster inputs
+                if re.match("sourceProduct\d*", name) and alg.algorithm().operator != "Read":
+                    QMessageBox.warning(None, self.tr("Unable to save model"),
+                                        self.tr("Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm" % (alg.algorithm().operator,)))
+                    return
+                param = graph.find(
+                    './node[@id="'+alg.algorithm().nodeId+'"]/parameters/'+name.replace('!', '').replace('>', '/'))
+                if param is not None:
+                    param.set("qgisModelInputVars",
+                              self.parameterDefinition(modelParameterName).toVariantMap())
+                    position = self.parameterComponent(modelParameterName).position()
+                    param.set("qgisModelInputPos", str(position.x())+","+str(position.y()))
+
+            # Save model outputs connected to that algorithm
+            for out in list(alg.modelOutputs().values()):
+                outParam = alg.algorithm().parameterDefinition(out.childOutputName())
                 # Only Write operators can save raster outputs
-                if alg.algorithm.operator != "Write" and isinstance(out, OutputRaster):
-                    if out.name in alg.outputs:
-                        QMessageBox.warning(None, self.tr('Unable to save model'),
-                                            self.tr('Output rasters can only be saved by Write operator. Remove the value of raster output in %s algorithm or add a Write operator' % (alg.algorithm.operator,)))
-                        return
-                outTag = graph.find('node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+out.name)
+                if alg.algorithm().operator != "Write" and isinstance(outParam, QgsProcessingParameterRasterDestination):
+                    QMessageBox.warning(None, self.tr("Unable to save model"),
+                                        self.tr("Output rasters can only be saved by Write operator. Remove the value of raster output in %s algorithm or add a Write operator" % (alg.algorithm().operator,)))
+                    return
+                outTag = graph.find(
+                        './node[@id="'+alg.algorithm().nodeId+'"]/parameters/'+out.name())
                 if outTag is not None:
-                    safeOutName = self.getSafeNameForOutput(alg.name, out.name)
-                    for modelOutput in self.outputs:
-                        if modelOutput.name == safeOutName:
-                            outTag.attrib["qgisModelOutputName"] = str(modelOutput.description)
-                            break
-
-            # Save also the position and settings of model inputs.
-            # They are saved as attributes of relevant parameter XML nodes.
-            # This way they do not interfere with the model when it's opened
-            # in SNAP.
-            for param in list(alg.params.keys()):
-                paramValue = str(alg.params[param])
-                if paramValue in list(self.inputs.keys()):
-                    # Only Read operators can read raster inputs
-                    if re.match("sourceProduct\d*", param) and alg.algorithm.operator != "Read":
-                        QMessageBox.warning(None, self.tr('Unable to save model'),
-                                            self.tr('Input rasters can only be loaded by Read operator. Change the value of raster input in %s algorithm to an output of another algorithm' % (alg.algorithm.operator,)))
-                        return
-                    paramTag = graph.find(
-                        'node[@id="'+alg.algorithm.nodeID+'"]/parameters/'+param.replace('!', '').replace('>', '/'))
-                    if paramTag is not None:
-                        pos = self.inputs[paramValue].pos
-                        paramTag.attrib["qgisModelInputPos"] = str(pos.x())+","+str(pos.y())
-                        paramTag.attrib["qgisModelInputVars"] = str(
-                            self.inputs[paramValue].param.todict())
+                    outTag.attrib["qgisModelOutputName"] = out.description()
+                    break
 
         # Save model layout
-        presentation = ET.SubElement(graph, "applicationData",
-                                     {"id": "Presentation", "name": self.name, "group": self.group})
+        presentation = ET.SubElement(graph, "applicationData", {"id": "Presentation",
+                                                                "name": self.name(),
+                                                                "group": self.group()})
         ET.SubElement(presentation, "Description")
-        for alg in list(self.algs.values()):
-            node = ET.SubElement(presentation, "node", {"id": alg.algorithm.nodeID})
-            ET.SubElement(node, "displayPosition", {"x": str(alg.pos.x()), "y": str(alg.pos.y())})
+        for algId in self.childAlgorithms().keys():
+            alg = self.childAlgorithm(algId)
+            node = ET.SubElement(presentation, "node", {"id": alg.algorithm().nodeId})
+            ET.SubElement(node, "displayPosition", {"x": str(alg.position().x()),
+                                                    "y": str(alg.position().y())})
 
         # Make it look nice in text file
         GPFUtils.indentXML(graph)
 
-        return ET.tostring(graph)
+        return ET.tostring(graph, encoding="unicode")
 
     # Need to set the parameter here while checking it's type to
     # accommodate drop-down list, CRS and extent
-    @staticmethod
-    def parseParameterValue(parameter, value):
-        if isinstance(parameter, ParameterSelection):
-            return parameter.options.index(value)
-        elif isinstance(parameter, ParameterCrs):
+    def parseParameterValue(self, parameter, value):
+        if isinstance(parameter, QgsProcessingParameterEnum):
+            return parameter.options().index(value)
+        elif isinstance(parameter, QgsProcessingParameterCrs):
             return QgsCoordinateReferenceSystem(value).authid()
-        elif isinstance(parameter, ParameterExtent):
+        elif isinstance(parameter, QgsProcessingParameterExtent):
             if value:
                 match = re.match("POLYGON\s*\(\((.*)\)\)", value)
                 if match:
@@ -223,409 +250,179 @@ class GPFModelerAlgorithm (GeoAlgorithm):
                     if xmin is not None:
                         return "("+str(xmin)+","+str(xmax)+","+str(ymin)+","+str(ymax)+")"
             return None
-        elif isinstance(parameter, ParameterBoolean):
+        elif isinstance(parameter, QgsProcessingParameterBoolean):
             return value == "True"
         else:
             return value
 
-    @staticmethod
-    def fromFile(filename, gpfAlgorithmProvider):
+    def fromFile(self, filename):
         try:
             tree = ET.parse(filename)
-            root = tree.getroot()
+            if tree:
+                self.setSourceFilePath(filename)
+                return self.fromXml(ET.tostring(tree.getroot(), encoding="unicode"))
+            else:
+                return False
+        except Exception:
+            return False
+
+    def fromXml(self, xml):
+        try:
+            root = ET.fromstring(xml)
             if root.tag == "graph" and "id" in root.attrib and root.attrib["id"] == "Graph":
-                model = GPFModelerAlgorithm(gpfAlgorithmProvider)
-                model.descriptionFile = filename
                 modelConnections = []
                 inConnections = {}
                 outConnections = {}
                 # Process all graph nodes (algorithms)
                 for node in root.findall("node"):
                     operator = node.find("operator").text
-                    alg = gpfAlgorithmProvider.getAlgorithmFromOperator(operator)
+                    alg = self.provider().getAlgorithmFromOperator(operator)
                     if alg is not None:
-                        modelAlg = Algorithm(alg.commandLineName())
-                        modelAlg.description = node.attrib["id"]
-                        for param in alg.parameters:
-                            modelAlg.params[param.name] = None
+                        modelAlg = QgsProcessingModelChildAlgorithm(alg.id())
+                        modelAlg.setChildId(SNAP_ID+":"+node.attrib["id"])
+                        modelAlg.setDescription(modelAlg.childId())
+                        _alg = modelAlg.algorithm()
+                        _alg._name = node.attrib["id"]
+                        _alg._display_name = operator
+                        _alg._short_description = operator
+                        _alg.nodeId = node.attrib["id"]
+                        for param in _alg.parameterDefinitions():
                             # Set algorithm parameter values
                             paramNode = node.find(
-                                "parameters/"+param.name.replace('!', '').replace('>', '/'))
+                                "parameters/"+param.name().replace('!', '').replace('>', '/'))
                             if paramNode is not None:
-                                modelAlg.params[param.name] = GPFModelerAlgorithm.parseParameterValue(
-                                    param, paramNode.text)
                                 # Process model inputs which are saved as XML attributes
                                 # of a algorithm parameters
-                                if "qgisModelInputPos" in paramNode.attrib and "qgisModelInputVars" in paramNode.attrib:
-                                    modelInput = ModelerParameter()
-                                    modelInput.param = copy.deepcopy(param)
-                                    modelInput.param.__dict__ = ast.literal_eval(
-                                        paramNode.attrib["qgisModelInputVars"])
+                                if ("qgisModelInputPos" in paramNode.attrib and
+                                        "qgisModelInputVars" in paramNode.attrib):
+                                    paramAttribs = ast.literal_eval(
+                                                        paramNode.attrib["qgisModelInputVars"])
+                                    modelInput = QgsProcessingModelParameter(paramAttribs["name"])
+                                    modelParam = param.clone()
+                                    modelParam.fromVariantMap(paramAttribs)
+                                    # fromVariantMap overwrites parameter metadata so below we make
+                                    # sure that correct widgets are used for special parameter
+                                    # types.
+                                    if (isinstance(modelParam, ParameterBandExpression) or
+                                            isinstance(modelParam, ParameterPolarisations)):
+                                        modelParam.setCustomWidget()
                                     pos = paramNode.attrib["qgisModelInputPos"].split(',')
-                                    modelInput.pos = QPointF(float(pos[0]), float(pos[1]))
-                                    model.addParameter(modelInput)
-                                    modelAlg.params[param.name] = ValueFromInput(
-                                        modelInput.param.name)
+                                    modelInput.setPosition(QPointF(float(pos[0]), float(pos[1])))
+                                    self.addModelParameter(modelParam, modelInput)
+                                    paramSources = [
+                                            QgsProcessingModelChildParameterSource().fromModelParameter(modelInput.parameterName())]
+                                else:
+                                    value = self.parseParameterValue(param, paramNode.text)
+                                    paramSources = [
+                                        QgsProcessingModelChildParameterSource().fromStaticValue(value)]
+                                modelAlg.addParameterSources(param.name(), paramSources)
 
                             # Save the connections between nodes in the model
                             # Once all the nodes have been processed they will be processed
-                            if node.find("sources/"+param.name) is not None:
-                                refid = node.find("sources/"+param.name).attrib["refid"]
-                                modelConnections.append((refid, modelAlg, param.name))
+                            if node.find("sources/"+param.name()) is not None:
+                                refid = node.find("sources/"+param.name()).attrib["refid"]
+                                modelConnections.append((SNAP_ID+":"+refid,
+                                                         modelAlg.childId(),
+                                                         param.name()))
 
                         # Process model outputs which are saved as XML attributes
                         # of a algorithm parameters
-                        for output in alg.outputs:
-                            outputNode = node.find("parameters/"+output.name)
+                        for output in _alg.destinationParameterDefinitions():
+                            outputNode = node.find("parameters/"+output.name())
                             if outputNode is not None:
                                 if "qgisModelOutputName" in outputNode.attrib:
-                                    modelOutput = ModelerOutput(
-                                        outputNode.attrib["qgisModelOutputName"])
-                                    modelOutput.pos = QPointF(0, 0)
-                                    modelAlg.outputs[output.name] = modelOutput
-                                    outConnections[modelAlg] = modelOutput
+                                    outputDescription = outputNode.attrib["qgisModelOutputName"]
+                                    modelOutput = QgsProcessingModelOutput(output.name(),
+                                                                           outputDescription)
+                                    modelOutput.setChildId(modelAlg.childId())
+                                    modelOutput.setChildOutputName(output.name())
+                                    modelOutput.setPosition(QPointF(0, 0))
+                                    modelAlg.setModelOutputs({output.name(): modelOutput})
+                                    outConnections[modelAlg.childId()] = output.name()
 
                         # Special treatment for Read operator since it provides
                         # the main raster input to the graph. This is used in case
                         # the graph comes straight from SNAP and the Read operator
-                        # does not have a QGIS ParameterRaster.
-                        if operator == "Read" and not modelAlg.params["file"]:
-                            param = getParameterFromString("ParameterRaster|file|Source product")
-                            modelParameter = ModelerParameter(param, QPointF(0, 0))
-                            model.addParameter(modelParameter)
-                            modelAlg.params["file"] = ValueFromInput("file")
-                            inConnections[modelAlg] = modelParameter
+                        # does not have a QgsProcessingParameterRasterLayer.
+                        if operator == "Read" and not modelAlg.parameterSources()["file"][0].parameterName():
+                            modelParam = getParameterFromString("ParameterSnapRasterLayer|file|Source product|None|False")
+                            modelInput = QgsProcessingModelParameter("Read")
+                            self.addModelParameter(modelParam, modelInput)
+                            paramSources = [
+                                QgsProcessingModelChildParameterSource().fromModelParameter(modelInput.parameterName())]
+                            modelAlg.addParameterSources("file", paramSources)
+                            inConnections[modelAlg.childId()] = modelInput
 
                         # Special treatment for Write operator since it provides
                         # the main raster output from the graph. This is used in case
                         # the graph comes straight from SNAP and the Write operator
-                        # does not have a QGIS OutputRaster.
-                        if operator == "Write" and not "file" in list(modelAlg.outputs.keys()):
-                            modelOutput = ModelerOutput("Output file")
+                        # does not have a QGIS QgsProcessingParameterRasterDestination.
+                        if operator == "Write" and "file" not in list(modelAlg.modelOutputs().keys()):
+                            outputName = "file"
+                            modelOutput = QgsProcessingModelOutput(outputName, "Output file")
+                            modelOutput.setChildId(modelAlg.childId())
+                            modelOutput.setChildOutputName(outputName)
                             modelOutput.pos = QPointF(0, 0)
-                            modelAlg.outputs["file"] = modelOutput
-                            outConnections[modelAlg] = modelOutput
+                            modelAlg.setModelOutputs({outputName: modelOutput})
+                            outConnections[modelAlg.childId()] = outputName
 
-                        model.addAlgorithm(modelAlg)
+                        self.addChildAlgorithm(modelAlg)
+                        self.updateDestinationParameters()
                     else:
-                        raise Exception("Unknown operator "+operator)
+                        raise QgsProcessingException("Unknown operator "+operator)
 
                 # Set up connections between nodes of the graph
                 for connection in modelConnections:
-                    for alg in list(model.algs.values()):
-                        if alg.description == connection[0]:
-                            modelAlg = connection[1]
-                            paramName = connection[2]
-                            modelAlg.params[paramName] = ValueFromOutput(alg.name, "-out")
-                            break
+                    modelAlg = self.childAlgorithm(connection[1])
+                    paramName = connection[2]
+                    modelAlg.addParameterSources(
+                        paramName,
+                        [QgsProcessingModelChildParameterSource().fromChildOutput(connection[0],
+                                                                                  "-out")])
 
                 presentation = root.find('applicationData[@id="Presentation"]')
                 # Set the model name and group
-                model.name = presentation.attrib["name"] if "name" in list(
-                    presentation.attrib.keys()) else os.path.splitext(os.path.basename(filename))[0]
-                model.group = presentation.attrib["group"] if "group" in list(
-                    presentation.attrib.keys()) else "Uncategorized"
+                if "name" in list(presentation.attrib.keys()):
+                    self.setName(presentation.attrib["name"])
+                else:
+                    self.setName("Unknown")
+                if "group" in list(presentation.attrib.keys()):
+                    self.setGroup(presentation.attrib["group"])
+                else:
+                    self.setGroup("Uncategorized")
                 # Place the nodes on the graph canvas
-                for alg in list(model.algs.values()):
-                    position = presentation.find('node[@id="'+alg.description+'"]/displayPosition')
+                for algId in self.childAlgorithms().keys():
+                    alg = self.childAlgorithm(algId)
+                    nodeId = alg.childId().split(":")[1]
+                    position = presentation.find('node[@id="'+nodeId+'"]/displayPosition')
                     if position is not None:
-                        alg.pos = QPointF(float(position.attrib["x"]), float(position.attrib["y"]))
-                        # For algorithms that have input or output model parameters set those parameters
-                        # in position relative to the algorithm
-                        if alg in inConnections:
-                            inConnections[alg].pos = QPointF(
-                                max(alg.pos.x()-50, 0), max(alg.pos.y()-50, 0))
-                        if alg in outConnections:
-                            outConnections[alg].pos = QPointF(alg.pos.x()+50, alg.pos.y()+50)
-                return model
+                        alg.setPosition(QPointF(float(position.attrib["x"]),
+                                                float(position.attrib["y"])))
+                        # For algorithms that have input or output model parameters set those
+                        # parameters in position relative to the algorithm
+                        if algId in inConnections:
+                            inConnections[algId].setPosition(
+                                    QPointF(max(alg.position().x()-50, 0),
+                                            max(alg.position().y()-50, 0)))
+                        if algId in outConnections:
+                            modelOutput = alg.modelOutput(outConnections[algId])
+                            modelOutput.setPosition(QPointF(alg.position().x()+50,
+                                                            alg.position().y()+50))
+
+                self.updateDestinationParameters()
+                return True
         except Exception as e:
-            raise WrongModelException("Error reading GPF XML file: "+str(e))
+            raise QgsProcessingException("Error reading GPF XML file: "+str(e))
 
+    def tr(self, string, context=''):
+        if context == '':
+            context = self.__class__.__name__
+        return QCoreApplication.translate(context, string)
 
-#####################################################################
-# Unmodified methods copied from ModelerAlgorithm
-
-    CANVAS_SIZE = 4000
-
-    def defineCharacteristics(self):
-        classes = [ParameterRaster, ParameterVector, ParameterTable, ParameterTableField,
-                   ParameterBoolean, ParameterString, ParameterNumber]
-        self.parameters = []
-        for c in classes:
-            for inp in list(self.inputs.values()):
-                if isinstance(inp.param, c):
-                    self.parameters.append(inp.param)
-        for inp in list(self.inputs.values()):
-            if inp.param not in self.parameters:
-                self.parameters.append(inp.param)
-        self.outputs = []
-        for alg in list(self.algs.values()):
-            if alg.active:
-                for out in alg.outputs:
-                    modelOutput = copy.deepcopy(alg.algorithm.getOutputFromName(out))
-                    modelOutput.name = self.getSafeNameForOutput(alg.name, out)
-                    modelOutput.description = alg.outputs[out].description
-                    self.outputs.append(modelOutput)
-
-    def addParameter(self, param):
-        self.inputs[param.param.name] = param
-
-    def updateParameter(self, param):
-        self.inputs[param.name].param = param
-
-    def addAlgorithm(self, alg):
-        name = self.getNameForAlgorithm(alg)
-        alg.name = name
-        self.algs[name] = alg
-
-    def getNameForAlgorithm(self, alg):
-        i = 1
-        while alg.consoleName.upper().replace(":", "") + "_" + str(i) in list(self.algs.keys()):
-            i += 1
-        return alg.consoleName.upper().replace(":", "") + "_" + str(i)
-
-    def updateAlgorithm(self, alg):
-        alg.pos = self.algs[alg.name].pos
-        self.algs[alg.name] = alg
-
-        from processing.modeler.ModelerGraphicItem import ModelerGraphicItem
-        for i, out in enumerate(alg.outputs):
-            alg.outputs[out].pos = (alg.outputs[out].pos or
-                                    alg.pos +
-                                    QPointF(ModelerGraphicItem.BOX_WIDTH,
-                                            (i + 1.5) * ModelerGraphicItem.BOX_HEIGHT))
-
-    def removeAlgorithm(self, name):
-        """Returns True if the algorithm could be removed, False if
-        others depend on it and could not be removed.
-        """
-        if self.hasDependencies(name):
-            return False
-        del self.algs[name]
-        self.modelerdialog.hasChanged = True
-        return True
-
-    def removeParameter(self, name):
-        """Returns True if the parameter could be removed, False if
-        others depend on it and could not be removed.
-        """
-        if self.hasDependencies(name):
-            return False
-        del self.inputs[name]
-        self.modelerdialog.hasChanged = True
-        return True
-
-    def hasDependencies(self, name):
-        """This method returns True if some other element depends on
-        the passed one.
-        """
-        for alg in list(self.algs.values()):
-            for value in list(alg.params.values()):
-                if value is None:
-                    continue
-                if isinstance(value, list):
-                    for v in value:
-                        if isinstance(v, ValueFromInput):
-                            if v.name == name:
-                                return True
-                        elif isinstance(v, ValueFromOutput):
-                            if v.alg == name:
-                                return True
-                if isinstance(value, ValueFromInput):
-                    if value.name == name:
-                        return True
-                elif isinstance(value, ValueFromOutput):
-                    if value.alg == name:
-                        return True
-        return False
-
-    def getDependsOnAlgorithms(self, name):
-        """This method returns a list with names of algorithms
-        a given one depends on.
-        """
-        alg = self.algs[name]
-        algs = set()
-        algs.update(set(alg.dependencies))
-        for value in list(alg.params.values()):
-            if value is None:
-                continue
-            if isinstance(value, list):
-                for v in value:
-                    if isinstance(v, ValueFromOutput):
-                        algs.add(v.alg)
-                        algs.update(self.getDependsOnAlgorithms(v.alg))
-            elif isinstance(value, ValueFromOutput):
-                algs.add(value.alg)
-                algs.update(self.getDependsOnAlgorithms(value.alg))
-
-        return algs
-
-    def getDependentAlgorithms(self, name):
-        """This method returns a list with the names of algorithms
-        depending on a given one. It includes the algorithm itself
-        """
-        algs = set()
-        algs.add(name)
-        for alg in list(self.algs.values()):
-            for value in list(alg.params.values()):
-                if value is None:
-                    continue
-                if isinstance(value, list):
-                    for v in value:
-                        if isinstance(v, ValueFromOutput) and v.alg == name:
-                            algs.update(self.getDependentAlgorithms(alg.name))
-                elif isinstance(value, ValueFromOutput) and value.alg == name:
-                    algs.update(self.getDependentAlgorithms(alg.name))
-
-        return algs
-
-    def setPositions(self, paramPos, algPos, outputsPos):
-        for param, pos in paramPos.items():
-            self.inputs[param].pos = pos
-        for alg, pos in algPos.items():
-            self.algs[alg].pos = pos
-        for alg, positions in outputsPos.items():
-            for output, pos in positions.items():
-                self.algs[alg].outputs[output].pos = pos
-
-    def prepareAlgorithm(self, alg):
-        algInstance = alg.algorithm
-        for param in algInstance.parameters:
-            if not param.hidden:
-                if param.name in alg.params:
-                    value = self.resolveValue(alg.params[param.name])
-                else:
-                    iface.messageBar().pushMessage(self.tr("Warning"),
-                                                   self.tr("Parameter %s in algorithm %s in the model is run with default value! Edit the model to make sure that this is correct." % (
-                                                       param.name, alg.name)),
-                                                   QgsMessageBar.WARNING, 4)
-                    value = None
-                if value is None and isinstance(param, ParameterExtent):
-                    value = self.getMinCoveringExtent()
-                elif value is None:
-                    try:
-                        value = param.default
-                    except:
-                        pass
-                # We allow unexistent filepaths, since that allows
-                # algorithms to skip some conversion routines
-                if not param.setValue(value) and not isinstance(param,
-                                                                ParameterDataObject):
-                    raise GeoAlgorithmExecutionException(
-                        self.tr('Wrong value: %s for parameter %s', 'ModelerAlgorithm') % (value, param.name))
-        for out in algInstance.outputs:
-            if not out.hidden:
-                if out.name in alg.outputs:
-                    name = self.getSafeNameForOutput(alg.name, out.name)
-                    modelOut = self.getOutputFromName(name)
-                    if modelOut:
-                        out.value = modelOut.value
-                else:
-                    out.value = None
-
-        return algInstance
-
-    def deactivateAlgorithm(self, algName):
-        dependent = self.getDependentAlgorithms(algName)
-        for alg in dependent:
-            self.algs[alg].active = False
-
-    def activateAlgorithm(self, algName):
-        parents = self.getDependsOnAlgorithms(algName)
-        for alg in parents:
-            if not self.algs[alg].active:
-                return False
-        self.algs[algName].active = True
-        return True
-
-    def getSafeNameForOutput(self, algName, outName):
-        return outName + '_ALG' + algName
-
-    def resolveValue(self, value):
-        if value is None:
-            return None
-        if isinstance(value, list):
-            return ";".join([self.resolveValue(v) for v in value])
-        if isinstance(value, ValueFromInput):
-            return self.getParameterFromName(value.name).value
-        elif isinstance(value, ValueFromOutput):
-            return self.algs[value.alg].algorithm.getOutputFromName(value.output).value
-        else:
-            return value
-
-    def getMinCoveringExtent(self):
-        first = True
-        found = False
-        for param in self.parameters:
-            if param.value:
-                if isinstance(param, (ParameterRaster, ParameterVector)):
-                    found = True
-                    if isinstance(param.value, (QgsRasterLayer, QgsVectorLayer)):
-                        layer = param.value
-                    else:
-                        layer = dataobjects.getObjectFromUri(param.value)
-                    self.addToRegion(layer, first)
-                    first = False
-                elif isinstance(param, ParameterMultipleInput):
-                    found = True
-                    layers = param.value.split(';')
-                    for layername in layers:
-                        layer = dataobjects.getObjectFromUri(layername)
-                        self.addToRegion(layer, first)
-                        first = False
-        if found:
-            return ','.join([str(v) for v in [self.xmin, self.xmax, self.ymin, self.ymax]])
-        else:
-            return None
-
-    def addToRegion(self, layer, first):
-        if first:
-            self.xmin = layer.extent().xMinimum()
-            self.xmax = layer.extent().xMaximum()
-            self.ymin = layer.extent().yMinimum()
-            self.ymax = layer.extent().yMaximum()
-        else:
-            self.xmin = min(self.xmin, layer.extent().xMinimum())
-            self.xmax = max(self.xmax, layer.extent().xMaximum())
-            self.ymin = min(self.ymin, layer.extent().yMinimum())
-            self.ymax = max(self.ymax, layer.extent().yMaximum())
-
-    def getAsCommand(self):
-        if self.descriptionFile:
-            return GeoAlgorithm.getAsCommand(self)
-        else:
-            return None
-
-    def setModelerView(self, dialog):
-        self.modelerdialog = dialog
-
-    def updateModelerView(self):
-        if self.modelerdialog:
-            self.modelerdialog.repaintModel()
-
-    def help(self):
-        try:
-            return True, getHtmlFromDescriptionsDict(self, self.helpContent)
-        except:
-            return False, None
 
     ##############################################################################
-    # Below are GeoAlgorithm functions which need to be overwritten to support
+    # Below are QgsProcessingAlgorithm functions which need to be overwritten to support
     # non-GDAL inputs (.safe, .zip, .dim) and outputs (.dim) in Processing toolbox.
 
-    def convertUnsupportedFormats(self, progress):
-        pass
-
-    def checkOutputFileExtensions(self):
-        pass
-
-    def checkInputCRS(self):
+    def validateInputCRS(self):
         return True
-
-    def _checkParameterValuesBeforeExecuting(self):
-        msg = GeoAlgorithm._checkParameterValuesBeforeExecuting(self)
-        # .safe, .zip, .dim and .xml file formats can be opened with Sentinel Toolbox
-        # even though they can't be opened by GDAL.
-        if msg and (msg.endswith(".safe") or msg.endswith(".zip") or msg.endswith(".dim") or msg.endswith(".xml") or msg.endswith(".N1")):
-            msg = None
-        return msg

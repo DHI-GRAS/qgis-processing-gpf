@@ -34,20 +34,35 @@ import os
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import (QPushButton, QLineEdit, QWidget, QHBoxLayout, QVBoxLayout,
                                  QDialogButtonBox, QTableWidget, QHeaderView, QLabel, QApplication,
-                                 QDialog, QCheckBox)
+                                 QDialog, QCheckBox, QComboBox)
 from qgis.core import (Qgis,
-                       QgsProcessingParameters,
                        QgsMessageLog,
                        QgsProcessingParameterRasterLayer,
                        QgsProcessingUtils)
 from qgis.gui import (QgsProcessingParameterWidgetFactoryInterface,
-                      QgsAbstractProcessingParameterWidgetWrapper,
-                      QgsDoubleSpinBox)
+                      QgsProcessingGui)
 from processing.tools import dataobjects
 
 from processing_gpf.GPFUtils import GPFUtils
 from processing_gpf.GPFParameters import ParameterBandExpression, ParameterPolarisations
 from processing.gui.wrappers import WidgetWrapper
+
+
+# TODO: Resume work when integrating GPF parameters into modeller
+class GPFBandExpressionWidgetFactory(QgsProcessingParameterWidgetFactoryInterface):
+
+    def parameterType(self):
+        return ParameterBandExpression.parameterType()
+
+    def createWidgetWrapper(self, parameter, widgetType):
+        return GPFBandExpressionWidgetWrapper(parameter, widgetType)
+
+    def createModelerWidgetWrapper(self, model, childId, parameter, context):
+        return GPFBandExpressionWidgetWrapper(parameter, QgsProcessingGui.Modeler)
+
+    def createParameterDefinitionWidget(self, context, widgetContext, definition, algorithm):
+        return GPFBandExpressionParameterDefinitionWidget(context, widgetContext, definition,
+                                                          algorithm)
 
 
 # GPF band expression widget is the same as normal string widget except that it has a button next
@@ -119,6 +134,40 @@ class GPFBandExpressionWidgetWrapper(WidgetWrapper):
 
     def parameterType(self):
         return ParameterBandExpression.parameterType()
+
+
+# TODO: Resume work when integrating GPF parameters into modeller
+class GPFBandExpressionParameterDefinitionWidget():
+
+    def __init__(self, context, widgetContext, definition, algorithm, parent=None):
+        super().__init__(context, widgetContext, definition, algorithm, parent)
+        verticalLayout = QVBoxLayout()
+        verticalLayout.setMargin(0)
+        verticalLayout.setContentsMargins(0, 0, 0, 0)
+        verticalLayout.addWidget(QLabel(self.tr('Default Value')))
+        self.defaultLineEdit = QLineEdit()
+        self.defaultLineEdit.setText(definition.defaultValue())
+        verticalLayout.addWidget(self.defaultLineEdit)
+        verticalLayout.addWidget(QLabel(self.tr('Parent layer')))
+        self.parentCombo = QComboBox()
+        idx = 0
+        for param in list(algorithm.parameterComponents().values()):
+            paramDef = algorithm.parameterDefinition(param.parameterName())
+            if isinstance(paramDef, (QgsProcessingParameterRasterLayer)):
+                self.parentCombo.addItem(paramDef.description(), paramDef.name())
+                if param is not None:
+                    if definition.parentLayerParameterName() == paramDef.name():
+                        self.parentCombo.setCurrentIndex(idx)
+                idx += 1
+        verticalLayout.addWidget(self.parentCombo)
+        self.setLayout(verticalLayout)
+
+    def createParameter(self, name, description, flags):
+        defaultValue = self.defaultLineEdit.text()
+        parentLayerParameterName = self.parentCombo.currentText()
+        param = ParameterBandExpression(name, description, defaultValue, parentLayerParameterName)
+        param.setFlags(flags)
+        return param
 
 
 # Same as GPFBandExpressionWidgetWrapper except for polarisations

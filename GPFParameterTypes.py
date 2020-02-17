@@ -1,6 +1,6 @@
 """
 ***************************************************************************
-    ProcessingGpfPlugin.py
+    GPFParametersPanel.py
 -------------------------------------
     Copyright (C) 2014 TIGER-NET (www.tiger-net.org)
 
@@ -26,49 +26,37 @@
 ***************************************************************************
 """
 
-from builtins import object
-import os
-import sys
-import inspect
-from qgis.PyQt.QtCore import (QTranslator,
-                              QCoreApplication)
-from qgis.core import QgsApplication
-from processing.core.Processing import Processing
-from processing_gpf.BEAMAlgorithmProvider import BEAMAlgorithmProvider
-from processing_gpf.SNAPAlgorithmProvider import SNAPAlgorithmProvider
+from qgis.PyQt.QtCore import QCoreApplication
+from qgis.core import QgsProcessingParameterType
 
-cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-if cmd_folder not in sys.path:
-    sys.path.insert(0, cmd_folder)
+from processing_gpf.GPFParameters import ParameterBandExpression
 
 
-class ProcessingGpfPlugin(object):
+# TODO: resume work when integrating parameters into modeller
+class ParameterBandExpressionType(QgsProcessingParameterType):
 
-    def __init__(self, iface):
-        self.BeamProvider = BEAMAlgorithmProvider()
-        self.SNAPProvider = SNAPAlgorithmProvider()
+    def create(self, name):
+        return ParameterBandExpression(name)
 
-        self.iface = iface
+    def description(self):
+        return QCoreApplication.translate("Processing",
+                                          "A raster band expression parameter, for creating band "+
+                                          "expressions using existing bands from a raster source.")
 
-        # initialize locale
-        plugin_dir = os.path.dirname(__file__)
-        locale = QgsApplication.locale()
-        locale_path = os.path.join(
-            plugin_dir,
-            'i18n',
-            '{}.qm'.format(locale))
+    def name(self):
+        return QCoreApplication.translate("Processing", "Raster Band Expression")
 
-        if os.path.exists(locale_path):
-            self.translator = QTranslator()
-            self.translator.load(locale_path)
-            QCoreApplication.installTranslator(self.translator)
+    def id(self):
+        return "GpfParameterBandExpression"
 
-    def initGui(self):
-        QgsApplication.processingRegistry().addProvider(self.BeamProvider)
-        QgsApplication.processingRegistry().addProvider(self.SNAPProvider)
-        # Models have to be loaded once SNAP Provider and all its algorithms have been registered.
-        self.SNAPProvider.loadGpfModels()
+    def pythonImportString(self):
+        return "from processing_gpf.GPFParameters import ParameterBandExpression"
 
-    def unload(self):
-        QgsApplication.processingRegistry().removeProvider(self.BeamProvider)
-        QgsApplication.processingRegistry().removeProvider(self.SNAPProvider)
+    def className(self):
+        return "ParameterBandExpression"
+
+    def acceptedPythonTypes(self):
+        return ["str"]
+
+    def acceptedStringValues(self):
+        return ["Band expression consisting of mathematical symbols and band names"]
