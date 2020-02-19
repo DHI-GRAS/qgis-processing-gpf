@@ -74,6 +74,7 @@ class GPFBandExpressionWidgetWrapper(WidgetWrapper):
         self.appendProductName = False
         super().__init__(parameter, widgetType, row, col, **kwargs)
         self.context = dataobjects.createContext()
+        self._parentWrapper = None
 
     def createWidget(self):
         self._expressionPanel = QLineEdit()
@@ -93,7 +94,6 @@ class GPFBandExpressionWidgetWrapper(WidgetWrapper):
         return widget
 
     def postInitialize(self, wrappers):
-        self._parentWrapper = None
         for wrapper in wrappers:
             if wrapper.parameterDefinition().name() == self.parameterDefinition().parentLayerParameterName():
                 self._parentWrapper = wrapper
@@ -109,12 +109,14 @@ class GPFBandExpressionWidgetWrapper(WidgetWrapper):
 
     def value(self):
         return self._expressionPanel.text()
-    
+
     def wrappedWidget(self):
         return self.widget
 
     def _sourceProduct(self):
         sourceProduct = ""
+        if self._parentWrapper is None:
+            return sourceProduct
         layer = self._parentWrapper.parameterValue()
         if isinstance(layer, QgsProcessingParameterRasterLayer):
             sourceProduct, _ = layer.source.valueAsString(self.context.expressionContext())
