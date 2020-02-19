@@ -55,9 +55,6 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
     NOVALUEINT = 99999
     NOVALUEDOUBLE = 99999.9
 
-    # static nodeIDNum, increased everytime an algorithm is created
-    nodeIDNum = 0
-
     def __init__(self, descriptionfile):
         QgsProcessingAlgorithm.__init__(self)
         self._name = ''
@@ -68,9 +65,7 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
         self.groupIdRegex = re.compile(r'^[^\(]+')
         self.descriptionFile = descriptionfile
         self.defineCharacteristicsFromFile()
-        self.nodeID = ""+self.operator+"_"+str(GPFAlgorithm.nodeIDNum)
-        GPFAlgorithm.nodeIDNum += 1
-        self.previousAlgInGraph = None
+        self.nodeId = self.operator
         self.programKey = GPFUtils.snapKey()
 
     def createInstance(self):
@@ -140,14 +135,12 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
                             Qgis.Critical)
                     raise e
 
-    def addGPFNode(self, parameters, graph, context):
-        # If there are previous nodes that should be added to the graph, recursively go backwards
-        # and add them
-        if self.previousAlgInGraph is not None:
-            self.previousAlgInGraph.addGPFNode(graph)
+    def addGPFNode(self, parameters, graph, context, nodeId=None):
+        if nodeId:
+            self.nodeId = nodeId
 
         # now create and add the current node
-        node = ET.Element("node", {"id": self.nodeID})
+        node = ET.Element("node", {"id": self.nodeId})
         operator = ET.SubElement(node, "operator")
         operator.text = self.operator
 
@@ -183,7 +176,7 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
                             paramName = param.name()
                             if operator.text == "Read":
                                 sourceNodeId = self.addReadNode(graph, value, dataFormat,
-                                                                self.nodeID)
+                                                                self.nodeId)
                                 return graph
                             else:
                                 sourceNodeId = self.addReadNode(graph, value, dataFormat)
@@ -197,7 +190,7 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
                 elif operator.text == "Read":
                     dataFormat = 'GeoTIFF'
                     value = ""
-                    sourceNodeId = self.addReadNode(graph, value, dataFormat, self.nodeID)
+                    sourceNodeId = self.addReadNode(graph, value, dataFormat, self.nodeId)
                     return graph
 
             # add parameters
@@ -263,12 +256,12 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
         return graph
 
     def addProductSetReaderNode(self, graph, filename):
-        nodeID = self.nodeID+"_ProductSet-Reader"
-        node = graph.find(".//*[@id='"+nodeID+"']")
+        nodeId = self.nodeId+"_ProductSet-Reader"
+        node = graph.find(".//*[@id='"+nodeId+"']")
 
         # add ProductSet-Reader node if it doesn't exist yet
         if node is None:
-            node = ET.SubElement(graph, "node", {"id": nodeID})
+            node = ET.SubElement(graph, "node", {"id": nodeId})
             ET.SubElement(node, "sources")
             operator = ET.SubElement(node, "operator")
             operator.text = "ProductSet-Reader"
@@ -280,14 +273,13 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
         else:
             parameter = node.find(".//fileList")
             parameter.text += ","+filename
-        return nodeID
+        return nodeId
 
-    def addReadNode(self, graph, filename, dataFormat="", nodeID=""):
+    def addReadNode(self, graph, filename, dataFormat="", nodeId=""):
         # Add read node
-        if not nodeID:
-            nodeID = self.nodeID+"_read_"+str(GPFAlgorithm.nodeIDNum)
-        GPFAlgorithm.nodeIDNum += 1
-        node = ET.SubElement(graph, "node", {"id": nodeID})
+        if not nodeId:
+            nodeId = self.nodeId+"_read"
+        node = ET.SubElement(graph, "node", {"id": nodeId})
         operator = ET.SubElement(node, "operator")
         operator.text = "Read"
 
@@ -302,21 +294,20 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
             dataFormatParameter = ET.SubElement(parametersNode, "formatName")
             dataFormatParameter.text = dataFormat
 
-        return nodeID
+        return nodeId
 
     def addWriteNode(self, parameters, graph, output, key, context):
 
         # add write node
-        nodeID = self.nodeID+"_write_"+str(GPFAlgorithm.nodeIDNum)
-        GPFAlgorithm.nodeIDNum += 1
-        node = ET.SubElement(graph, "node", {"id": nodeID})
+        nodeId = self.nodeId+"_write"
+        node = ET.SubElement(graph, "node", {"id": nodeId})
         operator = ET.SubElement(node, "operator")
         operator.text = "Write"
         value = self.parameterAsOutputLayer(parameters, output.name(), context)
 
         # add source
         sources = ET.SubElement(node, "sources")
-        ET.SubElement(sources, "sourceProduct", {"refid": self.nodeID})
+        ET.SubElement(sources, "sourceProduct", {"refid": self.nodeId})
 
         # add some options
         parametersNode = ET.SubElement(node, "parameters")

@@ -43,8 +43,8 @@ class SNAPAlgorithm(GPFAlgorithm):
         GPFAlgorithm.__init__(self, descriptionfile)
         self.programKey = GPFUtils.snapKey()
 
-    def addGPFNode(self, parameters, graph, context):
-        graph = GPFAlgorithm.addGPFNode(self, parameters, graph, context)
+    def addGPFNode(self, parameters, graph, context, nodeId=None):
+        graph = GPFAlgorithm.addGPFNode(self, parameters, graph, context, nodeId)
         # split band element with multiple bands into multiple elements
         for parent in graph.findall(".//band/.."):
             for element in parent.findall("band"):
