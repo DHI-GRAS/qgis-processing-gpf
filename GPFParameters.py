@@ -89,6 +89,12 @@ class ParameterBandExpression(QgsProcessingParameterBand):
             {'widget_wrapper': {
                 'class': 'processing_gpf.GPFParameterWidgets.GPFBandExpressionWidgetWrapper'}})
 
+    def clone(self):
+        clone = ParameterBandExpression(self.name(), self.description(), self.defaultValue(),
+                                        self.parentLayerParameterName())
+        clone.fromVariantMap(self.toVariantMap())
+        return clone
+
     def type(self):
         return ParameterBandExpression.parameterType()
 
@@ -115,6 +121,12 @@ class ParameterPolarisations(QgsProcessingParameterBand):
             {'widget_wrapper': {
                     'class': 'processing_gpf.GPFParameterWidgets.GPFPolarisationsWidgetWrapper'}})
 
+    def clone(self):
+        clone = ParameterPolarisations(self.name(), self.description(), self.defaultValue(),
+                                       self.parentLayerParameterName())
+        clone.fromVariantMap(self.toVariantMap())
+        return clone
+
     def type(self):
         ParameterPolarisations.parameterType()
 
@@ -133,3 +145,8 @@ class ParameterSnapRasterLayer(QgsProcessingParameterRasterLayer):
 
     def valueAsPythonString(self, value, context):
         return QgsProcessingParameterDefinition.valueAsPythonString(self, value, context)
+
+    def clone(self):
+        clone = ParameterSnapRasterLayer(self.name(), self.description(), self.defaultValue())
+        clone.fromVariantMap(self.toVariantMap())
+        return clone
