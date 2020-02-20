@@ -1,5 +1,5 @@
 Resample
-snap_Resample
+SNAP_Resample
 Resampling
 Raster
 ParameterSnapRasterLayer|sourceProduct|Input image|None|False
