@@ -23,4 +23,4 @@ class DeleteGpfModelAction(ContextAction):
             QMessageBox.No)
         if reply == QMessageBox.Yes:
             os.remove(self.itemData.sourceFilePath())
-            QgsApplication.processingRegistry().providerById("snap").refreshAlgorithms()
+            QgsApplication.processingRegistry().providerById("esa_snap").refreshAlgorithms()

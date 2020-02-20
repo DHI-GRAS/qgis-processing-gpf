@@ -62,7 +62,7 @@ except ImportError:
     import xml.etree.ElementTree as ET
 
 
-SNAP_ID = "snap"
+SNAP_ID = "esa_snap"
 
 
 class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):

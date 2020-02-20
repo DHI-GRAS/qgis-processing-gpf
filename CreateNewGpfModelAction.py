@@ -21,4 +21,4 @@ class CreateNewGpfModelAction(CreateNewModelAction):
         dlg.show()
 
     def updateModel(self):
-        QgsApplication.processingRegistry().providerById('snap').refreshAlgorithms()
+        QgsApplication.processingRegistry().providerById('esa_snap').refreshAlgorithms()

@@ -12,7 +12,7 @@ class EditGpfModelAction(ContextAction):
         self.name = self.tr('Edit GPF Graph', 'EditGpfModelAction')
 
     def isEnabled(self):
-        return isinstance(self.itemData, GPFModelerAlgorithm) and self.itemData.provider().id() == "snap"
+        return isinstance(self.itemData, GPFModelerAlgorithm) and self.itemData.provider().id() == "esa_snap"
 
     def execute(self):
         alg = self.itemData
@@ -25,4 +25,4 @@ class EditGpfModelAction(ContextAction):
             dlg.show()
 
     def updateModel(self):
-        QgsApplication.processingRegistry().providerById('snap').refreshAlgorithms()
+        QgsApplication.processingRegistry().providerById('esa_snap').refreshAlgorithms()

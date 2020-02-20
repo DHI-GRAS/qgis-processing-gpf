@@ -150,10 +150,10 @@ class SNAPAlgorithmProvider(QgsProcessingProvider):
         return "SNAP"
 
     def id(self):
-        return "snap"
+        return "esa_snap"
 
     def helpId(self):
-        return "snap"
+        return "esa_snap"
 
     def icon(self):
         return QIcon(os.path.dirname(__file__) + "/images/snap.png")
