@@ -1,5 +1,24 @@
 <graph id="Graph">
   <version>1.0</version>
+  <node id="Calibration_293">
+    <operator>Calibration</operator>
+    <sources>
+      <sourceProduct refid="Subset_294" />
+    </sources>
+    <parameters>
+      <selectedPolarisations />
+      <sourceBands />
+      <auxFile>Latest Auxiliary File</auxFile>
+      <externalAuxFile />
+      <outputImageInComplex>false</outputImageInComplex>
+      <outputImageScaleInDb>false</outputImageScaleInDb>
+      <outputGammaBand>false</outputGammaBand>
+      <createGammaBand>false</createGammaBand>
+      <outputBetaBand>false</outputBetaBand>
+      <createBetaBand>false</createBetaBand>
+      <outputSigmaBand>true</outputSigmaBand>
+    </parameters>
+  </node>
   <node id="LinearToFromdB_290">
     <operator>LinearToFromdB</operator>
     <sources>
@@ -7,6 +26,14 @@
     </sources>
     <parameters>
       <sourceBands />
+    </parameters>
+  </node>
+  <node id="Read_295">
+    <operator>Read</operator>
+    <sources />
+    <parameters>
+      <file qgisModelInputPos="118.0,79.0" qgisModelInputVars="{'default': None, 'description': 'Input L1 raster', 'flags': 0, 'metadata': {}, 'name': 'file', 'parameter_type': 'raster'}" />
+      <formatName>GeoTIFF</formatName>
     </parameters>
   </node>
   <node id="Speckle-Filter_291">
@@ -20,11 +47,26 @@
       <filterSizeX>3</filterSizeX>
       <filterSizeY>3</filterSizeY>
       <dampingFactor>2</dampingFactor>
+      <windowSize>7x7</windowSize>
       <targetWindowSizeStr>3x3</targetWindowSizeStr>
       <sigmaStr>0.9</sigmaStr>
       <anSize>50</anSize>
-      <estimateENL>True</estimateENL>
+      <estimateENL>false</estimateENL>
+      <numLooksStr>1</numLooksStr>
       <enl>1</enl>
+    </parameters>
+  </node>
+  <node id="Subset_294">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct refid="Read_295" />
+    </sources>
+    <parameters>
+      <geoRegion />
+      <subSamplingX>1</subSamplingX>
+      <subSamplingY>1</subSamplingY>
+      <sourceBands />
+      <copyMetadata>false</copyMetadata>
     </parameters>
   </node>
   <node id="Terrain-Correction_292">
@@ -37,63 +79,26 @@
       <demName>SRTM 3Sec</demName>
       <externalDEMFile />
       <externalDEMNoDataValue>0</externalDEMNoDataValue>
+      <externalDEMApplyEGM>false</externalDEMApplyEGM>
       <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
       <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>
-      <pixelSpacingInDegree>8.9831528412e-05</pixelSpacingInDegree>
       <pixelSpacingInMeter>10</pixelSpacingInMeter>
-      <nodataValueAtSea>True</nodataValueAtSea>
-      <saveDEM>False</saveDEM>
-      <saveLatLon>False</saveLatLon>
-      <saveLocalIncidenceAngle>False</saveLocalIncidenceAngle>
-      <saveIncidenceAngleFromEllipsoid>False</saveIncidenceAngleFromEllipsoid>
-      <saveProjectedLocalIncidenceAngle>False</saveProjectedLocalIncidenceAngle>
-      <saveSelectedSourceBand>True</saveSelectedSourceBand>
-      <applyRadiometricNormalization>False</applyRadiometricNormalization>
-      <saveSigmaNought>False</saveSigmaNought>
-      <saveGammaNought>False</saveGammaNought>
-      <saveBetaNought>False</saveBetaNought>
+      <nodataValueAtSea>true</nodataValueAtSea>
+      <saveDEM>false</saveDEM>
+      <saveLatLon>false</saveLatLon>
+      <saveLocalIncidenceAngle>false</saveLocalIncidenceAngle>
+      <saveIncidenceAngleFromEllipsoid>false</saveIncidenceAngleFromEllipsoid>
+      <saveProjectedLocalIncidenceAngle>false</saveProjectedLocalIncidenceAngle>
+      <saveSelectedSourceBand>true</saveSelectedSourceBand>
+      <applyRadiometricNormalization>false</applyRadiometricNormalization>
+      <outputComplex>false</outputComplex>
+      <saveSigmaNought>false</saveSigmaNought>
+      <saveGammaNought>false</saveGammaNought>
+      <saveBetaNought>false</saveBetaNought>
       <incidenceAngleForSigma0>Use projected local incidence angle from DEM</incidenceAngleForSigma0>
       <incidenceAngleForGamma0>Use projected local incidence angle from DEM</incidenceAngleForGamma0>
       <auxFile>Latest Auxiliary File</auxFile>
       <externalAuxFile />
-    </parameters>
-  </node>
-  <node id="Calibration_293">
-    <operator>Calibration</operator>
-    <sources>
-      <sourceProduct refid="Subset_294" />
-    </sources>
-    <parameters>
-      <sourceBands />
-      <auxFile>Latest Auxiliary File</auxFile>
-      <externalAuxFile />
-      <outputBetaBand>False</outputBetaBand>
-      <outputGammaBand>False</outputGammaBand>
-      <outputSigmaBand>True</outputSigmaBand>
-      <outputImageScaleInDb>False</outputImageScaleInDb>
-      <outputDNBand>False</outputDNBand>
-      <outputImageInComplex>False</outputImageInComplex>
-    </parameters>
-  </node>
-  <node id="Subset_294">
-    <operator>Subset</operator>
-    <sources>
-      <sourceProduct refid="Read_295" />
-    </sources>
-    <parameters>
-      <geoRegion qgisModelInputPos="377.0,51.0" qgisModelInputVars="{'isAdvanced': False, 'name': u'extent', 'default': '0,1,0,1', 'hidden': False, 'optional': False, 'value': None, 'description': u'Extent'}" />
-      <subSamplingX>1</subSamplingX>
-      <subSamplingY>1</subSamplingY>
-      <sourceBands />
-      <copyMetadata>True</copyMetadata>
-    </parameters>
-  </node>
-  <node id="Read_295">
-    <operator>Read</operator>
-    <sources />
-    <parameters>
-      <file qgisModelInputPos="118.0,79.0" qgisModelInputVars="{'isAdvanced': False, 'name': 'file', 'showSublayersDialog': True, 'default': None, 'value': None, 'exported': None, 'hidden': False, 'optional': False, 'description': u'Input L1 raster'}" />
-      <formatName>GeoTIFF</formatName>
     </parameters>
   </node>
   <node id="Write_289">
@@ -108,23 +113,23 @@
   </node>
   <applicationData group="S1 Graphs" id="Presentation" name="S1 Preprocessing">
     <Description />
+    <node id="Calibration_293">
+      <displayPosition x="147.0" y="285.0" />
+    </node>
     <node id="LinearToFromdB_290">
       <displayPosition x="415.0" y="345.0" />
+    </node>
+    <node id="Read_295">
+      <displayPosition x="134.0" y="181.0" />
     </node>
     <node id="Speckle-Filter_291">
       <displayPosition x="433.0" y="481.0" />
     </node>
-    <node id="Terrain-Correction_292">
-      <displayPosition x="127.0" y="413.0" />
-    </node>
-    <node id="Calibration_293">
-      <displayPosition x="147.0" y="285.0" />
-    </node>
     <node id="Subset_294">
       <displayPosition x="423.0" y="185.0" />
     </node>
-    <node id="Read_295">
-      <displayPosition x="134.0" y="181.0" />
+    <node id="Terrain-Correction_292">
+      <displayPosition x="127.0" y="413.0" />
     </node>
     <node id="Write_289">
       <displayPosition x="274.0" y="573.0" />
