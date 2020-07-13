@@ -16,7 +16,7 @@ QgsProcessingParameterBoolean|addDeltaBands|Add delta bands|False
 *QgsProcessingParameterNumber|width|The width of the target product|QgsProcessingParameterNumber.Integer|99999|False|0|None
 *QgsProcessingParameterNumber|height|The height of the target product|QgsProcessingParameterNumber.Integer|99999|False|0|None
 *QgsProcessingParameterNumber|easting|The easting of the reference pixel|QgsProcessingParameterNumber.Double|99999.9|False|None|None
-*QgsProcessingParameterNumber|northing|The northing of the reference pixel|QgsProcessingParameterNumber.Integer|99999.9|False|None|None
+*QgsProcessingParameterNumber|northing|The northing of the reference pixel|QgsProcessingParameterNumber.Double|99999.9|False|None|None
 *QgsProcessingParameterNumber|referencePixelX|The X-position of the reference pixel|QgsProcessingParameterNumber.Double|99999.9|False|None|None
 *QgsProcessingParameterNumber|referencePixelY|The Y-position of the reference pixel|QgsProcessingParameterNumber.Double|99999.9|False|None|None
 *QgsProcessingParameterNumber|orientation|The orientation of the output product (in degree)|QgsProcessingParameterNumber.Double|0.0|False|-360|360

@@ -40,6 +40,7 @@ from qgis.core import (Qgis,
                        QgsProcessingParameterRasterLayer,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterExtent,
+                       QgsProcessingParameterCrs,
                        QgsMessageLog,
                        QgsProcessingException)
 from processing.core.parameters import getParameterFromString
@@ -243,6 +244,9 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
                         parameter.text += values[1] + ' ' + values[3] + ", "
                         parameter.text += values[1] + ' ' + values[2] + ", "
                         parameter.text += values[0] + ' ' + values[2] + "))"
+                elif isinstance(param, QgsProcessingParameterCrs):
+                    authId = self.parameterAsCrs(parameters, param.name(), context).authid()
+                    parameter.text = authId
                 else:
                     parameter.text = self.parameterAsString(parameters, param.name(), context)
 
