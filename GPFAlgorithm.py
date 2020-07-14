@@ -358,9 +358,7 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
         GPFUtils.executeGpf(key, ET.tostring(graph, encoding="unicode"), progress)
 
         for output in self.destinationParameterDefinitions():
-            results[output.name()] = self.parameterAsOutputLayer(parameters,
-                                                                 output.name(),
-                                                                 context)
+            results[output.name()] = self.parameterAsFileOutput(parameters, output.name(), context)
         return results
 
     def tr(self, string, context=''):
