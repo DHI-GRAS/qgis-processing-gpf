@@ -357,7 +357,8 @@ class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):
                         # the main raster output from the graph. This is used in case
                         # the graph comes straight from SNAP and the Write operator
                         # does not have a QGIS QgsProcessingParameterRasterDestination.
-                        if operator == "Write" and "file" not in list(modelAlg.modelOutputs().keys()):
+                        algOutputNameList = [o.childOutputName() for o in modelAlg.modelOutputs().values()]
+                        if operator == "Write" and "file" not in algOutputNameList:
                             outputName = "file"
                             outputDescription = "Output file"
                             modelOutput = QgsProcessingModelOutput(outputDescription, outputDescription)
