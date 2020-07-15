@@ -162,11 +162,11 @@ class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):
             if executionParameters is not None:
                 for algParamName, modelParamName in modelParameters.items():
                     staticParameters[algParamName] = executionParameters[modelParamName]
-                for algParamName, modelOutput in alg.modelOutputs().items():
-                    outputId = ":".join([algId, algParamName])
+                for modelOutput in list(alg.modelOutputs().values()):
+                    outputId = ":".join([algId, modelOutput.name()])
                     output = executionParameters[outputId]
                     outputValue = output.sink.staticValue()
-                    staticParameters[algParamName] = outputValue
+                    staticParameters[modelOutput.childOutputName()] = outputValue
 
             # Save model algorithm
             if alg.algorithm().nodeId == alg.algorithm().operator:
@@ -206,7 +206,7 @@ class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):
                                         self.tr("Output rasters can only be saved by Write operator. Remove the value of raster output in %s algorithm or add a Write operator" % (alg.algorithm().operator,)))
                     return
                 outTag = graph.find(
-                        './node[@id="'+alg.algorithm().nodeId+'"]/parameters/'+out.name())
+                        './node[@id="'+alg.algorithm().nodeId+'"]/parameters/'+out.childOutputName())
                 if outTag is not None:
                     outTag.attrib["qgisModelOutputName"] = out.description()
                     break
@@ -332,13 +332,13 @@ class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):
                             if outputNode is not None:
                                 if "qgisModelOutputName" in outputNode.attrib:
                                     outputDescription = outputNode.attrib["qgisModelOutputName"]
-                                    modelOutput = QgsProcessingModelOutput(output.name(),
+                                    modelOutput = QgsProcessingModelOutput(outputDescription,
                                                                            outputDescription)
                                     modelOutput.setChildId(modelAlg.childId())
                                     modelOutput.setChildOutputName(output.name())
                                     modelOutput.setPosition(QPointF(0, 0))
-                                    modelAlg.setModelOutputs({output.name(): modelOutput})
-                                    outConnections[modelAlg.childId()] = output.name()
+                                    modelAlg.setModelOutputs({outputDescription: modelOutput})
+                                    outConnections[modelAlg.childId()] = outputDescription
 
                         # Special treatment for Read operator since it provides
                         # the main raster input to the graph. This is used in case
@@ -359,12 +359,13 @@ class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):
                         # does not have a QGIS QgsProcessingParameterRasterDestination.
                         if operator == "Write" and "file" not in list(modelAlg.modelOutputs().keys()):
                             outputName = "file"
-                            modelOutput = QgsProcessingModelOutput(outputName, "Output file")
+                            outputDescription = "Output file"
+                            modelOutput = QgsProcessingModelOutput(outputDescription, outputDescription)
                             modelOutput.setChildId(modelAlg.childId())
                             modelOutput.setChildOutputName(outputName)
                             modelOutput.pos = QPointF(0, 0)
-                            modelAlg.setModelOutputs({outputName: modelOutput})
-                            outConnections[modelAlg.childId()] = outputName
+                            modelAlg.setModelOutputs({outputDescription: modelOutput})
+                            outConnections[modelAlg.childId()] = outputDescription
 
                         self.addChildAlgorithm(modelAlg)
                         self.updateDestinationParameters()
