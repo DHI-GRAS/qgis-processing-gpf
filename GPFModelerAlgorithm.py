@@ -48,7 +48,7 @@ from qgis.core import (Qgis,
                        QgsProcessingParameterCrs,
                        QgsProcessingParameterExtent,
                        QgsProcessingException)
-from processing.tools.dataobjects import createContext
+from processing.tools.dataobjects import createContext, load
 from processing_gpf.GPFParameters import (getParameterFromString,
                                           ParameterBandExpression,
                                           ParameterPolarisations)
@@ -106,7 +106,6 @@ class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):
                             feedback)
 
         # Extract paths to model outputs from XML
-        # TODO: Check why the output layer does not automatically load in QGIS
         results = {}
         root = ET.fromstring(gpfXml)
         for out in self.destinationParameterDefinitions():
@@ -114,6 +113,10 @@ class GPFModelerAlgorithm(QgsProcessingModelAlgorithm):
             node = root.find("./node[@id='"+outputNodeId+"']")
             value = node.find("./parameters/file").text
             results[out.name()] = value
+        # For some reason outputs do not load automatically so as a quick workaround they are
+        # loaded manually. 
+        for out in results.values():
+            load(out, isRaster=True)
         return results
 
     def createInstance(self):
