@@ -224,7 +224,7 @@ class GPFBandsListDialog(QDialog):
         self.table.setColumnWidth(0, 270)
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setVisible(False)
-        self.table.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.setTableContent()
         self.horizontalLayout.addWidget(self.table)
         self.horizontalLayout.addWidget(self.buttonBox)
