@@ -18,9 +18,10 @@ from processing_gpf.S1TbxAlgorithm import S1TbxAlgorithm
 from processing_gpf.S2TbxAlgorithm import S2TbxAlgorithm
 from processing_gpf.S3TbxAlgorithm import S3TbxAlgorithm
 from processing_gpf.SNAPAlgorithm import SNAPAlgorithm
-from processing_gpf.CreateNewGpfModelAction import CreateNewGpfModelAction
-from processing_gpf.EditGpfModelAction import EditGpfModelAction
-from processing_gpf.DeleteGpfModelAction import DeleteGpfModelAction
+# Do not use GPF model addition or edit functionality until it has been fully ported to QGIS 3.x
+# from processing_gpf.CreateNewGpfModelAction import CreateNewGpfModelAction
+# from processing_gpf.EditGpfModelAction import EditGpfModelAction
+# from processing_gpf.DeleteGpfModelAction import DeleteGpfModelAction
 from processing_gpf.GPFParameterTypes import ParameterBandExpressionType
 from processing_gpf.GPFParameterWidgets import GPFBandExpressionWidgetFactory
 
@@ -29,8 +30,8 @@ class SNAPAlgorithmProvider(QgsProcessingProvider):
 
     def __init__(self):
         QgsProcessingProvider.__init__(self)
-        self.actions = [CreateNewGpfModelAction()]
-        self.contextMenuActions = [EditGpfModelAction(), DeleteGpfModelAction()]
+        # self.actions = [CreateNewGpfModelAction()]
+        # self.contextMenuActions = [EditGpfModelAction(), DeleteGpfModelAction()]
         self.activate = False
         self.algs = []
         self.models = []
@@ -64,8 +65,8 @@ class SNAPAlgorithmProvider(QgsProcessingProvider):
         # TODO: uncomment below when working on integrating GPF parameters into modeller
         #QgsApplication.processingRegistry().addParameterType(ParameterBandExpressionType())
         #QgsGui.processingGuiRegistry().addParameterWidgetFactory(GPFBandExpressionWidgetFactory())
-        ProviderActions.registerProviderActions(self, self.actions)
-        ProviderContextMenuActions.registerProviderContextMenuActions(self.contextMenuActions)
+        #ProviderActions.registerProviderActions(self, self.actions)
+        #ProviderContextMenuActions.registerProviderContextMenuActions(self.contextMenuActions)
         ProcessingConfig.readSettings()
         # Load operators
         self.loadAlgorithms()
