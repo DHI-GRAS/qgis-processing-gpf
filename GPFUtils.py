@@ -179,7 +179,7 @@ class GPFUtils(object):
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                 stdin=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                universal_newlines=True).stdout
+                                universal_newlines=True, env={}).stdout
         progress.pushCommandInfo(command)
         line = ""
         for char in iter((lambda: proc.read(1)), ''):
@@ -244,7 +244,7 @@ class GPFUtils(object):
             logging.disable(logging.INFO)
 
             import snappy
-            import jpy
+            from snappy import jpy
             return snappy, jpy
         except Exception:
             QgsMessageLog.logMessage(
@@ -268,8 +268,9 @@ class GPFUtils(object):
         if snappy is not None:
             try:
                 product = snappy.ProductIO.readProduct(productPath)
-                for band in product.getBands():
-                    bands.append(band.getName())
+                bands = product.getBandNames()
+                product.closeIO()
+                product.dispose()
             except Exception as e:
                 # Snappy sometimes throws an error on first try but returns band names
                 # on second try
@@ -306,6 +307,8 @@ class GPFUtils(object):
                 polarisations = \
                     jpy.get_type(
                         'org.esa.s1tbx.insar.gpf.support.Sentinel1Utils').getProductPolarizations(metadata)
+                product.closeIO()
+                product.dispose()
             except Exception as e:
                 # Snappy sometimes throws an error on first try but returns band names
                 # on second try
@@ -313,7 +316,9 @@ class GPFUtils(object):
                     polarisations = GPFUtils.getPolarisations(productPath, secondAttempt=True)
                 else:
                     polarisations = ['Snappy exception', 'See Processing log for more details']
-                    ProcessingLog.addToLog(ProcessingLog.LOG_ERROR, "Snappy exception: "+str(e))
+                    QgsMessageLog.logMessage(GPFUtils.tr("Snappy exception: ")+str(e),
+                                             GPFUtils.tr("Processing"),
+                                             Qgis.Critical)
         else:
             polarisations = ['Python module snappy is not installed in the user directory',
                              'Please run SNAP installer']
