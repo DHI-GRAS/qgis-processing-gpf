@@ -42,7 +42,8 @@ from qgis.core import (Qgis,
                        QgsProcessingParameterExtent,
                        QgsProcessingParameterCrs,
                        QgsMessageLog,
-                       QgsProcessingException)
+                       QgsProcessingException,
+                       QgsCoordinateReferenceSystem)
 from processing.core.parameters import getParameterFromString
 
 from processing_gpf.GPFUtils import GPFUtils
@@ -235,15 +236,9 @@ class GPFAlgorithm(QgsProcessingAlgorithm):
                     parameter.text = str(param.options()[idx])
                 # create at WKT polygon from the extent values, used in Subset Operator
                 elif isinstance(param, QgsProcessingParameterExtent):
-                    values = self.parameterAsString(parameters, param.name(), context)
-                    values = values.split(",")
-                    if len(values) == 4:
-                        parameter.text = "POLYGON(("
-                        parameter.text += values[0] + ' ' + values[2] + ", "
-                        parameter.text += values[0] + ' ' + values[3] + ", "
-                        parameter.text += values[1] + ' ' + values[3] + ", "
-                        parameter.text += values[1] + ' ' + values[2] + ", "
-                        parameter.text += values[0] + ' ' + values[2] + "))"
+                    extent = self.parameterAsExtent(parameters, param.name(), context,
+                                                    QgsCoordinateReferenceSystem.fromEpsgId(4326))
+                    parameter.text = extent.asWktPolygon()
                 elif isinstance(param, QgsProcessingParameterCrs):
                     authId = self.parameterAsCrs(parameters, param.name(), context).authid()
                     parameter.text = authId
