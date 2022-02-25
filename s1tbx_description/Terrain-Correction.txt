@@ -20,7 +20,6 @@ QgsProcessingParameterNumber|pixelSpacingInMeter|The pixel spacing in meters|Qgs
 *QgsProcessingParameterBoolean|saveProjectedLocalIncidenceAngle|Save projected local incidence angle|False
 *QgsProcessingParameterBoolean|saveSelectedSourceBand|Save selected Source Band|True
 QgsProcessingParameterBoolean|applyRadiometricNormalization|Apply Radiometric Normalization|False
-*QgsProcessingParameterBoolean|outputComplex|Output complex data|False
 *QgsProcessingParameterBoolean|saveSigmaNought|Save Sigma Nought|False
 *QgsProcessingParameterBoolean|saveGammaNought|Save Gamma Nought|False
 *QgsProcessingParameterBoolean|saveBetaNought|Save Beta Nought|False
