@@ -179,7 +179,7 @@ class GPFUtils(object):
         loglines.append(command)
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                 stdin=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                universal_newlines=True, env={}).stdout
+                                universal_newlines=True).stdout
         progress.pushCommandInfo(command)
         line = ""
         for char in iter((lambda: proc.read(1)), ''):
